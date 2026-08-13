@@ -1,0 +1,27 @@
+# Unity/Tuanjie
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]em-[Ll]og/
+
+# IDE
+.idea/
+.vs/
+*.user
+*.suo
+*.cache
+*.DotSettings.user
+.codely-cli/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Screenshots (codely debug)
+screenshots/
