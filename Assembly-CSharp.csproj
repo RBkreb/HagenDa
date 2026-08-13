@@ -84,6 +84,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Extra\TurretEditor.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\Utilities\DestroyMe.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\InputManager.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkShootableTarget.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\WeaponWeightSystem.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Attachment.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\HitDetectionSystem.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Effects\ProceduralShot_SO.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Scope.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\ShootBehaviour.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkPlayerHealth.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\CrouchTilt.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Movement\PlayerMovementSettings.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Enemies\TurretProjectile.cs" />
@@ -139,6 +141,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Camera\MoveCamera.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\PoolManager.cs" />
     <Compile Include="Assets\Cowsins\Scripts\FootstepSoundsDrawer.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkPlayerController.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\CompatibleAttachmentEntryDrawer.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\WeaponControllerEvents.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Enemies\Turret.cs" />
@@ -161,6 +164,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\FootstepsBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\CheckPointView.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\WeaponIdentificationEditor.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkInputState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\GameSettingsManager.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\WeaponState\WeaponDefaultState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\SpreadSystem.cs" />

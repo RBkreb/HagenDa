@@ -71,7 +71,9 @@
     <Compile Include="Assets\Cowsins\Scripts\Editor\Experimental\CowsinsManager\BaseCowsinsManagerTabs.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Editor\Experimental\AddonSymbolTracker.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Editor\Experimental\CowsinsManager\WeaponsCowsinsManagerTab.cs" />
+    <Compile Include="Assets\Scripts\Network\Editor\BuildScript.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Editor\TagLayerInitializationManager.cs" />
+    <Compile Include="Assets\Scripts\Network\Editor\NetworkSetup.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Editor\Experimental\CowsinsManager\CustomTabEditorWindow.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Editor\Experimental\WeaponCreatorAssistant.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Editor\Experimental\ExternalButtonRegister.cs" />

@@ -77,6 +77,35 @@ ScriptableObjects: `Assets/Cowsins/ScriptableObjects/{Weapons,Bullets,Attachment
 - Local UPM package `cn.tuanjie.ai.generators` (resolved from `.codely-cli/extensions/TJGenerators/Packages/cn.tuanjie.ai.generators`)
 - Enables in-editor AI asset generation (models, images, materials, sprites, audio, video, etc.)
 
+## Multiplayer Networking (`Assets/Scripts/Network/`)
+
+Server-authoritative multiplayer built on Mirror, using a Rigidbody-based player avatar (mirrors the FPS Engine's physics model: Rigidbody + CapsuleCollider, `freezeRotation`, manual gravity).
+
+### Authority model (Mirror "Option A")
+- **Movement / hit-detection / health**: server-authoritative.
+- **Aim (look)**: client-authoritative. The owning client renders its camera from raw mouse delta every frame and sends its **absolute** `yaw`/`pitch` up; the server adopts that view verbatim (no delta-accumulation / packet-loss drift), then uses it to derive movement direction and shoot direction.
+
+### Input flow
+- `Update()` samples all input every rendered frame (edge-triggered inputs like jump are latched, never missed).
+- `FixedUpdate()` sends an unreliable `[Command] CmdInput(NetworkInputState)` at 60 Hz server tick.
+- `NetworkTransformReliable` (SyncDirection = `ServerToClient`) syncs position + yaw down; `pitch` syncs via a `[SyncVar]`.
+- Client render rate capped at 180 Hz (`Application.targetFrameRate` + vsync off); server tick = 60 Hz (Mirror `sendRate`).
+
+### Files
+| File | Purpose |
+|------|---------|
+| `NetworkPlayerController.cs` | Server-authoritative movement + client-authoritative look + server-side hitscan |
+| `NetworkPlayerHealth.cs` | Server-authoritative health (SyncVar), death/respawn |
+| `NetworkShootableTarget.cs` | Static networked target for verifying hitscan |
+| `NetworkInputState.cs` | Serialized input snapshot struct |
+| `Editor/NetworkSetup.cs` | `HagenDa/Setup Multiplayer Scene` — builds player prefab + configures scene |
+| `Editor/BuildScript.cs` | `HagenDa/Build Windows Client` — builds standalone Windows client for 2-end testing |
+| `Prefabs/NetworkPlayer.prefab` | Generated networked player prefab |
+
+### Two-end testing
+- Editor runs as **Host**; a standalone client build (`Build/Client/HagenDa.exe`) connects as **Client**.
+- Sensitivity is calibrated: `lookSensitivity = 0.05793` (2500 DPI, 4.56 cm = 260°, linear).
+
 ## Building & Running
 
 ### Editor
@@ -93,12 +122,12 @@ Use the available Unity builtin tools for editor control:
 - `unity_asset` / `unity_gameobject` — inspect and edit assets / GameObjects
 
 ### Batch mode
-No custom build script was found in the project (no `Build/` folder or `BuildScript.cs`). For a batch-mode build, use a generic invocation (adapt the method name once a build script exists):
+Custom build script at `Assets/Scripts/Network/Editor/BuildScript.cs` (`HagenDa.Networking.EditorTools.BuildScript.PerformBuild`), menu item `HagenDa/Build Windows Client`:
 
 ```bash
 Tuanjie.exe -batchmode -quit -projectPath . \
-  -executeMethod <BuildScript.MethodName> \
-  -buildTarget <Target> -logFile
+  -executeMethod HagenDa.Networking.EditorTools.BuildScript.PerformBuild \
+  -logFile
 ```
 
 ## Development Conventions
