@@ -97,14 +97,26 @@ namespace HagenDa.Networking.EditorTools
             rb.interpolation = RigidbodyInterpolation.None;
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-            var capsule = root.AddComponent<CapsuleCollider>();
-            capsule.height = 1.8f;
-            capsule.radius = 0.25f;
-            capsule.center = new Vector3(0f, 0.9f, 0f);
+            // Stand collider: 1.8m tall x 0.5m wide (radius 0.25m).
+            var standCapsule = root.AddComponent<CapsuleCollider>();
+            standCapsule.height = 1.8f;
+            standCapsule.radius = 0.25f;
+            standCapsule.center = new Vector3(0f, 0.9f, 0f);
+
+            // Crouch collider: 0.9m tall x 0.5m wide (radius 0.25m). Disabled by default.
+            var crouchCapsule = root.AddComponent<CapsuleCollider>();
+            crouchCapsule.height = 0.9f;
+            crouchCapsule.radius = 0.25f;
+            crouchCapsule.center = new Vector3(0f, 0.45f, 0f);
+            crouchCapsule.enabled = false;
 
             // Behaviour
             var controller = root.AddComponent<NetworkPlayerController>();
             root.AddComponent<NetworkPlayerHealth>();
+            root.AddComponent<DebugHud>();
+
+            controller.standCollider = standCapsule;
+            controller.crouchCollider = crouchCapsule;
 
             // Camera child (local player only). Bound to capsule top (1.8m) - 0.15m = 1.65m.
             var camGo = new GameObject("Camera");
