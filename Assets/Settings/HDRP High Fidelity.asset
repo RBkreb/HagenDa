@@ -519,8 +519,7 @@ MonoBehaviour:
     sssCustomSampleBudget: 20
     msaaMode: 0
     materialQuality: 0
-  m_ObsoleteRenderPipelineResources: {fileID: 11400000, guid: 3ce144cff5783da45aa5d4fdc2da14b7,
-    type: 2}
+  m_ObsoleteRenderPipelineResources: {fileID: 0}
   m_ObsoleteRenderPipelineRayTracingResources: {fileID: 0}
   m_ObsoleteBeforeTransparentCustomPostProcesses: []
   m_ObsoleteBeforePostProcessCustomPostProcesses: []
@@ -532,7 +531,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   m_PrefilterUseLightmapSingle: 0
-  m_PrefilterBRGVariantStorageStrip: 0
+  m_PrefilterBRGVariantStorageStrip: 2
   m_PrefilterUseTuanjieGI: 0
   m_PrefilterStripAPSKeywords: 1
   m_PrefilterAPSKeepL1: 0

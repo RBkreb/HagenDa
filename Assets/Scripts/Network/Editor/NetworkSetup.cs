@@ -2,6 +2,8 @@ using Mirror;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem.UI;
+using cowsins;
 
 namespace HagenDa.Networking.EditorTools
 {
@@ -15,6 +17,8 @@ namespace HagenDa.Networking.EditorTools
     public static class NetworkSetup
     {
         private const string PrefabPath = "Assets/Scripts/Network/Prefabs/NetworkPlayer.prefab";
+        private const string FpsPrefabPath = "Assets/Scripts/Network/Prefabs/FpsEngineNetworkPlayer.prefab";
+        private const string FpsSourcePrefab = "Assets/Cowsins/Prefabs/PlayerControllers/CowsinsFPSController.prefab";
 
         [MenuItem("HagenDa/Setup Multiplayer Scene")]
         public static void Setup()
@@ -25,8 +29,47 @@ namespace HagenDa.Networking.EditorTools
 
             SetupScene(playerPrefab);
 
+            SaveActiveScene();
             AssetDatabase.SaveAssets();
             Debug.Log("[NetworkSetup] Done. Built player prefab and configured the active scene.");
+        }
+
+        [MenuItem("HagenDa/Setup FPS Engine Demo")]
+        public static void SetupFpsDemo()
+        {
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+
+            GameObject playerPrefab = BuildFpsEnginePlayerPrefab();
+
+            SetupScene(playerPrefab, addTargets: true);
+
+            SaveActiveScene();
+            AssetDatabase.SaveAssets();
+            Debug.Log("[NetworkSetup] Done. Built FPS Engine player prefab and configured the active scene.");
+        }
+
+        [MenuItem("HagenDa/Create Physics Movement Scene")]
+        public static void CreatePhysicsMovementScene()
+        {
+            EnsureFolder("Assets", "Scenes");
+
+            GameObject playerPrefab = BuildPlayerPrefab();
+
+            // Start from a fresh, empty scene.
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(
+                UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Single);
+
+            EnsureLighting();
+
+            SetupScene(playerPrefab, addTargets: true);
+
+            // A wall to verify the rigidbody collides with static geometry.
+            CreateWall(new Vector3(0f, 1.5f, -6f), new Vector3(10f, 3f, 1f));
+
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, "Assets/Scenes/PhysicsMovement.scene");
+            AssetDatabase.SaveAssets();
+            Debug.Log("[NetworkSetup] Done. Created Assets/Scenes/PhysicsMovement.scene with the force-driven player.");
         }
 
         // ---------------------------------------------------------------
@@ -46,36 +89,38 @@ namespace HagenDa.Networking.EditorTools
             nt.interpolatePosition = true;
             nt.interpolateRotation = true;
 
-            // Physics (mirrors FPS Engine: Rigidbody + CapsuleCollider, freezeRotation, manual gravity)
+            // Physics: force-driven capsule rigidbody (NOT Character Controller).
+            // Capsule height 1.8m, radius 0.25m, center at half-height so the base sits at y=0.
             var rb = root.AddComponent<Rigidbody>();
             rb.freezeRotation = true;
-            rb.useGravity = false;
+            rb.useGravity = false; // gravity applied manually (1g) by the controller
             rb.interpolation = RigidbodyInterpolation.None;
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
             var capsule = root.AddComponent<CapsuleCollider>();
-            capsule.height = 2f;
-            capsule.radius = 0.5f;
-            capsule.center = new Vector3(0f, 1f, 0f);
+            capsule.height = 1.8f;
+            capsule.radius = 0.25f;
+            capsule.center = new Vector3(0f, 0.9f, 0f);
 
             // Behaviour
             var controller = root.AddComponent<NetworkPlayerController>();
             root.AddComponent<NetworkPlayerHealth>();
 
-            // Camera child (local player only)
+            // Camera child (local player only). Bound to capsule top (1.8m) - 0.15m = 1.65m.
             var camGo = new GameObject("Camera");
             camGo.transform.SetParent(root.transform, false);
-            camGo.transform.localPosition = new Vector3(0f, 1.6f, 0f);
+            camGo.transform.localPosition = new Vector3(0f, 1.65f, 0f);
             var cam = camGo.AddComponent<Camera>();
             camGo.tag = "MainCamera";
             camGo.AddComponent<AudioListener>();
             controller.playerCamera = cam;
 
-            // Remote visual (capsule body)
+            // Remote visual (capsule body), scaled to match the 1.8m x 0.25m collider.
             var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             body.name = "Body";
             body.transform.SetParent(root.transform, false);
-            body.transform.localPosition = new Vector3(0f, 1f, 0f);
+            body.transform.localPosition = new Vector3(0f, 0.9f, 0f);
+            body.transform.localScale = new Vector3(0.5f, 0.9f, 0.5f);
             Object.DestroyImmediate(body.GetComponent<CapsuleCollider>());
             controller.visual = body;
 
@@ -86,42 +131,118 @@ namespace HagenDa.Networking.EditorTools
         }
 
         // ---------------------------------------------------------------
-        // SCENE
+        // FPS ENGINE NETWORKED PREFAB
         // ---------------------------------------------------------------
-        private static void SetupScene(GameObject playerPrefab)
+        private static GameObject BuildFpsEnginePlayerPrefab()
         {
-            if (Object.FindObjectOfType<NetworkManager>() != null)
+            var source = AssetDatabase.LoadAssetAtPath<GameObject>(FpsSourcePrefab);
+            if (source == null)
             {
-                Debug.LogWarning("[NetworkSetup] NetworkManager already present, skipping scene setup.");
-                return;
+                Debug.LogError($"[NetworkSetup] FPS Engine controller prefab not found at {FpsSourcePrefab}");
+                return null;
             }
 
-            // NetworkManager + KCP transport + HUD
-            var nmGo = new GameObject("NetworkManager");
-            var nm = nmGo.AddComponent<NetworkManager>();
-            var kcp = nmGo.AddComponent<kcp2k.KcpTransport>();
-            nm.transport = kcp;
+            GameObject contents = PrefabUtility.LoadPrefabContents(FpsSourcePrefab);
+
+            // Remove missing scripts (e.g. HDRP HDAdditionalCameraData whose GUID
+            // doesn't resolve in Tuanjie) so SaveAsPrefabAsset doesn't refuse to save.
+            RemoveMissingScripts(contents);
+
+            // Networking
+            contents.AddComponent<NetworkIdentity>();
+
+            var nt = contents.AddComponent<NetworkTransformReliable>();
+            nt.syncDirection = SyncDirection.ClientToServer; // client-authoritative movement
+            nt.syncPosition = true;
+            nt.syncRotation = false; // FPS Engine root never rotates (look lives on camera/orientation)
+            nt.interpolatePosition = true;
+            nt.interpolateRotation = false;
+
+            contents.AddComponent<NetworkPlayerHealth>();
+
+            var fps = contents.AddComponent<NetworkFpsPlayer>();
+
+            // Remote proxy body (visible capsule for other players).
+            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            body.name = "RemoteBody";
+            body.transform.SetParent(contents.transform, false);
+            body.transform.localPosition = new Vector3(0f, 1f, 0f);
+            Object.DestroyImmediate(body.GetComponent<CapsuleCollider>());
+            body.SetActive(false);
+            fps.remoteBody = body;
+
+            // Wire references.
+            fps.playerMovement = contents.GetComponentInChildren<PlayerMovement>(true);
+            fps.weaponController = contents.GetComponentInChildren<WeaponController>(true);
+            fps.playerStats = contents.GetComponentInChildren<PlayerStats>(true);
+            fps.inputManager = contents.GetComponentInChildren<InputManager>(true);
+
+            // Save.
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(contents, FpsPrefabPath);
+            PrefabUtility.UnloadPrefabContents(contents);
+            return prefab;
+        }
+
+        // ---------------------------------------------------------------
+        // SCENE
+        // ---------------------------------------------------------------
+        private static void SetupScene(GameObject playerPrefab, bool addTargets = false)
+        {
+            // Find or create the NetworkManager (idempotent).
+            var nm = Object.FindObjectOfType<NetworkManager>();
+            if (nm == null)
+            {
+                var nmGo = new GameObject("NetworkManager");
+                nm = nmGo.AddComponent<NetworkManager>();
+                var kcp = nmGo.AddComponent<kcp2k.KcpTransport>();
+                nm.transport = kcp;
+                nmGo.AddComponent<NetworkManagerHUD>();
+            }
+
+            // Always wire the player prefab (this is the whole point).
             nm.playerPrefab = playerPrefab;
             nm.autoCreatePlayer = true;
-            nmGo.AddComponent<NetworkManagerHUD>();
 
-            // Spawn points
-            CreateSpawnPoint("Spawn A", new Vector3(-5f, 1f, 0f));
-            CreateSpawnPoint("Spawn B", new Vector3(5f, 1f, 0f));
+            // Spawn points (only if none exist).
+            if (Object.FindObjectsOfType<NetworkStartPosition>().Length == 0)
+            {
+                CreateSpawnPoint("Spawn A", new Vector3(-5f, 1f, 0f));
+                CreateSpawnPoint("Spawn B", new Vector3(5f, 1f, 0f));
+            }
 
-            // Floor
-            var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            floor.name = "Floor";
-            floor.transform.position = Vector3.zero;
-            floor.transform.localScale = new Vector3(10f, 1f, 10f);
+            // Floor (only if none exists).
+            if (GameObject.Find("Floor") == null)
+            {
+                var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
+                floor.name = "Floor";
+                floor.transform.position = Vector3.zero;
+                floor.transform.localScale = new Vector3(10f, 1f, 10f);
+            }
 
-            // Shootable targets
-            CreateTarget(new Vector3(0f, 1f, 10f));
-            CreateTarget(new Vector3(-8f, 1f, 10f));
+            // Shootable targets.
+            if (addTargets)
+            {
+                CreateTarget(new Vector3(0f, 1f, 10f));
+                CreateTarget(new Vector3(-8f, 1f, 10f));
+                CreateTarget(new Vector3(8f, 1f, 10f));
+            }
 
-            // Disable the scene's pre-existing camera so the player camera takes over.
-            var existing = Camera.main;
-            if (existing != null) existing.gameObject.SetActive(false);
+            // EventSystem (required by FPS Engine UI / PauseMenu).
+            if (Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
+            {
+                var esGo = new GameObject("EventSystem");
+                esGo.AddComponent<UnityEngine.EventSystems.EventSystem>();
+                esGo.AddComponent<InputSystemUIInputModule>();
+            }
+
+            // Remove any non-networked camera in the scene (the player brings its own).
+            foreach (var cam in Object.FindObjectsOfType<Camera>())
+            {
+                if (cam.GetComponentInParent<NetworkIdentity>() == null)
+                {
+                    Object.DestroyImmediate(cam.gameObject);
+                }
+            }
 
             MarkSceneDirty();
         }
@@ -150,11 +271,59 @@ namespace HagenDa.Networking.EditorTools
                 AssetDatabase.CreateFolder(parent, folder);
         }
 
+        // Removes any MonoBehaviour with an unresolved script reference (missing
+        // script), recursively.
+        private static void RemoveMissingScripts(GameObject root)
+        {
+            foreach (var t in root.GetComponentsInChildren<Transform>(true))
+            {
+                GameObjectUtility.RemoveMonoBehavioursWithMissingScript(t.gameObject);
+            }
+        }
+
         private static void MarkSceneDirty()
         {
             var scene = SceneManager.GetActiveScene();
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+        }
+
+        private static void SaveActiveScene()
+        {
+            var scene = SceneManager.GetActiveScene();
             UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+        }
+
+        private static void CreateWall(Vector3 pos, Vector3 scale)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            go.name = "Wall";
+            go.transform.position = pos;
+            go.transform.localScale = scale;
+        }
+
+        // Adds a directional light so the freshly created (empty) scene is visible.
+        // Intensity is chosen for the active render pipeline; HDRP needs its
+        // additional light data component attached for correct rendering.
+        private static void EnsureLighting()
+        {
+            if (Object.FindObjectOfType<Light>() != null) return;
+
+            var lightGo = new GameObject("Directional Light");
+            var light = lightGo.AddComponent<Light>();
+            light.type = LightType.Directional;
+
+            var pipeline = UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline;
+            bool hdrp = pipeline != null && pipeline.GetType().Name.Contains("HighDefinition");
+            light.intensity = hdrp ? 10000f : 1f;
+
+            lightGo.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+
+            // Best-effort: attach HDRP additional light data if the HDRP assembly is
+            // present (avoid a hard compile-time dependency on the HDRP package).
+            var hdType = System.Type.GetType(
+                "UnityEngine.Rendering.HighDefinition.HDAdditionalLightData, Unity.RenderPipelines.HighDefinition.Runtime");
+            if (hdType != null && lightGo.GetComponent(hdType) == null)
+                lightGo.AddComponent(hdType);
         }
     }
 }
