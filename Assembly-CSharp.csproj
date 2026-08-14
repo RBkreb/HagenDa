@@ -67,36 +67,46 @@
     <Compile Include="Assets\Cowsins\Scripts\UI\CowsinsButton.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\WeaponEffects.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\AttachmentPickeable.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\Cowsins\Scripts\CustomAttributes\TitleAttribute.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\WeaponState\WeaponUnholsterState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\DashBehaviour.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\WeaponState\WeaponReloadState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\Interactable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\UIEvents.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\UIEffects.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerStatsEditor.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\InteractManagerEditor.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\WeaponSpecificEffects.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerControl.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\Identifiable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\IWeaponControllerProvider.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Movement\IPlayerMovementProvider.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\TurretEditor.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\Utilities\DestroyMe.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkShootableTarget.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\WeaponWeightSystem.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Attachment.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\HitDetectionSystem.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Camera\CameraFOVManager.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\ExperienceManager.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\Experience.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerOrientation.cs" />
-    <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerDefaultState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Stock.cs" />
+    <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerDefaultState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\RebindUI.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerDependencies.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\JumpMotion.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\AttachmentsSystem.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\BulletsItem_SO.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\UIController.cs" />
@@ -104,6 +114,8 @@
     <Compile Include="Assets\Cowsins\Scripts\Effects\ProceduralShot_SO.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Scope.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\ShootBehaviour.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkPlayerHealth.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\CrouchTilt.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Movement\PlayerMovementSettings.cs" />
@@ -111,6 +123,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Laser.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerStateFactory.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\WeaponState\WeaponStateFactory.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\WeaponInventorySystem.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\DeviceDetection.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\CompassElement.cs" />
@@ -130,12 +143,15 @@
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\QuickActionBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\AttachmentUIElement.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\StaminaBehaviour.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\MainMenuManager.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\DefaultAttachment.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\DisplayKey.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\DeathRestart.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\WeaponAnimator.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkFpsPlayer.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\WeaponState\WeaponShootingState.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\WallRunBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerDeadState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Camera\MoveCamera.cs" />
@@ -166,8 +182,13 @@
     <Compile Include="Assets\Cowsins\Scripts\Weapons\WeaponIdentificationEditor.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkInputState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\GameSettingsManager.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\WeaponState\WeaponDefaultState.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\SpreadSystem.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\Pickeable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\GetGameInformation.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\ShootStyles\HitscanShootStyle.cs" />
@@ -187,7 +208,10 @@
     <Compile Include="Assets\Cowsins\Scripts\Extra\Destructible.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerStats.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\SoundManager.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\AddonManager.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Enemies\IDamageable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Flashlight.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Weapon_SO.cs" />
@@ -198,27 +222,37 @@
     <Compile Include="Assets\Cowsins\Scripts\Extra\Lootbox.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Movement\PlayerMovementEditor.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\Compass.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\WeaponContext.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\Coin.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Enemies\EnemyHealth.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\HealMultiplierPowerUp.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\JumpBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Bullet.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\IPlayerMultipliers.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\AimBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\HurtTrigger.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\ExplosiveBarrel.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\RecoilSystem.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\ShootStyles\MeleeShootStyle.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\CameraEffects.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Barrel.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\Crosshair.cs" />
     <Compile Include="Assets\Cowsins\Scripts\ImpactEffectsDrawer.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerJumpState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\Item_SO.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\Utilities\CowsinsUtilities.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerCrouchState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\VelocityHandlerBehaviour.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\UIControllerEditor.cs" />
     <Compile Include="Assets\Cowsins\Scripts\CustomAttributes\SaveFieldAttribute.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerDashState.cs" />
@@ -243,34 +277,59 @@
     <Compile Include="Assets\Cowsins\Scripts\Extra\GravitonWeapon.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerClimbState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\CustomAttributes\TitleDrawer.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\GrapplingHookBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\DoorInteractable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\ShootStyles\ProjectileShootStyle.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\ScriptTemplates\52-Mirror__Network Authenticator-NewNetworkAuthenticator.cs.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\Cowsins\UI\Typography\Outfit_Complete\License\OFL.txt" />
+    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Oswald-Bold - OFL.txt" />
     <None Include="Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll" />
     <None Include="Assets\Mirror\version.txt" />
+    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Anton OFL.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\ScriptTemplates\56-Mirror__Network Discovery-NewNetworkDiscovery.cs.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\ScriptTemplates\51-Mirror__Network Manager With Actions-NewNetworkManagerWithActions.cs.txt" />
     <None Include="Assets\ScriptTemplates\53-Mirror__Network Behaviour With Actions-NewNetworkBehaviourWithActions.cs.txt" />
     <None Include="Assets\Cowsins\Shaders\UIBlur_Shared.cginc" />
     <None Include="Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\Mirror\Readme.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\ScriptTemplates\57-Mirror__Network Transform-NewNetworkTransform.cs.txt" />
     <None Include="Assets\Cowsins\Models\Weapons\License.txt" />
+    <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\ScriptTemplates\52-Mirror__Network Behaviour-NewNetworkBehaviour.cs.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\Cowsins\Shaders\UIBlur.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Mirror\Plugins\Mono.Cecil\License.txt" />
     <None Include="Assets\ScriptTemplates\55-Mirror__Network Room Player-NewNetworkRoomPlayer.cs.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\ScriptTemplates\54-Mirror__Custom Interest Management-CustomInterestManagement.cs.txt" />
     <None Include="Assets\Cowsins\Shaders\WorldSpace.shader" />
     <None Include="Assets\Cowsins\TUTORIALS.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\ScriptTemplates\50-Mirror__Network Manager-NewNetworkManager.cs.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\ScriptTemplates\54-Mirror__Network Room Manager-NewNetworkRoomManager.cs.txt" />
+    <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
+    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Bangers - OFL.txt" />
     <None Include="Assets\Mirror\Hosting\Readme.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -626,8 +685,28 @@
       <HintPath>E:\Unity3D\2022.3.62t12\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Mono.CecilX">
+      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.CecilX.Mdb">
+      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.2.6\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mirror.BouncyCastle.Cryptography">
+      <HintPath>Assets\Mirror\Transports\Encryption\Plugins\BouncyCastle\Mirror.BouncyCastle.Cryptography.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.CecilX.Pdb">
+      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.CecilX.Rocks">
+      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
@@ -640,26 +719,6 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.2.1\Runtime\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.CecilX.Mdb">
-      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.CecilX.Pdb">
-      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.CecilX">
-      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.CecilX.Rocks">
-      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mirror.BouncyCastle.Cryptography">
-      <HintPath>Assets\Mirror\Transports\Encryption\Plugins\BouncyCastle\Mirror.BouncyCastle.Cryptography.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

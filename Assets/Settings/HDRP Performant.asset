@@ -29,6 +29,8 @@ MonoBehaviour:
     supportWater: 0
     waterSimulationResolution: 128
     waterCPUSimulation: 0
+    supportTuanjieGI: 0
+    supportTuanjieGIRayTracing: 0
     supportDistortion: 1
     supportTransparentBackface: 1
     supportTransparentDepthPrepass: 1
@@ -51,6 +53,7 @@ MonoBehaviour:
     decalNormalBufferHP: 0
     msaaSampleCount: 1
     supportMotionVectors: 1
+    supportDataDrivenLensFlare: 1
     supportRuntimeAOVAPI: 0
     supportDitheringCrossFade: 1
     supportTerrainHole: 0
@@ -136,9 +139,17 @@ MonoBehaviour:
     dynamicResolutionSettings:
       enabled: 0
       useMipBias: 0
+      advancedUpscalersByPriority: 
       enableDLSS: 0
       DLSSPerfQualitySetting: 0
       DLSSInjectionPoint: 0
+      TAAUInjectionPoint: 0
+      TJSRInjectionPoint: 0
+      TJSRSettings:
+        tjsrQuality: 0
+        tjsrBaseBlendFactor: 0
+        m_tjsrContrastAdaptiveSharpening: 0
+      defaultInjectionPoint: 2
       DLSSUseOptimalSettings: 0
       DLSSSharpness: 0
       fsrOverrideSharpness: 0
@@ -151,6 +162,8 @@ MonoBehaviour:
       forcedPercentage: 100
       lowResTransparencyMinimumThreshold: 0
       rayTracingHalfResThreshold: 50
+      lowResSSGIMinimumThreshold: 0
+      lowResVolumetricCloudsMinimumThreshold: 50
     lowresTransparentSettings:
       enabled: 1
       checkerboardDepthBuffer: 1
@@ -196,6 +209,7 @@ MonoBehaviour:
       - 1
       m_SchemaId:
         m_Id: With3Levels
+    smallMeshScreenPercentage: 0
     lightingQualitySettings:
       AOStepCount: 030000000400000006000000
       AOFullRes: 000000
@@ -269,6 +283,15 @@ MonoBehaviour:
       - 0.5
       - 0.5
       - 0.5
+    gpuResidentDrawerSettings:
+      gpuResidentDrawerStat: 0
+      grdEnableCollectTransform: 1
+      grdEnableCollectLightMap: 0
+      grdEnableCollectLightProbe: 0
+      grdEnableCollectMotionVector: 0
+      grdUseTextureStoreData: 0
+      grdEnableGPUOcclusionCulling: 0
+      brgShaderVariantStorageStripType: 1
     m_ObsoleteLightLayerName0: Light LayerDefault
     m_ObsoleteLightLayerName1: InteriorOnly
     m_ObsoleteLightLayerName2: ExteriorOnly
@@ -291,12 +314,27 @@ MonoBehaviour:
   availableMaterialQualityLevels: -1
   m_DefaultMaterialQualityLevel: 4
   diffusionProfileSettings: {fileID: 0}
+  virtualShadowMapSettings:
+    globallyEnabled: 0
+    cacheEnabled: 1
+    clipmapMinLevel: 6
+    clipmapMaxLevel: 22
+    surroundingPageLevelStart: 15
+    surroundingPageLevelEnd: 18
+    directionalLightCacheDisabled: 0
+    separateDynamicAndStaticPages: 1
+    singlePageMode: 0
+    softShadowMode: 0
+    vertexAnimationCacheUpdateDist: 70
   virtualTexturingSettings:
     streamingCpuCacheSizeInMegaBytes: 256
+    streamingMipPreloadTexturesPerFrame: 0
+    streamingPreloadMipCount: 1
     streamingGpuCacheSettings:
     - format: 0
       sizeInMegaBytes: 128
   m_UseRenderGraph: 1
+  testHDRPForceGRD: 0
   m_Version: 22
   m_ObsoleteFrameSettings:
     overrides: 0
@@ -494,3 +532,9 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 11400000, guid: 2b7005ba3a4d8474b8cdc34141ad766e, type: 2}
+  m_PrefilterUseLightmapSingle: 0
+  m_PrefilterBRGVariantStorageStrip: 2
+  m_PrefilterUseTuanjieGI: 0
+  m_PrefilterStripAPSKeywords: 1
+  m_PrefilterAPSKeepL1: 0
+  m_PrefilterAPSKeepL2: 0

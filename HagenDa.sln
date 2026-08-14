@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mirror.Transports", "Mirror.Transports.csproj", "{AF1AAB4B-C7E6-7D4D-1C3F-0C991034EE97}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mirror", "Mirror.csproj", "{882F8EA0-54EB-9875-3DDA-32FCA1CB4670}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edgegap", "Edgegap.csproj", "{84478C4A-8EAB-0BB2-5549-5DEF9B5299E8}"
@@ -18,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{31FFBBCE-FA3D-F20A-A211-24ACFDD97A8A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mirror.Editor", "Mirror.Editor.csproj", "{F1144F00-5E37-CE86-4CB3-950755949C9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mirror.Transports", "Mirror.Transports.csproj", "{AF1AAB4B-C7E6-7D4D-1C3F-0C991034EE97}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tjgenerators.Editor", "tjgenerators.Editor.csproj", "{64E7F004-0F35-B081-C5A9-22F4FD6D0A7D}"
 EndProject
@@ -43,10 +43,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AF1AAB4B-C7E6-7D4D-1C3F-0C991034EE97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF1AAB4B-C7E6-7D4D-1C3F-0C991034EE97}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF1AAB4B-C7E6-7D4D-1C3F-0C991034EE97}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF1AAB4B-C7E6-7D4D-1C3F-0C991034EE97}.Release|Any CPU.Build.0 = Release|Any CPU
 		{882F8EA0-54EB-9875-3DDA-32FCA1CB4670}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{882F8EA0-54EB-9875-3DDA-32FCA1CB4670}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{882F8EA0-54EB-9875-3DDA-32FCA1CB4670}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -79,6 +75,10 @@ Global
 		{F1144F00-5E37-CE86-4CB3-950755949C9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1144F00-5E37-CE86-4CB3-950755949C9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1144F00-5E37-CE86-4CB3-950755949C9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF1AAB4B-C7E6-7D4D-1C3F-0C991034EE97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF1AAB4B-C7E6-7D4D-1C3F-0C991034EE97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF1AAB4B-C7E6-7D4D-1C3F-0C991034EE97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF1AAB4B-C7E6-7D4D-1C3F-0C991034EE97}.Release|Any CPU.Build.0 = Release|Any CPU
 		{64E7F004-0F35-B081-C5A9-22F4FD6D0A7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{64E7F004-0F35-B081-C5A9-22F4FD6D0A7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64E7F004-0F35-B081-C5A9-22F4FD6D0A7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
