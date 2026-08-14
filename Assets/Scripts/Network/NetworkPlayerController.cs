@@ -4,74 +4,101 @@ using UnityEngine.InputSystem;
 
 namespace HagenDa.Networking
 {
+    public enum PlayerPosture
+    {
+        Stand,
+        Crouch,
+        Prone
+    }
+
     /// <summary>
-    /// Server-authoritative, force-driven FPS player controller.
+    /// Server-authoritative, force-driven FPS controller implementing PHASE2 "3C" logic:
+    /// walk / sprint / jump / slide / dive, and stand / crouch / prone postures.
     ///
     /// Authority model (Mirror "Option A"):
-    ///  - The owning client ONLY samples input (WASD / mouse / space / fire) and sends it
-    ///    up via an unreliable [Command] every FixedUpdate. It never moves its own body.
-    ///  - The server applies that input to the Rigidbody (movement forces + gravity +
-    ///    jump) and performs the shooting hitscan, then syncs the result down:
-    ///       * position + yaw -> NetworkTransformReliable (ServerToClient)
-    ///       * pitch          -> SyncVar
-    ///  - The owner renders its own camera immediately from raw mouse delta (linear,
-    ///    frame-rate independent) and sends its ABSOLUTE view (yaw/pitch) up. The server
-    ///    adopts that view exactly (client-authoritative aim), while still owning
-    ///    movement / hit-detection / health.
+    ///  - The owning client only samples input and sends intent up via an unreliable
+    ///    [Command]; it never moves its own body.
+    ///  - The server applies movement forces + gravity + jump/slide/dive, maintains the
+    ///    posture state machine, switches colliders, and performs the shooting hitscan.
+    ///  - Position + yaw sync down via NetworkTransformReliable; pitch / posture /
+    ///    sliding sync via SyncVars.
+    ///  - The local camera is rendered client-side from raw mouse delta (client
+    ///    authoritative aim). Its height lerps between postures and shakes on jump /
+    ///    slide / dive events.
     ///
-    /// Locomotion is pure force-driven physics on a capsule Rigidbody (NOT Character
-    /// Controller, so the body integrates naturally with the world):
-    ///   * gravity               = 1g downward
-    ///   * horizontal driving    = a horizontal force (moveAcceleration) in the move direction
-    ///   * max horizontal speed  = 7 m/s, clamped every FixedUpdate
-    ///   * ground friction       = velocity-proportional drag that stops the body when
-    ///                             input is released (gradual deceleration to a stop)
-    ///   * jump                  = height-based impulse: v = sqrt(2 * |gravity| * jumpHeight)
-    ///
-    /// Friction model:
-    ///   The drag force is proportional to horizontal velocity (viscous friction), so it
-    ///   is smooth ("gradually decelerates") and naturally caps top speed. While the
-    ///   player is driving, a *small* drag is used — its magnitude at the speed cap is
-    ///   still below the driving force (drag < drive), so the character can always
-    ///   accelerate. When input is released, a *stronger* drag brings the body from max
-    ///   speed to ~5% (effectively stopped) within ~0.5s.
-    ///
-    /// Airborne (not grounded): only gravity is applied. Driving force, drag (friction),
-    /// speed clamp, and jump are all disabled while airborne.
+    /// Collider model (server-side physics only):
+    ///   * stand collider  = capsule 1.8m x 0.5m (radius 0.25m), upright (direction Y)
+    ///   * crouch collider = capsule 0.9m x 0.5m, upright; enabled for crouch & slide
+    ///   * prone           = stand collider rotated flat (direction Z), centre 0.25m
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(CapsuleCollider))]
     public class NetworkPlayerController : NetworkBehaviour
     {
         [Header("Movement")]
-        [Tooltip("Horizontal driving acceleration, applied in the move direction. Kept above the drag at the speed cap so the body can always accelerate.")]
+        [Tooltip("Horizontal driving acceleration, applied in the move direction.")]
         public float moveAcceleration = 12f;
 
-        [Tooltip("Velocity-proportional drag while driving (1/s). Terminal speed = moveAcceleration / friction.\nKept small so drag < drive at the speed cap (character can always accelerate).")]
+        [Tooltip("Velocity-proportional drag while driving (1/s). Drag < drive at the speed cap so the body can accelerate.")]
         public float friction = 1.5f;
 
-        [Tooltip("Velocity-proportional drag when input is released (1/s). Stops the body from max speed to ~5% within ~0.5s.")]
+        [Tooltip("Velocity-proportional drag when input is released (1/s). Stops the body within ~0.5s.")]
         public float stoppingFriction = 8f;
 
-        [Tooltip("Maximum horizontal speed (m/s). Clamped every FixedUpdate.")]
-        public float maxSpeed = 7f;
+        [Tooltip("Velocity-proportional drag during a slide (1/s). No drive/clamp while sliding.")]
+        public float slideFriction = 1.5f;
 
         [Tooltip("Gravity (1g = 9.81 m/s^2), applied downward while airborne.")]
         public float gravity = 9.81f;
 
+        [Header("Speeds")]
+        public float standWalkSpeed = 3.5f;
+        public float standSprintSpeed = 7f;
+        public float crouchWalkSpeed = 2f;
+        public float crouchSprintSpeed = 4.5f;
+        public float proneSpeed = 0.5f;
+
+        [Header("Posture dimensions")]
+        public float standHeight = 1.8f;
+        public float crouchHeight = 0.9f;
+        [Tooltip("Capsule diameter when lying flat (prone).")]
+        public float proneHeight = 0.5f;
+
+        [Header("Posture switch delays (camera lerp duration)")]
+        public float standCrouchDelay = 0.1f;
+        public float standProneDelay = 0.25f;
+        public float crouchProneDelay = 0.15f;
+
         [Header("Jump")]
-        [Tooltip("Jump apex height in meters. Converted to an impulse velocity via sqrt(2 * |gravity| * jumpHeight).")]
         public float jumpHeight = 0.6f;
 
+        [Header("Slide")]
+        public float slideSpeed = 8f;
+        public float slideTriggerSpeed = 5f;
+        public float slideTriggerAngle = 60f;
+        public float slideEndSpeed = 4f;
+        public float slideCooldown = 1f;
+
+        [Header("Dive")]
+        public float diveSpeed = 15f;
+        public float diveTriggerSpeed = 4f;
+
         [Header("Look")]
-        [Tooltip("Degrees of rotation per 1 unit of mouse delta. Linear: no acceleration and no frame-rate dependence.\nCalibrated default: 2500 DPI, 4.56 cm = 260 degrees.")]
         public float lookSensitivity = 0.05793f;
         public float minPitch = -89f;
         public float maxPitch = 89f;
 
         [Header("Camera")]
-        [Tooltip("Distance from the capsule's TOP to the eye/camera, measured along the body's up axis.\nThe eye is derived from the capsule collider geometry (center/height/radius) so it\nautomatically follows crouch (height change) and prone (rotation change).")]
+        [Tooltip("Distance below the capsule top for the eye/camera.")]
         public float eyeOffsetFromTop = 0.15f;
+
+        [Header("Camera shake")]
+        public float jumpShakeIntensity = 0.12f;
+        public float jumpShakeDuration = 0.15f;
+        public float slideShakeIntensity = 0.12f;
+        public float slideShakeDuration = 0.25f;
+        public float diveShakeIntensity = 0.22f;
+        public float diveShakeDuration = 0.3f;
 
         [Header("Combat")]
         public float shootRange = 200f;
@@ -80,43 +107,70 @@ namespace HagenDa.Networking
 
         [Header("References")]
         public Camera playerCamera;
+        public CapsuleCollider standCollider;
+        public CapsuleCollider crouchCollider;
         public GameObject visual; // remote body (hidden for owner)
 
-        // Server-authoritative look state. Yaw is the root rotation (synced by
-        // NetworkTransform), pitch is synced separately via SyncVar.
+        // ---- Server-authoritative synced state ----
         [SyncVar] public float pitch;
+        [SyncVar] public PlayerPosture posture = PlayerPosture.Stand;
+        [SyncVar] public bool sliding;
+
         private float yaw;
         private float nextFireTime;
+        private float slideCooldownEnd;
 
-        // Client-side look state (client-authoritative). The local camera is driven
-        // from raw mouse delta every rendered frame (linear, no tick quantization).
-        // The absolute yaw/pitch are sent up so the server adopts the client's view
-        // exactly (no delta accumulation drift, no packet-loss drift).
+        // Server-side posture/movement state.
+        private bool sprintActive;   // sticky sprint (exits only when forward is released)
+        private bool crouchByHold;   // true when crouch was entered by holding left ctrl
+        private bool diving;         // dive in progress (until landing)
+        private bool jumpedOrDived;  // was airborne from a jump (for landing shake)
+
+        // Client-side look state (client-authoritative aim).
         private float localYaw;
         private float localPitch;
 
         private Rigidbody rb;
-        private CapsuleCollider capsuleCol;
         private bool grounded;
-        private NetworkInputState serverInput; // latest input from owner (server-side)
+        private bool wasGrounded;
+        private NetworkInputState serverInput;
 
-        // Client-side input cache, sampled every rendered frame in Update() so that
-        // edge-triggered inputs (e.g. jump) are never missed between FixedUpdate ticks.
+        // Client-side input cache (sampled every rendered frame).
         private Vector2 clientMove;
         private bool clientFire;
-        private bool jumpRequested; // latched until consumed by SendInput()
+        private bool clientSprint;
+        private bool clientCrouchHold;
+        private bool jumpRequested;
+        private bool crouchToggleRequested;
+        private bool proneToggleRequested;
+
+        // Client-side camera transition + shake state.
+        private float cameraEyeHeight;
+        private float cameraTransitionStart;
+        private float cameraTransitionTime;
+        private float cameraTransitionDuration;
+        private PlayerPosture prevCameraPosture = PlayerPosture.Stand;
+        private Vector3 shakeOffset;
+        private float shakeIntensity;
+        private float shakeDuration;
+        private float shakeTime;
+        private bool shakeVertical;
 
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
-            capsuleCol = GetComponent<CapsuleCollider>();
+            if (standCollider == null)
+                standCollider = GetComponent<CapsuleCollider>();
         }
 
         public override void OnStartServer()
         {
-            rb.useGravity = false;   // gravity is applied manually (1g)
+            rb.useGravity = false;   // gravity applied manually
             rb.freezeRotation = true;
             rb.isKinematic = false;
+
+            wasGrounded = grounded;
+            ApplyActiveCollider();
 
             if (isServerOnly && playerCamera != null)
                 playerCamera.enabled = false;
@@ -130,8 +184,7 @@ namespace HagenDa.Networking
 
             if (!isServer)
             {
-                // Only the server simulates physics; clients are kinematic and
-                // moved purely by NetworkTransform / SyncVars.
+                // Only the server simulates physics; clients are kinematic.
                 rb.isKinematic = true;
                 rb.useGravity = false;
             }
@@ -142,6 +195,7 @@ namespace HagenDa.Networking
                 Cursor.visible = false;
                 if (playerCamera != null) playerCamera.enabled = true;
                 if (visual != null) visual.SetActive(false);
+                cameraEyeHeight = GetEyeHeight(PlayerPosture.Stand);
             }
             else
             {
@@ -158,8 +212,9 @@ namespace HagenDa.Networking
             UpdateLocalLook();
         }
 
-        // Sample all player input once per rendered frame (Update), so inputs are
-        // captured reliably regardless of the FixedUpdate/physics cadence.
+        // ---------------------------------------------------------------
+        // CLIENT: input sampling
+        // ---------------------------------------------------------------
         private void SampleInput()
         {
             var k = Keyboard.current;
@@ -167,82 +222,14 @@ namespace HagenDa.Networking
 
             clientMove = ReadMove();
             clientFire = m != null && m.leftButton.isPressed;
+            clientSprint = k != null && k.leftShiftKey.isPressed;
+            clientCrouchHold = k != null && k.leftCtrlKey.isPressed;
 
-            if (k != null && k.spaceKey.wasPressedThisFrame)
-                jumpRequested = true;
-        }
+            if (k == null) return;
 
-        // Read mouse delta once per rendered frame and apply it IMMEDIATELY to the
-        // local camera (smooth, linear, every frame). localYaw/localPitch hold the
-        // client's absolute view and are sent up verbatim in SendInput().
-        private void UpdateLocalLook()
-        {
-            var ms = Mouse.current;
-            if (ms == null) return;
-
-            Vector2 d = ms.delta.ReadValue();
-            d.y = -d.y;                       // Unity mouse delta.y is inverted relative to camera pitch
-            d *= lookSensitivity;             // degrees, linear, frame-rate independent
-
-            localYaw += d.x;
-            localPitch = Mathf.Clamp(localPitch + d.y, minPitch, maxPitch);
-
-            if (playerCamera != null)
-            {
-                // Position the camera at the capsule top minus eyeOffsetFromTop, using
-                // the body's actual transform (handles crouch height + prone rotation).
-                playerCamera.transform.position = GetEyeWorldPosition();
-
-                // World-space rotation: independent of the server-synced root yaw, so
-                // the local view never snaps back to the tick-rate-quantized server value.
-                playerCamera.transform.rotation = Quaternion.Euler(localPitch, localYaw, 0f);
-            }
-        }
-
-        // The eye position in LOCAL space: capsule center + up*(height/2 - eyeOffsetFromTop).
-        // Read from the live CapsuleCollider so crouch (height/center change) is automatic.
-        private Vector3 GetEyeLocalPosition()
-        {
-            return capsuleCol.center + Vector3.up * (capsuleCol.height * 0.5f - eyeOffsetFromTop);
-        }
-
-        // The eye position in WORLD space: the local offset transformed by the body's
-        // current transform, so prone (body rotation) moves the eye with the body.
-        private Vector3 GetEyeWorldPosition()
-        {
-            return transform.TransformPoint(GetEyeLocalPosition());
-        }
-
-        private void FixedUpdate()
-        {
-            if (isLocalPlayer) SendInput();
-            if (isServer) SimulateServer();
-        }
-
-        // ---------------------------------------------------------------
-        // CLIENT -> SERVER (input uplink)
-        // ---------------------------------------------------------------
-        private void SendInput()
-        {
-            NetworkInputState s = default;
-            s.move = clientMove;
-
-            // Send the client's absolute view so the server adopts it exactly.
-            s.yaw = localYaw;
-            s.pitch = localPitch;
-
-            s.jump = jumpRequested;
-            jumpRequested = false;
-
-            s.fire = clientFire;
-
-            CmdInput(s);
-        }
-
-        [Command(channel = Channels.Unreliable)]
-        private void CmdInput(NetworkInputState s)
-        {
-            serverInput = s;
+            if (k.spaceKey.wasPressedThisFrame) jumpRequested = true;
+            if (k.xKey.wasPressedThisFrame) crouchToggleRequested = true;
+            if (k.cKey.wasPressedThisFrame) proneToggleRequested = true;
         }
 
         private Vector2 ReadMove()
@@ -259,6 +246,128 @@ namespace HagenDa.Networking
         }
 
         // ---------------------------------------------------------------
+        // CLIENT: local camera (aim + height lerp + shake)
+        // ---------------------------------------------------------------
+        private void UpdateLocalLook()
+        {
+            var ms = Mouse.current;
+            if (ms == null) return;
+
+            Vector2 d = ms.delta.ReadValue();
+            d.y = -d.y;
+            d *= lookSensitivity;
+
+            localYaw += d.x;
+            localPitch = Mathf.Clamp(localPitch + d.y, minPitch, maxPitch);
+
+            if (playerCamera == null) return;
+
+            UpdateCameraHeight();
+            UpdateCameraShake();
+
+            playerCamera.transform.position =
+                transform.position + Vector3.up * cameraEyeHeight + shakeOffset;
+            playerCamera.transform.rotation = Quaternion.Euler(localPitch, localYaw, 0f);
+        }
+
+        private void UpdateCameraHeight()
+        {
+            PlayerPosture eff = sliding ? PlayerPosture.Crouch : posture;
+            float target = GetEyeHeight(eff);
+
+            if (eff != prevCameraPosture)
+            {
+                cameraTransitionStart = cameraEyeHeight;
+                cameraTransitionDuration = ComputeSwitchDelay(prevCameraPosture, eff);
+                cameraTransitionTime = 0f;
+                prevCameraPosture = eff;
+            }
+
+            if (cameraTransitionTime < cameraTransitionDuration)
+            {
+                cameraTransitionTime += Time.deltaTime;
+                float t = Mathf.Clamp01(cameraTransitionTime / cameraTransitionDuration);
+                cameraEyeHeight = Mathf.Lerp(cameraTransitionStart, target, t);
+            }
+            else
+            {
+                cameraEyeHeight = target;
+            }
+        }
+
+        private void UpdateCameraShake()
+        {
+            if (shakeTime < shakeDuration)
+            {
+                shakeTime += Time.deltaTime;
+                float decay = 1f - Mathf.Clamp01(shakeTime / shakeDuration);
+
+                if (shakeVertical)
+                    shakeOffset = Vector3.up * (Random.value * 2f - 1f) * shakeIntensity * decay;
+                else
+                    shakeOffset = Random.insideUnitSphere * shakeIntensity * decay;
+            }
+            else
+            {
+                shakeOffset = Vector3.zero; // camera returns to the correct posture position
+            }
+        }
+
+        private float GetEyeHeight(PlayerPosture p)
+        {
+            switch (p)
+            {
+                case PlayerPosture.Crouch: return crouchHeight - eyeOffsetFromTop;
+                case PlayerPosture.Prone: return proneHeight - eyeOffsetFromTop;
+                default: return standHeight - eyeOffsetFromTop;
+            }
+        }
+
+        private float ComputeSwitchDelay(PlayerPosture a, PlayerPosture b)
+        {
+            if (a == b) return 0.05f;
+            if ((a == PlayerPosture.Stand && b == PlayerPosture.Crouch) ||
+                (a == PlayerPosture.Crouch && b == PlayerPosture.Stand))
+                return standCrouchDelay;
+            if ((a == PlayerPosture.Stand && b == PlayerPosture.Prone) ||
+                (a == PlayerPosture.Prone && b == PlayerPosture.Stand))
+                return standProneDelay;
+            return crouchProneDelay; // Crouch <-> Prone
+        }
+
+        // ---------------------------------------------------------------
+        // CLIENT -> SERVER (input uplink)
+        // ---------------------------------------------------------------
+        private void FixedUpdate()
+        {
+            if (isLocalPlayer) SendInput();
+            if (isServer) SimulateServer();
+        }
+
+        private void SendInput()
+        {
+            NetworkInputState s = default;
+            s.move = clientMove;
+            s.yaw = localYaw;
+            s.pitch = localPitch;
+
+            s.jump = jumpRequested; jumpRequested = false;
+            s.sprint = clientSprint;
+            s.crouchToggle = crouchToggleRequested; crouchToggleRequested = false;
+            s.proneToggle = proneToggleRequested; proneToggleRequested = false;
+            s.crouchHold = clientCrouchHold;
+            s.fire = clientFire;
+
+            CmdInput(s);
+        }
+
+        [Command(channel = Channels.Unreliable)]
+        private void CmdInput(NetworkInputState s)
+        {
+            serverInput = s;
+        }
+
+        // ---------------------------------------------------------------
         // SERVER SIMULATION (authoritative)
         // ---------------------------------------------------------------
         private void SimulateServer()
@@ -268,44 +377,70 @@ namespace HagenDa.Networking
             pitch = Mathf.Clamp(serverInput.pitch, minPitch, maxPitch);
             transform.rotation = Quaternion.Euler(0f, yaw, 0f);
 
-            if (grounded)
+            bool justLanded = grounded && !wasGrounded;
+
+            // Landing detection (jump landing / dive completion camera shake).
+            if (justLanded)
             {
-                // Movement direction is derived from the now client-synced yaw, so
-                // movement matches the client's view.
-                Vector3 dir = transform.forward * serverInput.move.y + transform.right * serverInput.move.x;
-                if (dir.sqrMagnitude > 1f) dir = dir.normalized;
-
-                bool hasInput = dir.sqrMagnitude > 0.0001f;
-
-                // Horizontal driving force in the move direction.
-                if (hasInput)
-                    rb.AddForce(dir * moveAcceleration, ForceMode.Acceleration);
-
-                // Ground friction (velocity-proportional drag). Small while driving (so
-                // drag < drive and the body can accelerate); strong when input is released
-                // (gradual deceleration to a stop within ~0.5s).
-                Vector3 hVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-                float drag = hasInput ? friction : stoppingFriction;
-                rb.AddForce(-hVel * drag, ForceMode.Acceleration);
-
-                // Limit horizontal speed every FixedUpdate.
-                ClampHorizontalSpeed();
-
-                // Jump: height-based impulse (edge-triggered, only when grounded).
-                if (serverInput.jump)
+                if (diving)
                 {
-                    float jumpVelocity = Mathf.Sqrt(2f * Mathf.Abs(gravity) * jumpHeight);
-                    rb.AddForce(Vector3.up * jumpVelocity, ForceMode.Impulse);
-                    grounded = false; // lift off immediately so gravity applies
+                    diving = false;
+                    RpcCameraShake(diveShakeIntensity, diveShakeDuration, false);
                 }
+                else if (jumpedOrDived)
+                {
+                    RpcCameraShake(jumpShakeIntensity, jumpShakeDuration, true);
+                }
+                jumpedOrDived = false;
             }
-            else
+            wasGrounded = grounded;
+
+            // Sprint (sticky: enter on forward + shift, exit only on forward release).
+            UpdateSprint();
+
+            bool jumpIntent = serverInput.jump;
+
+            // Slide lifecycle (end on jump / dive / slow-down).
+            if (sliding)
             {
-                // Airborne: gravity only. No driving force, drag, speed clamp, or jump.
-                rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
+                bool diveReplaces = serverInput.proneToggle &&
+                                    rb.velocity.magnitude > diveTriggerSpeed;
+
+                if (jumpIntent)
+                    EndSlide(endToStand: true);
+                else if (diveReplaces)
+                    EndSlide(endToStand: true);
+                else if (HorizontalSpeed() < slideEndSpeed)
+                    EndSlide();
             }
 
-            // Fire (server-authoritative hitscan).
+            // Dive trigger (prone key + fast + grounded).
+            bool dived = false;
+            if (!sliding && grounded && serverInput.proneToggle &&
+                rb.velocity.magnitude > diveTriggerSpeed)
+            {
+                StartDive();
+                dived = true;
+            }
+
+            // Slide trigger (ctrl + fast + grounded + off cooldown).
+            // Also fires on the landing frame so holding ctrl through a jump/fall
+            // correctly triggers the slide the moment the body touches down.
+            if (!dived && !sliding && serverInput.crouchHold &&
+                Time.time >= slideCooldownEnd && grounded &&
+                CanStartSlide(justLanded))
+            {
+                StartSlide();
+            }
+
+            // Posture state machine. Returns true when the jump key was consumed to
+            // stand up (so it must NOT also produce a jump impulse).
+            bool jumpConsumed = ProcessPosture(dived, jumpIntent);
+
+            // Movement forces + jump impulse + gravity.
+            ApplyMovement(jumpIntent && !jumpConsumed);
+
+            // Fire.
             if (serverInput.fire && Time.time >= nextFireTime)
             {
                 nextFireTime = Time.time + fireRate;
@@ -313,22 +448,240 @@ namespace HagenDa.Networking
             }
         }
 
-        private void ClampHorizontalSpeed()
+        private void UpdateSprint()
         {
+            bool forward = serverInput.move.y > 0.1f;
+
+            if (serverInput.sprint && forward)
+                sprintActive = true;
+            else if (!forward)
+                sprintActive = false;
+            // else: forward held without shift -> keep sprintActive (sticky)
+        }
+
+        private bool ProcessPosture(bool dived, bool jump)
+        {
+            bool jumpConsumed = false;
+            bool crouchToggle = serverInput.crouchToggle;
+            bool proneToggle = serverInput.proneToggle && !dived; // dive consumed the prone key
+            bool crouchHold = serverInput.crouchHold;
+            bool sprint = serverInput.sprint;
+
+            switch (posture)
+            {
+                case PlayerPosture.Stand:
+                    if (crouchToggle) { SetPosture(PlayerPosture.Crouch); crouchByHold = false; }
+                    else if (crouchHold) { SetPosture(PlayerPosture.Crouch); crouchByHold = true; }
+                    else if (proneToggle) SetPosture(PlayerPosture.Prone);
+                    break;
+
+                case PlayerPosture.Crouch:
+                    if (crouchToggle) SetPosture(PlayerPosture.Stand);
+                    else if (jump) { SetPosture(PlayerPosture.Stand); jumpConsumed = true; }
+                    else if (crouchByHold && !crouchHold) SetPosture(PlayerPosture.Stand);
+                    else if (proneToggle) SetPosture(PlayerPosture.Prone);
+                    break;
+
+                case PlayerPosture.Prone:
+                    if (proneToggle) SetPosture(PlayerPosture.Stand);
+                    else if (crouchToggle) { SetPosture(PlayerPosture.Crouch); crouchByHold = false; }
+                    else if (crouchHold) { SetPosture(PlayerPosture.Crouch); crouchByHold = true; }
+                    else if (jump) { SetPosture(PlayerPosture.Stand); jumpConsumed = true; }
+                    else if (sprint) SetPosture(PlayerPosture.Stand);
+                    break;
+            }
+
+            return jumpConsumed;
+        }
+
+        private void ApplyMovement(bool jump)
+        {
+            if (grounded)
+            {
+                Vector3 dir = transform.forward * serverInput.move.y +
+                              transform.right * serverInput.move.x;
+                if (dir.sqrMagnitude > 1f) dir = dir.normalized;
+                bool hasInput = dir.sqrMagnitude > 0.0001f;
+
+                Vector3 hVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+                if (sliding)
+                {
+                    // Slide: light drag only (no drive, no speed clamp).
+                    rb.AddForce(-hVel * slideFriction, ForceMode.Acceleration);
+                }
+                else
+                {
+                    if (hasInput)
+                        rb.AddForce(dir * moveAcceleration, ForceMode.Acceleration);
+
+                    float drag = hasInput ? friction : stoppingFriction;
+                    rb.AddForce(-hVel * drag, ForceMode.Acceleration);
+
+                    ClampHorizontalSpeed(CurrentMaxSpeed());
+                }
+
+                if (jump)
+                {
+                    float jumpVelocity = Mathf.Sqrt(2f * Mathf.Abs(gravity) * jumpHeight);
+                    rb.AddForce(Vector3.up * jumpVelocity, ForceMode.Impulse);
+                    grounded = false;
+                    jumpedOrDived = true;
+                    RpcCameraShake(jumpShakeIntensity, jumpShakeDuration, true);
+                }
+            }
+            else
+            {
+                // Airborne: gravity only.
+                rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
+            }
+        }
+
+        private float CurrentMaxSpeed()
+        {
+            if (sliding) return float.PositiveInfinity;
+
+            bool sprinting = sprintActive;
+            switch (posture)
+            {
+                case PlayerPosture.Stand:
+                    return sprinting ? standSprintSpeed : standWalkSpeed;
+                case PlayerPosture.Crouch:
+                    return sprinting ? crouchSprintSpeed : crouchWalkSpeed;
+                case PlayerPosture.Prone:
+                    return proneSpeed;
+            }
+            return standWalkSpeed;
+        }
+
+        private void ClampHorizontalSpeed(float max)
+        {
+            if (float.IsPositiveInfinity(max)) return;
+
             Vector3 v = rb.velocity;
             Vector3 h = new Vector3(v.x, 0f, v.z);
-
-            if (h.magnitude > maxSpeed)
+            if (h.magnitude > max)
             {
-                h = h.normalized * maxSpeed;
+                h = h.normalized * max;
                 rb.velocity = new Vector3(h.x, v.y, h.z);
             }
         }
 
+        private float HorizontalSpeed()
+        {
+            Vector3 v = rb.velocity;
+            return new Vector3(v.x, 0f, v.z).magnitude;
+        }
+
+        private bool CanStartSlide(bool justLanded)
+        {
+            float hSpeed = HorizontalSpeed();
+            if (hSpeed <= slideTriggerSpeed) return false;
+
+            // On the landing frame the collision momentarily gives the body a steep
+            // downward velocity; accept it directly so a held ctrl triggers the slide.
+            if (justLanded) return true;
+
+            // Continuous: the velocity must be within slideTriggerAngle of horizontal.
+            Vector3 h = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+            if (h.magnitude < 0.01f) return false;
+
+            float elevAngle = Vector3.Angle(rb.velocity, h);
+            return elevAngle < slideTriggerAngle;
+        }
+
+        private void StartSlide()
+        {
+            sliding = true;
+            SetPosture(PlayerPosture.Crouch); // crouch collider
+
+            Vector3 h = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+            if (h.magnitude > 0.01f)
+            {
+                float delta = slideSpeed - h.magnitude;
+                if (delta > 0f)
+                    rb.AddForce(h.normalized * delta, ForceMode.Impulse);
+            }
+
+            RpcCameraShake(slideShakeIntensity, slideShakeDuration, false);
+        }
+
+        private void EndSlide(bool endToStand = false)
+        {
+            sliding = false;
+            slideCooldownEnd = Time.time + slideCooldown;
+
+            if (endToStand)
+            {
+                SetPosture(PlayerPosture.Stand);
+            }
+            else if (serverInput.crouchHold)
+            {
+                SetPosture(PlayerPosture.Crouch);
+                crouchByHold = true;
+            }
+            else
+            {
+                SetPosture(PlayerPosture.Stand);
+            }
+        }
+
+        private void StartDive()
+        {
+            diving = true;
+            SetPosture(PlayerPosture.Prone); // flat collider
+
+            // Switching to prone rotates the capsule to lie flat, which momentarily
+            // lifts the body off the ground (centre rotation) — lift it, then slam down.
+            float lift = standHeight * 0.5f - proneHeight * 0.5f;
+            rb.position += Vector3.up * lift;
+
+            rb.AddForce(Vector3.down * diveSpeed, ForceMode.Impulse);
+            grounded = false;
+        }
+
+        private void SetPosture(PlayerPosture p)
+        {
+            posture = p;
+            ApplyActiveCollider();
+        }
+
+        private void ApplyActiveCollider()
+        {
+            PlayerPosture eff = sliding ? PlayerPosture.Crouch : posture;
+
+            switch (eff)
+            {
+                case PlayerPosture.Stand:
+                    standCollider.enabled = true;
+                    crouchCollider.enabled = false;
+                    standCollider.direction = 1; // Y
+                    standCollider.center = new Vector3(0f, standHeight * 0.5f, 0f);
+                    break;
+
+                case PlayerPosture.Crouch:
+                    standCollider.enabled = false;
+                    crouchCollider.enabled = true;
+                    crouchCollider.direction = 1; // Y
+                    crouchCollider.center = new Vector3(0f, crouchHeight * 0.5f, 0f);
+                    break;
+
+                case PlayerPosture.Prone:
+                    standCollider.enabled = true;
+                    crouchCollider.enabled = false;
+                    standCollider.direction = 2; // Z (lying forward)
+                    standCollider.center = new Vector3(0f, proneHeight * 0.5f, 0f);
+                    break;
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // COMBAT (server-authoritative hitscan)
+        // ---------------------------------------------------------------
         private void FireOnServer()
         {
-            // Eye position (capsule top - 0.15m), shared with the client camera.
-            Vector3 origin = GetEyeWorldPosition();
+            PlayerPosture eff = sliding ? PlayerPosture.Crouch : posture;
+            Vector3 origin = transform.position + Vector3.up * GetEyeHeight(eff);
             Vector3 forward = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
 
             if (Physics.Raycast(origin, forward, out RaycastHit hit, shootRange))
@@ -346,6 +699,20 @@ namespace HagenDa.Networking
                     target.TakeDamage(shootDamage);
                 }
             }
+        }
+
+        // ---------------------------------------------------------------
+        // CAMERA SHAKE (server -> owning client)
+        // ---------------------------------------------------------------
+        [ClientRpc]
+        private void RpcCameraShake(float intensity, float duration, bool vertical)
+        {
+            if (!isLocalPlayer || playerCamera == null) return;
+
+            shakeIntensity = intensity;
+            shakeDuration = duration;
+            shakeTime = 0f;
+            shakeVertical = vertical;
         }
 
         // ---------------------------------------------------------------

@@ -13,8 +13,10 @@ GameObject:
   - component: {fileID: 7435199111200836645}
   - component: {fileID: 201186464616464604}
   - component: {fileID: 1419845536819804041}
+  - component: {fileID: 5498135400834884255}
   - component: {fileID: 7971186896382879504}
   - component: {fileID: 8416130353467528664}
+  - component: {fileID: 5519252547045945658}
   m_Layer: 0
   m_HasEditorInfo: 1
   m_Name: NetworkPlayer
@@ -142,6 +144,29 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!136 &5498135400834884255
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634328753906994812}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Radius: 0.25
+  m_Height: 0.9
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.45, z: 0}
 --- !u!114 &7971186896382879504
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,20 +186,47 @@ MonoBehaviour:
   moveAcceleration: 12
   friction: 1.5
   stoppingFriction: 8
-  maxSpeed: 7
+  slideFriction: 1.5
   gravity: 9.81
-  jumpForce: 3
-  jumpDuration: 0.3
+  standWalkSpeed: 3.5
+  standSprintSpeed: 7
+  crouchWalkSpeed: 2
+  crouchSprintSpeed: 4.5
+  proneSpeed: 0.5
+  standHeight: 1.8
+  crouchHeight: 0.9
+  proneHeight: 0.5
+  standCrouchDelay: 0.1
+  standProneDelay: 0.25
+  crouchProneDelay: 0.15
+  jumpHeight: 0.6
+  slideSpeed: 8
+  slideTriggerSpeed: 5
+  slideTriggerAngle: 60
+  slideEndSpeed: 4
+  slideCooldown: 1
+  diveSpeed: 15
+  diveTriggerSpeed: 4
   lookSensitivity: 0.05793
   minPitch: -89
   maxPitch: 89
   eyeOffsetFromTop: 0.15
+  jumpShakeIntensity: 0.12
+  jumpShakeDuration: 0.15
+  slideShakeIntensity: 0.12
+  slideShakeDuration: 0.25
+  diveShakeIntensity: 0.22
+  diveShakeDuration: 0.3
   shootRange: 200
   shootDamage: 20
   fireRate: 0.15
   playerCamera: {fileID: 8132827260397661879}
+  standCollider: {fileID: 1419845536819804041}
+  crouchCollider: {fileID: 5498135400834884255}
   visual: {fileID: 7452951583415386550}
   pitch: 0
+  posture: 0
+  sliding: 0
 --- !u!114 &8416130353467528664
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,6 +246,20 @@ MonoBehaviour:
   maxHealth: 100
   respawnDelay: 3
   health: 0
+--- !u!114 &5519252547045945658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634328753906994812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ad25a8338628f84fa467a0e44dee1de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateInterval: 0.2
+  maxWindow: 3
 --- !u!1 &5844093405414719529
 GameObject:
   m_ObjectHideFlags: 0
