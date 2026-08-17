@@ -58,6 +58,17 @@ namespace HagenDa.Networking
                     smoke.mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
                     smoke.mat.SetInt("_ZWrite", 0);
                     smoke.mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+
+                    // Render BOTH faces: with the default back-face culling, once the
+                    // camera enters the cloud the sphere's far wall (an inner/back
+                    // face) is culled and the player sees straight through the smoke
+                    // they are standing in. HDRP splits cull mode per pass — set every
+                    // variant plus the keyword so the inner wall always renders.
+                    smoke.mat.SetFloat("_CullMode", 0f);              // 0 = Cull Off
+                    smoke.mat.SetFloat("_CullModeForward", 0f);       // legacy forward pass
+                    smoke.mat.SetFloat("_TransparentCullMode", 0f);   // transparent passes
+                    smoke.mat.SetFloat("_OpaqueCullMode", 0f);        // opaque passes
+                    smoke.mat.EnableKeyword("_DOUBLESIDED_ON");
                 }
 
                 rend.material = smoke.mat;

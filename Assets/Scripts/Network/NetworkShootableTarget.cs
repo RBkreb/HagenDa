@@ -30,6 +30,13 @@ namespace HagenDa.Networking
             if (health <= 0f) StartCoroutine(RespawnAfterDelay());
         }
 
+        // Static targets have no capsule hitbox; bullets apply a flat 1x multiplier.
+        [Server]
+        public void TakeDamage(float damage, Vector3 hitPoint)
+        {
+            TakeDamage(damage);
+        }
+
         private IEnumerator RespawnAfterDelay()
         {
             yield return new WaitForSeconds(respawnDelay);

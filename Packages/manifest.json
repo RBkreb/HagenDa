@@ -2,6 +2,7 @@
   "dependencies": {
     "cn.tuanjie.ai.generators": "file:../.codely-cli/extensions/TJGenerators/Packages/cn.tuanjie.ai.generators",
     "cn.tuanjie.codely.bridge": "1.0.75",
+    "com.crashkonijn.goap": "3.1.2",
     "com.unity.ai.navigation": "1.1.7",
     "com.unity.animation.rigging": "1.2.1",
     "com.unity.feature.development": "1.0.1",
@@ -42,5 +43,14 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.crashkonijn.goap"
+      ]
+    }
+  ]
 }

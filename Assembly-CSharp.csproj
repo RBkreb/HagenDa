@@ -110,6 +110,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\AttachmentsSystem.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\BulletsItem_SO.cs" />
+    <Compile Include="Assets\Scripts\Network\PlayerHud.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\UIController.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\WeaponState\WeaponInspectState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\ProceduralShot_SO.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkPlayerHealth.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkBullet.cs" />
     <Compile Include="Assets\Scripts\Network\IDamageable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\CrouchTilt.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Movement\PlayerMovementSettings.cs" />
@@ -200,6 +202,7 @@
     <Compile Include="Assets\Cowsins\Scripts\UI\WeaponsInventoryUISlot.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\BasicMovementBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerStates.cs" />
+    <Compile Include="Assets\Scripts\Network\HitboxUtility.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\Utilities\CowsinsEditorWindowUtilities.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\WeaponControllerEditor.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\WeaponPickeable.cs" />
@@ -275,6 +278,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Extra\PowerUp.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\DamageMultiplier.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\BulletsPickeable.cs" />
+    <Compile Include="Assets\Scripts\Network\RescueThrowable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\CrosshairShapeEditor.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Grip.cs" />
     <Compile Include="Assets\Cowsins\Inputs\PlayerActions.cs" />
@@ -700,6 +704,10 @@
     </Reference>
     <Reference Include="Mono.CecilX.Mdb">
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ReportGeneratorMerged">
@@ -1234,6 +1242,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="CrashKonijn.Goap.Runtime">
+      <HintPath>Library\ScriptAssemblies\CrashKonijn.Goap.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Animation.Rigging.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Animation.Rigging.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1274,12 +1286,20 @@
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Collections">
+      <HintPath>Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Settings.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Settings.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.AI.Navigation.Editor.ConversionSystem">
+      <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Editor.ConversionSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
@@ -1290,8 +1310,8 @@
       <HintPath>Library\ScriptAssemblies\Unity.Animation.Rigging.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.AI.Navigation.Editor.ConversionSystem">
-      <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Editor.ConversionSystem.dll</HintPath>
+    <Reference Include="CrashKonijn.Goap.Editor">
+      <HintPath>Library\ScriptAssemblies\CrashKonijn.Goap.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.HighDefinition.Editor">
@@ -1328,6 +1348,18 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CrashKonijn.Goap.Resolver">
+      <HintPath>Library\ScriptAssemblies\CrashKonijn.Goap.Resolver.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CrashKonijn.Agent.Runtime">
+      <HintPath>Library\ScriptAssemblies\CrashKonijn.Agent.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CrashKonijn.Agent.Core">
+      <HintPath>Library\ScriptAssemblies\CrashKonijn.Agent.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Timeline">
@@ -1372,6 +1404,10 @@
     </Reference>
     <Reference Include="Unity.AI.Navigation.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CrashKonijn.Goap.Core">
+      <HintPath>Library\ScriptAssemblies\CrashKonijn.Goap.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">

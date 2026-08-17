@@ -24,6 +24,8 @@ namespace HagenDa.Networking.EditorTools
         private const string FpsSourcePrefab = "Assets/Cowsins/Prefabs/PlayerControllers/CowsinsFPSController.prefab";
         private const string GrenadePrefabPath = "Assets/Scripts/Network/Prefabs/GrenadeThrowable.prefab";
         private const string SmokePrefabPath = "Assets/Scripts/Network/Prefabs/SmokeThrowable.prefab";
+        private const string RescuePrefabPath = "Assets/Scripts/Network/Prefabs/RescueThrowable.prefab";
+        private const string BulletPrefabPath = "Assets/Scripts/Network/Prefabs/Bullet.prefab";
         private const string AIPrefabPath = "Assets/Scripts/Network/Prefabs/AIEntity.prefab";
 
         [MenuItem("HagenDa/Setup Multiplayer Scene")]
@@ -97,11 +99,13 @@ namespace HagenDa.Networking.EditorTools
             EnsureFolder("Assets", "Scenes");
             EnsureFolder("Assets/Scripts/Network", "Prefabs");
 
-            // Build all prefabs (grenade & smoke first so player & AI can reference them).
+            // Build all prefabs (throwables first so player & AI can reference them).
             GameObject grenadePrefab = BuildGrenadePrefab();
             GameObject smokePrefab = BuildSmokePrefab();
-            GameObject playerPrefab = BuildPlayerPrefab(grenadePrefab, smokePrefab);
-            GameObject aiPrefab = BuildAIEntityPrefab(grenadePrefab, smokePrefab);
+            GameObject rescuePrefab = BuildRescuePrefab();
+            GameObject bulletPrefab = BuildBulletPrefab();
+            GameObject playerPrefab = BuildPlayerPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab);
+            GameObject aiPrefab = BuildAIEntityPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab);
 
             // Fresh empty scene.
             var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(
@@ -112,8 +116,9 @@ namespace HagenDa.Networking.EditorTools
 
             SetupScene(playerPrefab, addTargets: true);
 
-            // Register spawnable prefabs (grenade, smoke, AI) on the NetworkManager.
-            RegisterSpawnPrefabs(grenadePrefab, smokePrefab, aiPrefab);
+            // Register spawnable prefabs (throwables + AI) on the NetworkManager.
+            // The bullet is a server-only pooled projectile, so it is NOT registered.
+            RegisterSpawnPrefabs(grenadePrefab, smokePrefab, rescuePrefab, aiPrefab);
 
             // NavMesh on the floor for AI pathfinding.
             BuildNavMeshForFloor();
@@ -140,10 +145,10 @@ namespace HagenDa.Networking.EditorTools
         // ---------------------------------------------------------------
         private static GameObject BuildPlayerPrefab()
         {
-            return BuildPlayerPrefab(null, null);
+            return BuildPlayerPrefab(null, null, null, null);
         }
 
-        private static GameObject BuildPlayerPrefab(GameObject grenadePrefab, GameObject smokePrefab = null)
+        private static GameObject BuildPlayerPrefab(GameObject grenadePrefab, GameObject smokePrefab, GameObject rescuePrefab, GameObject bulletPrefab)
         {
             var root = new GameObject("NetworkPlayer");
 
@@ -205,15 +210,22 @@ namespace HagenDa.Networking.EditorTools
             var controller = root.AddComponent<NetworkPlayerController>();
             root.AddComponent<NetworkPlayerHealth>();
             root.AddComponent<DebugHud>();
+            root.AddComponent<PlayerHud>();
 
-            // Shared combat (hitscan + throwing). Reuse prefabs if already built.
+            // Shared combat (projectile shooting + throwing). Reuse prefabs if already built.
             if (grenadePrefab == null)
                 grenadePrefab = BuildGrenadePrefab();
             if (smokePrefab == null)
                 smokePrefab = BuildSmokePrefab();
+            if (rescuePrefab == null)
+                rescuePrefab = BuildRescuePrefab();
+            if (bulletPrefab == null)
+                bulletPrefab = BuildBulletPrefab();
             var combat = root.AddComponent<NetworkCombat>();
             combat.grenadeThrowablePrefab = grenadePrefab.GetComponent<NetworkThrowable>();
             combat.smokeThrowablePrefab = smokePrefab.GetComponent<NetworkThrowable>();
+            combat.rescueThrowablePrefab = rescuePrefab.GetComponent<NetworkThrowable>();
+            combat.bulletPrefab = bulletPrefab;
 
             controller.standCollider = standCapsule;
             controller.crouchCollider = crouchCapsule;
@@ -371,6 +383,12 @@ namespace HagenDa.Networking.EditorTools
             var rb = root.AddComponent<Rigidbody>();
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             rb.useGravity = true;
+            // Near-massless: the throwable spawns inside the thrower's capsule (no
+            // throwPoint assigned), and with equal 1kg masses the depenetration
+            // impulse kicks an airborne thrower into a rapid fall. A 1:100 mass
+            // ratio keeps the correction on the throwable. Trajectory is unaffected
+            // (gravity is mass-independent, drag is 0).
+            rb.mass = 0.01f;
 
             var col = root.GetComponent<SphereCollider>();
             col.material = null;
@@ -402,6 +420,7 @@ namespace HagenDa.Networking.EditorTools
             var rb = root.AddComponent<Rigidbody>();
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             rb.useGravity = true;
+            rb.mass = 0.01f; // near-massless — see GrenadeThrowable note above
 
             var smoke = root.AddComponent<SmokeThrowable>();
             smoke.fuseTime = 1f; // short fuse so it pops near the landing point
@@ -412,7 +431,61 @@ namespace HagenDa.Networking.EditorTools
             return prefab;
         }
 
-        private static GameObject BuildAIEntityPrefab(GameObject grenadePrefab, GameObject smokePrefab)
+        private static GameObject BuildRescuePrefab()
+        {
+            var root = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            root.name = "RescueThrowable";
+            root.transform.localScale = Vector3.one * 0.2f;
+
+            var rend = root.GetComponent<Renderer>();
+            var mat = CreatePersistentMaterial(
+                "Assets/Scripts/Network/Materials/RescueGreen.mat",
+                new Color(0.2f, 0.9f, 0.35f),
+                new Color(0.15f, 0.6f, 0.2f));
+            if (mat != null) rend.sharedMaterial = mat;
+
+            root.AddComponent<NetworkIdentity>();
+
+            var rb = root.AddComponent<Rigidbody>();
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            rb.useGravity = true;
+            rb.mass = 0.01f; // near-massless — see GrenadeThrowable note above
+
+            var rescue = root.AddComponent<RescueThrowable>();
+            rescue.fuseTime = 0f; // detonate on impact (no fuse)
+
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, RescuePrefabPath);
+            Object.DestroyImmediate(root);
+            return prefab;
+        }
+
+        private static GameObject BuildBulletPrefab()
+        {
+            var root = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            root.name = "Bullet";
+            root.transform.localScale = Vector3.one * 0.05f;
+
+            var rend = root.GetComponent<Renderer>();
+            var mat = CreatePersistentMaterial(
+                "Assets/Scripts/Network/Materials/BulletWhite.mat",
+                new Color(1f, 1f, 1f),
+                new Color(0.6f, 0.6f, 0.6f));
+            if (mat != null) rend.sharedMaterial = mat;
+
+            // Ray-based projectile: no physics collider (hit detection is a manual
+            // segment raycast on the server, so a collider would only cause self-hits).
+            Object.DestroyImmediate(root.GetComponent<SphereCollider>());
+
+            root.AddComponent<NetworkBullet>();
+
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, BulletPrefabPath);
+            Object.DestroyImmediate(root);
+            return prefab;
+        }
+
+        private static GameObject BuildAIEntityPrefab(GameObject grenadePrefab, GameObject smokePrefab, GameObject rescuePrefab, GameObject bulletPrefab)
         {
             var root = new GameObject("AIEntity");
 
@@ -464,6 +537,9 @@ namespace HagenDa.Networking.EditorTools
                 combat.grenadeThrowablePrefab = grenadePrefab.GetComponent<NetworkThrowable>();
             if (smokePrefab != null)
                 combat.smokeThrowablePrefab = smokePrefab.GetComponent<NetworkThrowable>();
+            if (rescuePrefab != null)
+                combat.rescueThrowablePrefab = rescuePrefab.GetComponent<NetworkThrowable>();
+            combat.bulletPrefab = bulletPrefab;
 
             // Health (same as player).
             root.AddComponent<NetworkPlayerHealth>();
@@ -488,6 +564,9 @@ namespace HagenDa.Networking.EditorTools
             var rend = body.GetComponent<Renderer>();
             if (rend != null)
                 rend.sharedMaterial = aiMat;
+
+            // Wire the visual so SetDead can rotate it into the prone posture.
+            ai.visual = body;
 
             EnsureFolder("Assets/Scripts/Network", "Prefabs");
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, AIPrefabPath);
@@ -514,6 +593,17 @@ namespace HagenDa.Networking.EditorTools
             // Always wire the player prefab (this is the whole point).
             nm.playerPrefab = playerPrefab;
             nm.autoCreatePlayer = true;
+
+            // Register any throwable prefabs the player's combat references, so
+            // throwing works in every scene (not just Phase3).
+            var combat = playerPrefab != null ? playerPrefab.GetComponent<NetworkCombat>() : null;
+            if (combat != null)
+            {
+                RegisterSpawnPrefabs(
+                    combat.grenadeThrowablePrefab != null ? combat.grenadeThrowablePrefab.gameObject : null,
+                    combat.smokeThrowablePrefab != null ? combat.smokeThrowablePrefab.gameObject : null,
+                    combat.rescueThrowablePrefab != null ? combat.rescueThrowablePrefab.gameObject : null);
+            }
 
             // Spawn points (only if none exist).
             if (Object.FindObjectsOfType<NetworkStartPosition>().Length == 0)

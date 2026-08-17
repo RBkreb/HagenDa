@@ -181,13 +181,19 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  shootRange: 200
   shootDamage: 20
   fireRate: 0.15
+  bulletSpeed: 750
+  bulletLifetime: 5
+  bulletPoolCapacity: 60
+  bulletPrefab: {fileID: 5926176164332243332, guid: dcb3f61632dbb1746985a4ecc29c1369,
+    type: 3}
   throwPoint: {fileID: 0}
   grenadeThrowablePrefab: {fileID: 3792378269598571763, guid: f8492bd32540f38419c8d1854790070d,
     type: 3}
   smokeThrowablePrefab: {fileID: 8750669352066971556, guid: a71b5efb948a6994cb201844257bac2c,
+    type: 3}
+  rescueThrowablePrefab: {fileID: 6601452253533115365, guid: 477445035a5cabe41a1df9782413153f,
     type: 3}
   throwSpeed: 10
   throwCooldown: 1
@@ -208,8 +214,11 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   maxHealth: 100
-  respawnDelay: 3
+  regenDelay: 8
+  regenInterval: 0.5
+  regenAmount: 5
   health: 0
+  armor: 0
 --- !u!114 &6098297461493983970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -235,6 +244,9 @@ MonoBehaviour:
   attackCooldown: 1.5
   throwInterval: 5
   combat: {fileID: 2861076355436660845}
+  visual: {fileID: 3619932077785825544}
+  standHeight: 1.8
+  proneHeight: 0.5
 --- !u!1 &3619932077785825544
 GameObject:
   m_ObjectHideFlags: 0
