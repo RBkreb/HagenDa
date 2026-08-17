@@ -59,7 +59,7 @@ namespace HagenDa.Networking
             float cx = Screen.width * 0.5f;
             float cy = Screen.height * 0.5f;
             float len = Screen.height * 0.012f;
-            float thick = Mathf.Max(1f, Screen.height * 0.002f);
+            float thick = Mathf.Max(2f, Screen.height * 0.004f);
             float gap = Screen.height * 0.005f;
 
             DrawLine(new Vector2(cx, cy - gap - len), new Vector2(cx, cy - gap), thick);

@@ -201,8 +201,8 @@
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\ReloadBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\WeaponsInventoryUISlot.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\BasicMovementBehaviour.cs" />
-    <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerStates.cs" />
     <Compile Include="Assets\Scripts\Network\HitboxUtility.cs" />
+    <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerStates.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\Utilities\CowsinsEditorWindowUtilities.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\WeaponControllerEditor.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\WeaponPickeable.cs" />

@@ -142,6 +142,8 @@ namespace HagenDa.Networking
         private NetworkPlayerHealth health;
         private bool addArmorRequested;
         private bool selfRescueRequested;
+        private PhysicMaterial aliveStandMat;   // cached no-friction material (stand)
+        private PhysicMaterial aliveCrouchMat;   // cached no-friction material (crouch)
 
         // Client-side input cache (sampled every rendered frame).
         private Vector2 clientMove;
@@ -179,6 +181,11 @@ namespace HagenDa.Networking
             rb.freezeRotation = true;
             rb.isKinematic = false;
 
+            // Cache the no-friction materials so SetDead can restore them on revive.
+            aliveStandMat = standCollider.sharedMaterial;
+            if (crouchCollider != null)
+                aliveCrouchMat = crouchCollider.sharedMaterial;
+
             wasGrounded = grounded;
             ApplyActiveCollider();
 
@@ -206,6 +213,16 @@ namespace HagenDa.Networking
                     rb.velocity = Vector3.zero;
                     rb.angularVelocity = Vector3.zero;
                 }
+
+                // Dead bodies use default friction so they stay put when pushed;
+                // alive players use zero-friction (all movement friction is manual).
+                if (standCollider != null) standCollider.sharedMaterial = null;
+                if (crouchCollider != null) crouchCollider.sharedMaterial = null;
+            }
+            else
+            {
+                if (standCollider != null) standCollider.sharedMaterial = aliveStandMat;
+                if (crouchCollider != null) crouchCollider.sharedMaterial = aliveCrouchMat;
             }
             // On revive the posture stays prone (PHASE4 spec).
         }
