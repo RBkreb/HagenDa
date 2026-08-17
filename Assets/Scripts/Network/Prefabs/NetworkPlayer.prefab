@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 7971186896382879504}
   - component: {fileID: 8416130353467528664}
   - component: {fileID: 5519252547045945658}
+  - component: {fileID: 7066042554987163495}
   - component: {fileID: 3271674328394960880}
   m_Layer: 0
   m_HasEditorInfo: 1
@@ -212,11 +213,11 @@ MonoBehaviour:
   minPitch: -89
   maxPitch: 89
   eyeOffsetFromTop: 0.15
-  jumpShakeIntensity: 0.12
+  jumpShakeIntensity: 0.2
   jumpShakeDuration: 0.15
-  slideShakeIntensity: 0.12
-  slideShakeDuration: 0.25
-  diveShakeIntensity: 0.22
+  slideShakeIntensity: 0.2
+  slideShakeDuration: 0.5
+  diveShakeIntensity: 0.4
   diveShakeDuration: 0.3
   combat: {fileID: 3271674328394960880}
   playerCamera: {fileID: 8132827260397661879}
@@ -243,8 +244,11 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   maxHealth: 100
-  respawnDelay: 3
+  regenDelay: 8
+  regenInterval: 0.5
+  regenAmount: 5
   health: 0
+  armor: 0
 --- !u!114 &5519252547045945658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -259,6 +263,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   updateInterval: 0.1
   maxWindow: 3
+--- !u!114 &7066042554987163495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634328753906994812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99d21d2fd3835b842bd1c95e7a9dfd87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: {fileID: 0}
 --- !u!114 &3271674328394960880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,13 +292,19 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  shootRange: 200
   shootDamage: 20
   fireRate: 0.15
+  bulletSpeed: 750
+  bulletLifetime: 5
+  bulletPoolCapacity: 60
+  bulletPrefab: {fileID: 5926176164332243332, guid: dcb3f61632dbb1746985a4ecc29c1369,
+    type: 3}
   throwPoint: {fileID: 0}
   grenadeThrowablePrefab: {fileID: 3792378269598571763, guid: f8492bd32540f38419c8d1854790070d,
     type: 3}
   smokeThrowablePrefab: {fileID: 8750669352066971556, guid: a71b5efb948a6994cb201844257bac2c,
+    type: 3}
+  rescueThrowablePrefab: {fileID: 6601452253533115365, guid: 477445035a5cabe41a1df9782413153f,
     type: 3}
   throwSpeed: 10
   throwCooldown: 1

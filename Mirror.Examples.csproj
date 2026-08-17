@@ -186,8 +186,8 @@
     <Compile Include="Assets\Mirror\Examples\MultipleMatches\Scripts\PlayerGUI.cs" />
     <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\Enumerations.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleMatches\Scripts\MatchMessages.cs" />
-    <Compile Include="Assets\Mirror\Examples\Chat\Scripts\Player.cs" />
     <Compile Include="Assets\Mirror\Examples\BenchmarkPrediction\NetworkManagerPredictionBenchmark.cs" />
+    <Compile Include="Assets\Mirror\Examples\Chat\Scripts\Player.cs" />
     <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\Interfaces\IEquipped.cs" />
     <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\RandomVector3.cs" />
     <Compile Include="Assets\Mirror\Examples\Pong\Scripts\NetworkManagerPong.cs" />
@@ -637,6 +637,10 @@
     </Reference>
     <Reference Include="Mono.CecilX.Mdb">
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ReportGeneratorMerged">

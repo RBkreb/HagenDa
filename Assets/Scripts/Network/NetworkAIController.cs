@@ -29,13 +29,21 @@ namespace HagenDa.Networking
         public float throwInterval = 5f;
         public NetworkCombat combat;
 
+        [Header("Posture")]
+        public GameObject visual;       // upright capsule mesh (Body)
+        public float standHeight = 1.8f;
+        public float proneHeight = 0.5f;
+
         private NavMeshAgent agent;
+        private CapsuleCollider capsule;
+        private Rigidbody rb;
         private AIState state = AIState.Wander;
         private NetworkPlayerController target;
         private float targetRefresh;
         private float nextAttack;
         private float nextThrow;
         private float wanderNext;
+        private bool dead;
 
         public override void OnStartServer()
         {
@@ -43,6 +51,9 @@ namespace HagenDa.Networking
             agent.speed = walkSpeed;
             agent.acceleration = 20f;
             agent.stoppingDistance = 1f;
+
+            capsule = GetComponent<CapsuleCollider>();
+            rb = GetComponent<Rigidbody>();
 
             if (combat == null)
                 combat = GetComponent<NetworkCombat>();
@@ -64,9 +75,79 @@ namespace HagenDa.Networking
             }
         }
 
+        /// <summary>
+        /// Called by NetworkPlayerHealth on death/rescue. Mirrors the player: death
+        /// forces prone (capsule + visual lie flat), stops the NavMeshAgent, and
+        /// zeroes residual momentum so the zero-friction capsule doesn't keep sliding.
+        /// Rescue restores the upright posture and resumes the agent.
+        /// </summary>
+        public void SetDead(bool value)
+        {
+            dead = value;
+
+            if (agent == null)
+                agent = GetComponent<NavMeshAgent>();
+            if (agent != null)
+            {
+                agent.isStopped = value;
+                if (value)
+                    agent.ResetPath();
+            }
+
+            SetProne(value);
+
+            if (rb == null)
+                rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                // Kill any momentum carried over from the NavMeshAgent's movement so
+                // a corpse doesn't slide on the frictionless capsule.
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+
+        private void SetProne(bool prone)
+        {
+            if (capsule == null)
+                capsule = GetComponent<CapsuleCollider>();
+
+            if (capsule != null)
+            {
+                if (prone)
+                {
+                    // Lie flat (direction Z): vertical extent is the capsule diameter.
+                    capsule.direction = 2;
+                    capsule.center = new Vector3(0f, proneHeight * 0.5f, 0f);
+                }
+                else
+                {
+                    capsule.direction = 1; // Y (upright)
+                    capsule.center = new Vector3(0f, standHeight * 0.5f, 0f);
+                }
+            }
+
+            if (visual != null)
+            {
+                if (prone)
+                {
+                    // Rotate the upright capsule mesh to lie flat and drop its centre
+                    // to half the diameter.
+                    visual.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                    visual.transform.localPosition = new Vector3(0f, proneHeight * 0.5f, 0f);
+                }
+                else
+                {
+                    visual.transform.localRotation = Quaternion.identity;
+                    visual.transform.localPosition = new Vector3(0f, standHeight * 0.5f, 0f);
+                }
+            }
+        }
+
         private void Update()
         {
             if (!isServer) return;
+            if (dead) return;
 
             if (target == null || Time.time >= targetRefresh)
                 RefreshTarget();

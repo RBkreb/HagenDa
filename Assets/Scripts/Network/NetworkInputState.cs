@@ -8,8 +8,9 @@ namespace HagenDa.Networking
     /// The client only sends *intent*; the server is authoritative for all physics,
     /// posture, movement and shooting. This keeps the uplink minimal.
     ///
-    /// Edge-triggered inputs (jump / crouchToggle / proneToggle) are latched client-side
-    /// and reset after being sent, so the server sees each press exactly once.
+    /// Edge-triggered inputs (jump / crouchToggle / proneToggle / addArmor /
+    /// selfRescue) are latched client-side and reset after being sent, so the server
+    /// sees each press exactly once.
     /// </summary>
     [System.Serializable]
     public struct NetworkInputState
@@ -24,5 +25,7 @@ namespace HagenDa.Networking
         public bool crouchHold;     // left ctrl (held)
         public bool fire;           // left mouse (held)
         public bool throwGrenade;   // g (edge-triggered)
+        public bool addArmor;       // j test key: +20 armor (edge-triggered)
+        public bool selfRescue;     // h test key: self-rescue (edge-triggered)
     }
 }

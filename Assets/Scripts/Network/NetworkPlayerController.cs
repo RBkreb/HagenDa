@@ -98,11 +98,11 @@ namespace HagenDa.Networking
         public float eyeOffsetFromTop = 0.15f;
 
         [Header("Camera shake")]
-        public float jumpShakeIntensity = 0.12f;
+        public float jumpShakeIntensity = 0.2f;
         public float jumpShakeDuration = 0.15f;
-        public float slideShakeIntensity = 0.12f;
-        public float slideShakeDuration = 0.25f;
-        public float diveShakeIntensity = 0.22f;
+        public float slideShakeIntensity = 0.2f;
+        public float slideShakeDuration = 0.5f;
+        public float diveShakeIntensity = 0.4f;
         public float diveShakeDuration = 0.3f;
 
         [Header("Combat")]
@@ -138,6 +138,11 @@ namespace HagenDa.Networking
         private bool wasGrounded;
         private NetworkInputState serverInput;
 
+        private bool dead;               // server: 3C + combat disabled, forced prone
+        private NetworkPlayerHealth health;
+        private bool addArmorRequested;
+        private bool selfRescueRequested;
+
         // Client-side input cache (sampled every rendered frame).
         private Vector2 clientMove;
         private bool clientFire;
@@ -165,6 +170,7 @@ namespace HagenDa.Networking
             rb = GetComponent<Rigidbody>();
             if (standCollider == null)
                 standCollider = GetComponent<CapsuleCollider>();
+            health = GetComponent<NetworkPlayerHealth>();
         }
 
         public override void OnStartServer()
@@ -178,6 +184,30 @@ namespace HagenDa.Networking
 
             if (isServerOnly && playerCamera != null)
                 playerCamera.enabled = false;
+        }
+
+        /// <summary>
+        /// Called by NetworkPlayerHealth on death/rescue. Death forces prone and
+        /// disables all 3C/combat; rescue re-enables them while keeping prone.
+        /// </summary>
+        public void SetDead(bool value)
+        {
+            dead = value;
+            if (value)
+            {
+                sliding = false;
+                diving = false;
+                SetPosture(PlayerPosture.Prone);
+
+                // Kill residual momentum so a corpse doesn't keep sliding on the
+                // zero-friction capsule.
+                if (rb != null)
+                {
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                }
+            }
+            // On revive the posture stays prone (PHASE4 spec).
         }
 
         public override void OnStartClient()
@@ -235,6 +265,8 @@ namespace HagenDa.Networking
             if (k.xKey.wasPressedThisFrame) crouchToggleRequested = true;
             if (k.cKey.wasPressedThisFrame) proneToggleRequested = true;
             if (k.zKey.wasPressedThisFrame) throwGrenadeRequested = true;
+            if (k.jKey.wasPressedThisFrame) addArmorRequested = true;
+            if (k.hKey.wasPressedThisFrame) selfRescueRequested = true;
         }
 
         private Vector2 ReadMove()
@@ -363,6 +395,8 @@ namespace HagenDa.Networking
             s.crouchHold = clientCrouchHold;
             s.fire = clientFire;
             s.throwGrenade = throwGrenadeRequested; throwGrenadeRequested = false;
+            s.addArmor = addArmorRequested; addArmorRequested = false;
+            s.selfRescue = selfRescueRequested; selfRescueRequested = false;
 
             CmdInput(s);
         }
@@ -382,6 +416,28 @@ namespace HagenDa.Networking
             yaw = serverInput.yaw;
             pitch = Mathf.Clamp(serverInput.pitch, minPitch, maxPitch);
             transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+
+            // Test keys (server-authoritative debug): J = +20 armor, H = self-rescue.
+            if (health != null)
+            {
+                if (serverInput.addArmor) health.AddArmor(20f);
+                if (serverInput.selfRescue) health.Rescue();
+            }
+
+            // Dead: stay prone, no 3C / combat. Apply horizontal drag so a corpse
+            // that was moving at the moment of death bleeds off its momentum and
+            // stops (velocity-proportional, same stop rate as releasing input), and
+            // gravity so an airborne corpse settles onto the ground.
+            if (dead)
+            {
+                Vector3 hVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                if (hVel.sqrMagnitude > 0.0001f)
+                    rb.AddForce(-hVel * stoppingFriction, ForceMode.Acceleration);
+
+                if (!grounded)
+                    rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
+                return;
+            }
 
             bool justLanded = grounded && !wasGrounded;
 
