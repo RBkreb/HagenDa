@@ -16,7 +16,7 @@ namespace HagenDa.Networking
     public class DebugHud : MonoBehaviour
     {
         [Tooltip("Seconds between display text refreshes.")]
-        public float updateInterval = 0.2f;
+        public float updateInterval = 0.1f;
 
         [Tooltip("Rolling window (seconds) over which the max speed is computed.")]
         public float maxWindow = 3f;
@@ -117,19 +117,15 @@ namespace HagenDa.Networking
 
             Vector3 h = new Vector3(velocity.x, 0f, velocity.z);
             float hSpeed = h.magnitude;
-            float elevAngle = velocity.magnitude > 0.001f
-                ? Vector3.Angle(velocity, h)
-                : 90f;
 
             var k = Keyboard.current;
             bool ctrl = k != null && k.leftCtrlKey.isPressed;
 
             bool speedOk = hSpeed > controller.slideTriggerSpeed;
-            bool angleOk = elevAngle < controller.slideTriggerAngle;
 
-            if (speedOk && angleOk && ctrl)
-                return $"可触发 (速度 {hSpeed:F1} 角度 {elevAngle:F0}°)";
-            return $"待机 (速度 {hSpeed:F1}/{controller.slideTriggerSpeed:F0} 角度 {elevAngle:F0}°)";
+            if (speedOk && ctrl)
+                return $"可触发 (速度 {hSpeed:F1})";
+            return $"待机 (速度 {hSpeed:F1}/{controller.slideTriggerSpeed:F0} ctrl:{(ctrl ? "按" : "松")})";
         }
 
         private void OnGUI()
