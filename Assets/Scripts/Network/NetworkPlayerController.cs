@@ -106,9 +106,7 @@ namespace HagenDa.Networking
         public float diveShakeDuration = 0.3f;
 
         [Header("Combat")]
-        public float shootRange = 200f;
-        public float shootDamage = 20f;
-        public float fireRate = 0.15f;
+        public NetworkCombat combat;
 
         [Header("References")]
         public Camera playerCamera;
@@ -122,7 +120,6 @@ namespace HagenDa.Networking
         [SyncVar] public bool sliding;
 
         private float yaw;
-        private float nextFireTime;
         private float slideCooldownEnd;
         //private float landingGraceEnd;
 
@@ -149,6 +146,7 @@ namespace HagenDa.Networking
         private bool jumpRequested;
         private bool crouchToggleRequested;
         private bool proneToggleRequested;
+        private bool throwGrenadeRequested;
 
         // Client-side camera transition + shake state.
         private float cameraEyeHeight;
@@ -236,6 +234,7 @@ namespace HagenDa.Networking
             if (k.spaceKey.wasPressedThisFrame) jumpRequested = true;
             if (k.xKey.wasPressedThisFrame) crouchToggleRequested = true;
             if (k.cKey.wasPressedThisFrame) proneToggleRequested = true;
+            if (k.zKey.wasPressedThisFrame) throwGrenadeRequested = true;
         }
 
         private Vector2 ReadMove()
@@ -363,6 +362,7 @@ namespace HagenDa.Networking
             s.proneToggle = proneToggleRequested; proneToggleRequested = false;
             s.crouchHold = clientCrouchHold;
             s.fire = clientFire;
+            s.throwGrenade = throwGrenadeRequested; throwGrenadeRequested = false;
 
             CmdInput(s);
         }
@@ -460,11 +460,25 @@ namespace HagenDa.Networking
             // Movement forces + jump impulse + gravity.
             ApplyMovement(jumpIntent && !jumpConsumed);
 
-            // Fire.
-            if (serverInput.fire && Time.time >= nextFireTime)
+            // Combat: fire + throw (routed through the shared NetworkCombat component
+            // so player and AI share an identical attack code path).
+            if (combat != null)
             {
-                nextFireTime = Time.time + fireRate;
-                FireOnServer();
+                if (serverInput.fire)
+                {
+                    PlayerPosture eff2 = sliding ? PlayerPosture.Crouch : posture;
+                    Vector3 origin = transform.position + Vector3.up * GetEyeHeight(eff2);
+                    Vector3 forward = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
+                    combat.TryFire(origin, forward);
+                }
+
+                if (serverInput.throwGrenade)
+                {
+                    PlayerPosture eff2 = sliding ? PlayerPosture.Crouch : posture;
+                    Vector3 origin = transform.position + Vector3.up * GetEyeHeight(eff2);
+                    Vector3 forward = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
+                    combat.TryThrow(origin, forward);
+                }
             }
         }
 
@@ -754,32 +768,6 @@ namespace HagenDa.Networking
                     standCollider.direction = 2; // Z (lying forward)
                     standCollider.center = new Vector3(0f, proneHeight * 0.5f, 0f);
                     break;
-            }
-        }
-
-        // ---------------------------------------------------------------
-        // COMBAT (server-authoritative hitscan)
-        // ---------------------------------------------------------------
-        private void FireOnServer()
-        {
-            PlayerPosture eff = sliding ? PlayerPosture.Crouch : posture;
-            Vector3 origin = transform.position + Vector3.up * GetEyeHeight(eff);
-            Vector3 forward = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
-
-            if (Physics.Raycast(origin, forward, out RaycastHit hit, shootRange))
-            {
-                var playerHealth = hit.collider.GetComponentInParent<NetworkPlayerHealth>();
-                if (playerHealth != null)
-                {
-                    playerHealth.TakeDamage(shootDamage);
-                    return;
-                }
-
-                var target = hit.collider.GetComponentInParent<NetworkShootableTarget>();
-                if (target != null)
-                {
-                    target.TakeDamage(shootDamage);
-                }
             }
         }
 
