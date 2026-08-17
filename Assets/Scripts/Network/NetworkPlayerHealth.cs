@@ -8,7 +8,7 @@ namespace HagenDa.Networking
     /// Server-authoritative health for the networked player.
     /// The server owns <see cref="health"/> (a SyncVar); clients only observe it.
     /// </summary>
-    public class NetworkPlayerHealth : NetworkBehaviour
+    public class NetworkPlayerHealth : NetworkBehaviour, IDamageable
     {
         [Header("Health")]
         public float maxHealth = 100f;

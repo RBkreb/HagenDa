@@ -23,5 +23,6 @@ namespace HagenDa.Networking
         public bool proneToggle;    // c (edge-triggered)
         public bool crouchHold;     // left ctrl (held)
         public bool fire;           // left mouse (held)
+        public bool throwGrenade;   // g (edge-triggered)
     }
 }

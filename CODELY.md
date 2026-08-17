@@ -10,7 +10,8 @@
 - **Genre:** First-person shooter
 - **Networking:** [Mirror](https://mirror-networking.gitbook.io/docs/) `96.11.0` (MMO-scale networking library)
 - **Hosting:** Edgegap plugin (`EDGEGAP_PLUGIN_SERVERS` scripting symbol)
-- **Gameplay framework:** Cowsins FPS Engine (commercial Unity FPS framework) — movement, weapons, enemies, pickups, UI
+- **Movement:** self-made force-driven capsule Rigidbody (3C: walk / sprint / jump / slide / dive; stand / crouch / prone) — see PHASE2
+- **Gameplay framework:** Cowsins FPS Engine (commercial Unity FPS framework) — weapons, enemies, pickups, UI (movement replaced by self-made)
 
 ### Scripting Define Symbols
 
@@ -27,7 +28,8 @@ EDGEGAP_PLUGIN_SERVERS
 
 | Scene | Path | Purpose |
 |-------|------|---------|
-| **OutdoorsScene** | `Assets/OutdoorsScene.scene` | **Main scene / build entry** (only scene in Build Settings). Currently a lighting/environment starter (Sun, Sky and Fog Volume, Main Camera, StaticLightingSky). |
+| **PhysicsMovement** | `Assets/Scenes/PhysicsMovement.scene` | **Primary movement test scene.** Self-made 3C player (force-driven capsule + stand/crouch/prone/slide/dive), spawn points, floor, wall, shootable targets. |
+| **OutdoorsScene** | `Assets/OutdoorsScene.scene` | **Build entry** (only scene in Build Settings). Lighting/environment starter (Sun, Sky and Fog Volume, Main Camera, StaticLightingSky). |
 | MainMenu | `Assets/Cowsins/Demo/MainMenu.unity` | FPS Engine main menu |
 | Showroom | `Assets/Cowsins/Demo/Showroom.unity` | FPS Engine weapon showcase |
 | MovementShowroom | `Assets/Cowsins/Demo/MovementShowroom.unity` | Movement demo |
@@ -79,26 +81,34 @@ ScriptableObjects: `Assets/Cowsins/ScriptableObjects/{Weapons,Bullets,Attachment
 
 ## Multiplayer Networking (`Assets/Scripts/Network/`)
 
-Server-authoritative multiplayer built on Mirror, using a Rigidbody-based player avatar (mirrors the FPS Engine's physics model: Rigidbody + CapsuleCollider, `freezeRotation`, manual gravity).
+Server-authoritative multiplayer built on Mirror. The player avatar is a **self-made force-driven capsule Rigidbody** (NOT Character Controller): manual gravity + driving force + speed clamp, with a stand / crouch / prone posture state machine, slide and dive.
 
 ### Authority model (Mirror "Option A")
-- **Movement / hit-detection / health**: server-authoritative.
+- **Movement / physics / posture / hit-detection / health**: server-authoritative. The client only sends intent; the server applies forces, switches colliders, runs the posture state machine, and does the hitscan.
 - **Aim (look)**: client-authoritative. The owning client renders its camera from raw mouse delta every frame and sends its **absolute** `yaw`/`pitch` up; the server adopts that view verbatim (no delta-accumulation / packet-loss drift), then uses it to derive movement direction and shoot direction.
 
 ### Input flow
-- `Update()` samples all input every rendered frame (edge-triggered inputs like jump are latched, never missed).
+- `Update()` samples all input every rendered frame (edge-triggered inputs like jump / crouch-toggle / prone-toggle are latched, never missed).
 - `FixedUpdate()` sends an unreliable `[Command] CmdInput(NetworkInputState)` at 60 Hz server tick.
-- `NetworkTransformReliable` (SyncDirection = `ServerToClient`) syncs position + yaw down; `pitch` syncs via a `[SyncVar]`.
+- `NetworkTransformReliable` (SyncDirection = `ServerToClient`) syncs position + yaw down; `pitch`, `posture`, `sliding` sync via `[SyncVar]`.
 - Client render rate capped at 180 Hz (`Application.targetFrameRate` + vsync off); server tick = 60 Hz (Mirror `sendRate`).
+
+### PHASE2 3C movement (see `PHASE2.md`)
+- **Postures**: stand (1.8m) / crouch (0.9m) / prone (0.5m). Stand & crouch use separate upright capsules (stand + crouch collider, one enabled at a time); prone rotates the stand collider flat. Overhead clearance ray blocks standing/crouching under low ceilings.
+- **Movement**: walk / sticky sprint (forward+shift, exits only on forward release) / jump (height-based impulse) / slide (ctrl + speed, crouch collider, no clamp, 1s cooldown) / dive (prone + 15 m/s downward slam).
+- **Speeds**: stand 3.5 walk / 7.5 sprint; crouch 2 / 4.5; prone 0.5 m/s. Zero-friction `PhysicMaterial` on both capsules (all friction is manual forces).
+- **Camera**: below capsule top by 0.15m, lerps between postures, shakes on jump / slide / dive.
 
 ### Files
 | File | Purpose |
 |------|---------|
-| `NetworkPlayerController.cs` | Server-authoritative movement + client-authoritative look + server-side hitscan |
+| `NetworkPlayerController.cs` | Server-authoritative force-driven 3C controller (movement, posture state machine, slide/dive/jump, overhead clearance, server hitscan) |
 | `NetworkPlayerHealth.cs` | Server-authoritative health (SyncVar), death/respawn |
 | `NetworkShootableTarget.cs` | Static networked target for verifying hitscan |
 | `NetworkInputState.cs` | Serialized input snapshot struct |
-| `Editor/NetworkSetup.cs` | `HagenDa/Setup Multiplayer Scene` — builds player prefab + configures scene |
+| `DebugHud.cs` | Top-right debug HUD (3D speed, 3s max speed, posture, slide state) |
+| `Physics/PlayerNoFriction.physicMaterial` | Zero-friction material for both capsules |
+| `Editor/NetworkSetup.cs` | `HagenDa/Setup Multiplayer Scene`, `Create Physics Movement Scene`, `Rebuild NetworkPlayer Prefab` |
 | `Editor/BuildScript.cs` | `HagenDa/Build Windows Client` — builds standalone Windows client for 2-end testing |
 | `Prefabs/NetworkPlayer.prefab` | Generated networked player prefab |
 
@@ -110,8 +120,8 @@ Server-authoritative multiplayer built on Mirror, using a Rigidbody-based player
 
 ### Editor
 1. Open the project in Tuanjie Editor (2022.3.62t12).
-2. Open `Assets/OutdoorsScene.scene` (the build entry).
-3. Press **Play**.
+2. Open `Assets/Scenes/PhysicsMovement.scene` (movement test) or `Assets/OutdoorsScene.scene` (build entry).
+3. Press **Play** (start Host via the NetworkManager HUD).
 
 ### Unity Tools Integration
 Use the available Unity builtin tools for editor control:
@@ -141,7 +151,11 @@ Assets/
 ├── Low Poly Weapons VOL.1/# Third-party weapons pack
 ├── ScriptTemplates/       # Mirror script templates (right-click → Create)
 ├── Settings/              # HDRP pipeline assets & profiles
-└── OutdoorsScene.scene    # Main scene
+├── Scenes/                # Self-made scenes (PhysicsMovement.scene)
+├── Scripts/Network/       # Self-made networking + 3C movement
+│   ├── Physics/           # Zero-friction PhysicMaterial
+│   └── Editor/            # NetworkSetup / BuildScript
+└── OutdoorsScene.scene    # Build entry scene
 ```
 
 ### Assembly Definition Files (`*.asmdef`)
@@ -181,7 +195,6 @@ Plus standard `com.unity.modules.*` engine modules.
 
 ## TODO / Open Questions
 
-- **No custom build script** — batch-mode builds need a `BuildScript.cs` under an `Editor/` folder (not yet present).
 - **Render pipeline detection discrepancy** — `unity_editor get_state` reports `srp: "builtin"` even though HDRP is installed and assigned in `GraphicsSettings.asset`. Trust `GraphicsSettings.asset` / `HDRPProjectSettings.asset` for pipeline questions.
-- **Main scene is a lighting starter** — `OutdoorsScene.scene` currently contains only environment/lighting objects (Sun, Sky and Fog Volume, Main Camera, StaticLightingSky). Actual gameplay objects (player controller, weapons, network manager) have not yet been placed.
 - **Target platforms** — not specified in Player Settings (`applicationIdentifier` is empty); likely PC but unconfirmed.
+- **3C animation** — character skeleton/model (PHASE2 "character" section) not yet implemented; movement is physics-only.

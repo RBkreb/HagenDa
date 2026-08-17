@@ -97,6 +97,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\HitDetectionSystem.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Camera\CameraFOVManager.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkCombat.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\ExperienceManager.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\Experience.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerOrientation.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkPlayerHealth.cs" />
+    <Compile Include="Assets\Scripts\Network\IDamageable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\CrouchTilt.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Movement\PlayerMovementSettings.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Enemies\TurretProjectile.cs" />
@@ -128,6 +130,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Managers\DeviceDetection.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\CompassElement.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\InteractManager.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkThrowable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\WallBounceBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\ShootStyles\CustomShootStyle.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\IInteractManagerProvider.cs" />
@@ -142,6 +145,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Managers\CoinManager.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\QuickActionBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\UI\AttachmentUIElement.cs" />
+    <Compile Include="Assets\Scripts\Network\GrenadeThrowable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\StaminaBehaviour.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\MainMenuManager.cs" />
@@ -209,9 +213,11 @@
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerStats.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\SoundManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkExplosion.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\AddonManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
+    <Compile Include="Assets\Scripts\Network\SmokeThrowable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Enemies\IDamageable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Flashlight.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Weapon_SO.cs" />
@@ -239,6 +245,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Extra\ExplosiveBarrel.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\RecoilSystem.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\ShootStyles\MeleeShootStyle.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkAIController.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\CameraEffects.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\Attachments\Barrel.cs" />
@@ -260,6 +267,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\WeaponState\WeaponBaseState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerGraphics.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\WeaponState\WeaponStates.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkSmoke.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\IPlayerControlProvider.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\ClimbLadderBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Movement\PlayerMovementEvents.cs" />
@@ -1218,6 +1226,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.AI.Navigation">
+      <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Burst.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1276,6 +1288,10 @@
     </Reference>
     <Reference Include="Unity.Animation.Rigging">
       <HintPath>Library\ScriptAssemblies\Unity.Animation.Rigging.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.AI.Navigation.Editor.ConversionSystem">
+      <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Editor.ConversionSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.HighDefinition.Editor">
@@ -1338,6 +1354,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.AI.Navigation.Updater">
+      <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Updater.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Mathematics">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
       <Private>False</Private>
@@ -1348,6 +1368,10 @@
     </Reference>
     <Reference Include="Unity.Searcher.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.AI.Navigation.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">

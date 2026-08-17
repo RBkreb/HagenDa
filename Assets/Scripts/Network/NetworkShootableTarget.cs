@@ -8,7 +8,7 @@ namespace HagenDa.Networking
     /// A static networked target the server can damage, for verifying
     /// server-authoritative hitscan shooting.
     /// </summary>
-    public class NetworkShootableTarget : NetworkBehaviour
+    public class NetworkShootableTarget : NetworkBehaviour, IDamageable
     {
         public float maxHealth = 100f;
         public float respawnDelay = 3f;
