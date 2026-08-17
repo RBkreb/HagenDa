@@ -37,6 +37,7 @@ namespace HagenDa.Networking
         private NavMeshAgent agent;
         private CapsuleCollider capsule;
         private Rigidbody rb;
+        private PhysicMaterial aliveMaterial;  // cached no-friction material
         private AIState state = AIState.Wander;
         private NetworkPlayerController target;
         private float targetRefresh;
@@ -54,6 +55,7 @@ namespace HagenDa.Networking
 
             capsule = GetComponent<CapsuleCollider>();
             rb = GetComponent<Rigidbody>();
+            aliveMaterial = capsule != null ? capsule.sharedMaterial : null;
 
             if (combat == null)
                 combat = GetComponent<NetworkCombat>();
@@ -105,6 +107,12 @@ namespace HagenDa.Networking
                 rb.velocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
             }
+
+            // Swap the capsule's physics material: dead bodies use default friction
+            // so they stay put when pushed; alive AI restores the zero-friction
+            // material (all movement friction is applied manually as forces).
+            if (capsule != null)
+                capsule.sharedMaterial = value ? null : aliveMaterial;
         }
 
         private void SetProne(bool prone)
