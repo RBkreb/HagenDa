@@ -117,6 +117,7 @@
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Services\TJGeneratorsHistoryManager.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Config\Models\UILayoutConfig.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\TJGeneratorsGenerationLabel.cs" />
+    <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Windows\TJGeneratorsAssetWindowBase.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\PostProcessing\ImageSlicePostProcess.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\GenerationAssetFormatUtils.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Config\Models\ModelSelectorConfig.cs" />
@@ -153,6 +154,7 @@
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\PathUtils.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Pipeline\PipelineApiModels.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\TJGeneratorsVideoUtils.cs" />
+    <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Windows\TJGeneratorsMaterialWindow.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\TJGeneratorsImageAssetPathUtility.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\UnityGaussianSplattingPackage.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\TJMaterialShaderUtility.cs" />
@@ -167,6 +169,7 @@
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Pipeline\PipelineSettings.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\UI\ImagePreview.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Models\UserInfoModels.cs" />
+    <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\VideoModeResolver.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\GenerationTaskTrackerStatus.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\UnityWebRequestCompat.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Generators\ModelGeneratorBase.cs" />

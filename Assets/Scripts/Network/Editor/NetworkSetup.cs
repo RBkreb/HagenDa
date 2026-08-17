@@ -72,6 +72,19 @@ namespace HagenDa.Networking.EditorTools
             Debug.Log("[NetworkSetup] Done. Created Assets/Scenes/PhysicsMovement.scene with the force-driven player.");
         }
 
+        [MenuItem("HagenDa/Rebuild NetworkPlayer Prefab")]
+        public static void RebuildPlayerPrefab()
+        {
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+
+            // Re-serialize the prefab from the current script defaults WITHOUT
+            // touching the active scene.
+            BuildPlayerPrefab();
+
+            AssetDatabase.SaveAssets();
+            Debug.Log("[NetworkSetup] Done. Rebuilt " + PrefabPath);
+        }
+
         // ---------------------------------------------------------------
         // PREFAB
         // ---------------------------------------------------------------
@@ -98,10 +111,32 @@ namespace HagenDa.Networking.EditorTools
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
             // Stand collider: 1.8m tall x 0.5m wide (radius 0.25m).
+            // Zero-friction material: the landing impact's friction impulse would
+            // otherwise eat horizontal speed inside the physics step (mu*deltaV can
+            // reach ~0.6x the fall speed), silently breaking the slide trigger.
+            // All movement friction is applied manually as forces by the controller.
+            // Saved as a persistent asset: in-memory material instances are dropped
+            // by SaveAsPrefabAsset (serialized as fileID: 0).
+            EnsureFolder("Assets/Scripts/Network", "Physics");
+            const string noFrictionPath = "Assets/Scripts/Network/Physics/PlayerNoFriction.physicMaterial";
+            var noFriction = AssetDatabase.LoadAssetAtPath<PhysicMaterial>(noFrictionPath);
+            if (noFriction == null)
+            {
+                noFriction = new PhysicMaterial("PlayerNoFriction");
+                AssetDatabase.CreateAsset(noFriction, noFrictionPath);
+            }
+            noFriction.dynamicFriction = 0f;
+            noFriction.staticFriction = 0f;
+            noFriction.bounciness = 0f;
+            noFriction.frictionCombine = PhysicMaterialCombine.Minimum;
+            noFriction.bounceCombine = PhysicMaterialCombine.Minimum;
+            EditorUtility.SetDirty(noFriction);
+
             var standCapsule = root.AddComponent<CapsuleCollider>();
             standCapsule.height = 1.8f;
             standCapsule.radius = 0.25f;
             standCapsule.center = new Vector3(0f, 0.9f, 0f);
+            standCapsule.sharedMaterial = noFriction;
 
             // Crouch collider: 0.9m tall x 0.5m wide (radius 0.25m). Disabled by default.
             var crouchCapsule = root.AddComponent<CapsuleCollider>();
@@ -109,6 +144,7 @@ namespace HagenDa.Networking.EditorTools
             crouchCapsule.radius = 0.25f;
             crouchCapsule.center = new Vector3(0f, 0.45f, 0f);
             crouchCapsule.enabled = false;
+            crouchCapsule.sharedMaterial = noFriction;
 
             // Behaviour
             var controller = root.AddComponent<NetworkPlayerController>();

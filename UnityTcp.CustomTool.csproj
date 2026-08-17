@@ -66,9 +66,11 @@
   <ItemGroup>
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateVoiceCloneTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateSkyboxTool.cs" />
+    <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\ReplaceAnimatedCharacterModelTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateUpscaleImageTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\Generate3DModelTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateRiggedAnimatedModelTool.cs" />
+    <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateImageLayersTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\AssetDownloadNotifier.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerationNotifier.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateSpriteSequenceTool.cs" />
@@ -79,10 +81,10 @@
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateSpriteTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\SearchAssetsTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\PreviewUrlHelper.cs" />
-    <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateAnimatedCharacterTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateMaterialTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateAudioClipTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateEffectVideoTool.cs" />
+    <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateTripoTextureModelTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\GenerateGameUiKitTool.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\AssemblyInfo.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\CustomTool\CustomToolHistoryBindings.cs" />

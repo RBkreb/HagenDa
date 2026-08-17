@@ -128,7 +128,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1634328753906994812}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: e09fb4eb95239ed40ac781754d239041, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -151,7 +151,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1634328753906994812}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: e09fb4eb95239ed40ac781754d239041, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -183,28 +183,28 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  moveAcceleration: 12
+  moveAcceleration: 15
   friction: 1.5
   stoppingFriction: 8
   slideFriction: 1.5
   gravity: 9.81
   standWalkSpeed: 3.5
-  standSprintSpeed: 7
+  standSprintSpeed: 7.5
   crouchWalkSpeed: 2
   crouchSprintSpeed: 4.5
   proneSpeed: 0.5
   standHeight: 1.8
   crouchHeight: 0.9
   proneHeight: 0.5
+  clearanceRayOffset: 0.02
   standCrouchDelay: 0.1
   standProneDelay: 0.25
   crouchProneDelay: 0.15
-  jumpHeight: 0.6
-  slideSpeed: 8
+  jumpHeight: 1
+  slideSpeed: 12
   slideTriggerSpeed: 5
-  slideTriggerAngle: 60
   slideEndSpeed: 4
-  slideCooldown: 1
+  slideCooldown: 2
   diveSpeed: 15
   diveTriggerSpeed: 4
   lookSensitivity: 0.05793
@@ -258,7 +258,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ad25a8338628f84fa467a0e44dee1de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  updateInterval: 0.2
+  updateInterval: 0.1
   maxWindow: 3
 --- !u!1 &5844093405414719529
 GameObject:

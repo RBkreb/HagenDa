@@ -37,7 +37,7 @@ namespace HagenDa.Networking
     {
         [Header("Movement")]
         [Tooltip("Horizontal driving acceleration, applied in the move direction.")]
-        public float moveAcceleration = 12f;
+        public float moveAcceleration = 15f;
 
         [Tooltip("Velocity-proportional drag while driving (1/s). Drag < drive at the speed cap so the body can accelerate.")]
         public float friction = 1.5f;
@@ -49,11 +49,11 @@ namespace HagenDa.Networking
         public float slideFriction = 1.5f;
 
         [Tooltip("Gravity (1g = 9.81 m/s^2), applied downward while airborne.")]
-        public float gravity = 9.81f;
+        public float gravity = 15f;
 
         [Header("Speeds")]
         public float standWalkSpeed = 3.5f;
-        public float standSprintSpeed = 7f;
+        public float standSprintSpeed = 7.5f;
         public float crouchWalkSpeed = 2f;
         public float crouchSprintSpeed = 4.5f;
         public float proneSpeed = 0.5f;
@@ -64,20 +64,25 @@ namespace HagenDa.Networking
         [Tooltip("Capsule diameter when lying flat (prone).")]
         public float proneHeight = 0.5f;
 
+        [Tooltip("Offset above the capsule top where the overhead clearance ray starts (avoids grazing the body's own collider).")]
+        public float clearanceRayOffset = 0.02f;
+
         [Header("Posture switch delays (camera lerp duration)")]
         public float standCrouchDelay = 0.1f;
         public float standProneDelay = 0.25f;
         public float crouchProneDelay = 0.15f;
 
         [Header("Jump")]
-        public float jumpHeight = 0.6f;
+        public float jumpHeight = 1f;
 
         [Header("Slide")]
-        public float slideSpeed = 8f;
+        public float slideSpeed = 12f;
         public float slideTriggerSpeed = 5f;
-        public float slideTriggerAngle = 60f;
         public float slideEndSpeed = 4f;
-        public float slideCooldown = 1f;
+        public float slideCooldown = 2f;
+
+        //[Tooltip("Seconds after landing during which no horizontal drag/clamp is applied, so the slide check (which runs before forces each tick) sees the full landing speed even if the server's input snapshot lags a tick or two.")]
+        //public float landingGrace = 0.15f;
 
         [Header("Dive")]
         public float diveSpeed = 15f;
@@ -119,6 +124,7 @@ namespace HagenDa.Networking
         private float yaw;
         private float nextFireTime;
         private float slideCooldownEnd;
+        //private float landingGraceEnd;
 
         // Server-side posture/movement state.
         private bool sprintActive;   // sticky sprint (exits only when forward is released)
@@ -382,6 +388,12 @@ namespace HagenDa.Networking
             // Landing detection (jump landing / dive completion camera shake).
             if (justLanded)
             {
+                // Landing grace: preserve the landing speed briefly so the slide
+                // check (which runs before all forces below) wins over the instant
+                // drag/clamp that would otherwise kill the speed before the server's
+                // ctrl-hold input snapshot arrives (unreliable uplink lags 1-2 ticks).
+                //landingGraceEnd = Time.time + landingGrace;
+
                 if (diving)
                 {
                     diving = false;
@@ -407,9 +419,13 @@ namespace HagenDa.Networking
                                     rb.velocity.magnitude > diveTriggerSpeed;
 
                 if (jumpIntent)
+                {
+                    // Jump out of a slide: stand collider + a full normal jump impulse.
                     EndSlide(endToStand: true);
+                    PerformJump();
+                }
                 else if (diveReplaces)
-                    EndSlide(endToStand: true);
+                    EndSlide(endToStand: true); // dive trigger below takes over this tick
                 else if (HorizontalSpeed() < slideEndSpeed)
                     EndSlide();
             }
@@ -423,19 +439,23 @@ namespace HagenDa.Networking
                 dived = true;
             }
 
-            // Slide trigger (ctrl + fast + grounded + off cooldown).
-            // Also fires on the landing frame so holding ctrl through a jump/fall
-            // correctly triggers the slide the moment the body touches down.
+            // Slide trigger (ctrl + fast + grounded + off cooldown). Runs BEFORE
+            // ApplyMovement so the drag/clamp of the same tick can never destroy the
+            // speed the check is looking at.
             if (!dived && !sliding && serverInput.crouchHold &&
                 Time.time >= slideCooldownEnd && grounded &&
-                CanStartSlide(justLanded))
+                CanStartSlide())
             {
                 StartSlide();
             }
 
             // Posture state machine. Returns true when the jump key was consumed to
-            // stand up (so it must NOT also produce a jump impulse).
-            bool jumpConsumed = ProcessPosture(dived, jumpIntent);
+            // stand up (so it must NOT also produce a jump impulse). Skipped while
+            // sliding — the slide owns its collider/posture and resolves the final
+            // posture in EndSlide().
+            bool jumpConsumed = false;
+            if (!sliding)
+                jumpConsumed = ProcessPosture(dived, jumpIntent);
 
             // Movement forces + jump impulse + gravity.
             ApplyMovement(jumpIntent && !jumpConsumed);
@@ -464,28 +484,33 @@ namespace HagenDa.Networking
             bool jumpConsumed = false;
             bool crouchToggle = serverInput.crouchToggle;
             bool proneToggle = serverInput.proneToggle && !dived; // dive consumed the prone key
-            bool crouchHold = serverInput.crouchHold;
+
+            // Holding ctrl only enters crouch while grounded. While airborne, a held
+            // ctrl is reserved for the slide check (which runs BEFORE this method), so
+            // a sprint that lands with ctrl held triggers a slide instead of getting
+            // swallowed by the crouch-run speed clamp on the first grounded frame.
+            bool crouchHold = serverInput.crouchHold && grounded;
             bool sprint = serverInput.sprint;
 
             switch (posture)
             {
                 case PlayerPosture.Stand:
-                    if (crouchToggle) { SetPosture(PlayerPosture.Crouch); crouchByHold = false; }
-                    else if (crouchHold) { SetPosture(PlayerPosture.Crouch); crouchByHold = true; }
+                    if (crouchToggle) { if (SetPosture(PlayerPosture.Crouch)) crouchByHold = false; }
+                    else if (crouchHold && !sliding) { if (SetPosture(PlayerPosture.Crouch)) crouchByHold = true; }
                     else if (proneToggle) SetPosture(PlayerPosture.Prone);
                     break;
 
                 case PlayerPosture.Crouch:
-                    if (crouchToggle) SetPosture(PlayerPosture.Stand);
-                    else if (jump) { SetPosture(PlayerPosture.Stand); jumpConsumed = true; }
-                    else if (crouchByHold && !crouchHold) SetPosture(PlayerPosture.Stand);
+                    if (crouchToggle) { if (SetPosture(PlayerPosture.Stand)) crouchByHold = false; }
+                    else if (jump) { SetPosture(PlayerPosture.Stand); crouchByHold = false; jumpConsumed = true; }
+                    else if (crouchByHold && !serverInput.crouchHold) { if (SetPosture(PlayerPosture.Stand)) crouchByHold = false; }
                     else if (proneToggle) SetPosture(PlayerPosture.Prone);
                     break;
 
                 case PlayerPosture.Prone:
                     if (proneToggle) SetPosture(PlayerPosture.Stand);
-                    else if (crouchToggle) { SetPosture(PlayerPosture.Crouch); crouchByHold = false; }
-                    else if (crouchHold) { SetPosture(PlayerPosture.Crouch); crouchByHold = true; }
+                    else if (crouchToggle) { if (SetPosture(PlayerPosture.Crouch)) crouchByHold = false; }
+                    else if (crouchHold) { if (SetPosture(PlayerPosture.Crouch)) crouchByHold = true; }
                     else if (jump) { SetPosture(PlayerPosture.Stand); jumpConsumed = true; }
                     else if (sprint) SetPosture(PlayerPosture.Stand);
                     break;
@@ -510,6 +535,12 @@ namespace HagenDa.Networking
                     // Slide: light drag only (no drive, no speed clamp).
                     rb.AddForce(-hVel * slideFriction, ForceMode.Acceleration);
                 }
+                //else if (Time.time < landingGraceEnd)
+                //{
+                    // Landing grace: pure momentum preservation. No drive, no drag,
+                    // no clamp — the slide check (evaluated before forces) gets the
+                    // full landing speed instead of an instantly clamped/dragged one.
+                //}
                 else
                 {
                     if (hasInput)
@@ -523,11 +554,7 @@ namespace HagenDa.Networking
 
                 if (jump)
                 {
-                    float jumpVelocity = Mathf.Sqrt(2f * Mathf.Abs(gravity) * jumpHeight);
-                    rb.AddForce(Vector3.up * jumpVelocity, ForceMode.Impulse);
-                    grounded = false;
-                    jumpedOrDived = true;
-                    RpcCameraShake(jumpShakeIntensity, jumpShakeDuration, true);
+                    PerformJump();
                 }
             }
             else
@@ -535,6 +562,18 @@ namespace HagenDa.Networking
                 // Airborne: gravity only.
                 rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
             }
+        }
+
+        // Normal jump: height-based impulse + takeoff feedback. Also used to jump
+        // out of a slide. Sets grounded=false so the same tick's posture logic and
+        // ApplyMovement cannot double-apply it.
+        private void PerformJump()
+        {
+            float jumpVelocity = Mathf.Sqrt(2f * gravity * jumpHeight);
+            rb.AddForce(Vector3.up * jumpVelocity, ForceMode.Impulse);
+            grounded = false;
+            jumpedOrDived = true;
+            RpcCameraShake(jumpShakeIntensity, jumpShakeDuration, true);
         }
 
         private float CurrentMaxSpeed()
@@ -573,21 +612,10 @@ namespace HagenDa.Networking
             return new Vector3(v.x, 0f, v.z).magnitude;
         }
 
-        private bool CanStartSlide(bool justLanded)
+        private bool CanStartSlide()
         {
-            float hSpeed = HorizontalSpeed();
-            if (hSpeed <= slideTriggerSpeed) return false;
-
-            // On the landing frame the collision momentarily gives the body a steep
-            // downward velocity; accept it directly so a held ctrl triggers the slide.
-            if (justLanded) return true;
-
-            // Continuous: the velocity must be within slideTriggerAngle of horizontal.
-            Vector3 h = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-            if (h.magnitude < 0.01f) return false;
-
-            float elevAngle = Vector3.Angle(rb.velocity, h);
-            return elevAngle < slideTriggerAngle;
+            return HorizontalSpeed() > slideTriggerSpeed;
+            //return rb.velocity.magnitude > slideTriggerSpeed;
         }
 
         private void StartSlide()
@@ -613,7 +641,9 @@ namespace HagenDa.Networking
 
             if (endToStand)
             {
-                SetPosture(PlayerPosture.Stand);
+                // Ceiling too low to stand: settle for crouch instead of clipping.
+                if (!SetPosture(PlayerPosture.Stand))
+                    SetPosture(PlayerPosture.Crouch);
             }
             else if (serverInput.crouchHold)
             {
@@ -622,7 +652,11 @@ namespace HagenDa.Networking
             }
             else
             {
-                SetPosture(PlayerPosture.Stand);
+                if (!SetPosture(PlayerPosture.Stand))
+                {
+                    SetPosture(PlayerPosture.Crouch);
+                    crouchByHold = false;
+                }
             }
         }
 
@@ -640,10 +674,58 @@ namespace HagenDa.Networking
             grounded = false;
         }
 
-        private void SetPosture(PlayerPosture p)
+        private bool SetPosture(PlayerPosture p)
         {
+            if (!HasOverheadClearance(p)) return false;
+
             posture = p;
             ApplyActiveCollider();
+            return true;
+        }
+
+        // Vertical extent of the CURRENT active collider above transform.position.
+        private float EffectiveHeight()
+        {
+            PlayerPosture eff = sliding ? PlayerPosture.Crouch : posture;
+            switch (eff)
+            {
+                case PlayerPosture.Crouch: return crouchHeight;
+                case PlayerPosture.Prone: return proneHeight;
+                default: return standHeight;
+            }
+        }
+
+        /// <summary>
+        /// Overhead clearance probe: a ray from the capsule TOP straight up.
+        /// Entering a TALLER posture (crouch / stand) is blocked when an obstacle sits
+        /// lower than that posture's height (e.g. standing up under a low ledge would
+        /// clip the head into it). Entering prone is never blocked (lowest posture).
+        /// </summary>
+        private bool HasOverheadClearance(PlayerPosture target)
+        {
+            float targetHeight;
+            switch (target)
+            {
+                case PlayerPosture.Crouch: targetHeight = crouchHeight; break;
+                case PlayerPosture.Stand: targetHeight = standHeight; break;
+                default: return true; // prone: always allowed
+            }
+
+            float currentTop = EffectiveHeight();
+            float distance = targetHeight - currentTop - clearanceRayOffset;
+            if (distance <= 0f) return true; // already as tall as the target
+
+            Vector3 origin = transform.position + Vector3.up * (currentTop + clearanceRayOffset);
+            if (Physics.Raycast(origin, Vector3.up, out RaycastHit hit, distance,
+                                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                // Ignore our own colliders (the origin is already above them, but a
+                // sloped contact or interpolation jitter could still graze them).
+                if (hit.collider == standCollider || hit.collider == crouchCollider)
+                    return true;
+                return false;
+            }
+            return true;
         }
 
         private void ApplyActiveCollider()
