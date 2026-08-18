@@ -198,3 +198,14 @@ Plus standard `com.unity.modules.*` engine modules.
 - **Render pipeline detection discrepancy** — `unity_editor get_state` reports `srp: "builtin"` even though HDRP is installed and assigned in `GraphicsSettings.asset`. Trust `GraphicsSettings.asset` / `HDRPProjectSettings.asset` for pipeline questions.
 - **Target platforms** — not specified in Player Settings (`applicationIdentifier` is empty); likely PC but unconfirmed.
 - **3C animation** — character skeleton/model (PHASE2 "character" section) not yet implemented; movement is physics-only.
+
+## Codely Structured Memories
+
+### User
+
+### Feedback
+
+### Project
+- [2026-08-18 15:24:15] PHASE5 通用枪械模板已完成并通过测试（2026-08-18），下一阶段为 PHASE6 道具设计。核心实现：WeaponDefinition（数据模板 ScriptableObject）+ NetworkGun（服务端权威枪械状态机，玩家/AI 共用），枪械模型 Assets/Low Poly Weapons VOL.1/Models/M4_8.fbx，资产 Assets/Scripts/Network/Weapons/M4Definition.asset。关键决策：射速 900rpm（偏离规格默认 600，解决散布回复 7°/s 与满速射击散布持续增大的矛盾）；保留子弹穿透（与 PHASE4 一致）；第一人称枪械表现用基础版（挂 M4 模型 + 视觉后座 + 瞄准归中，无枪口火光/换弹动画）。注意：WeaponDefinition 数值改代码字段初始值不会回写已存在的 .asset（序列化值覆盖代码默认），改数值应直接编辑 M4Definition.asset 或删除该资产重建。
+### Reference
+

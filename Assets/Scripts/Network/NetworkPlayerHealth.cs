@@ -39,6 +39,11 @@ namespace HagenDa.Networking
         private float lastDamageTime;
         private float regenAccumulator;
 
+        [Tooltip("Blast shield sets this to 0.4 (60% explosion reduction). Default 1.")]
+        public float explosionDamageMultiplier = 1f;
+
+        private float buffRegenPerSecond;   // >0 = syringe / supply-pack temporary regen
+
         public override void OnStartServer()
         {
             health = maxHealth;
@@ -55,7 +60,7 @@ namespace HagenDa.Networking
         [Server]
         public void TakeDamage(float damage)
         {
-            TakeDamageInternal(damage, 1f);
+            TakeDamageInternal(damage * explosionDamageMultiplier, 1f);
         }
 
         /// <summary>Hitbox-aware damage (bullets).</summary>
@@ -89,6 +94,9 @@ namespace HagenDa.Networking
                 // Regen is gated on health *actually decreasing*, not on taking
                 // damage: armor-only damage must not reset the regen timer.
                 lastDamageTime = Time.time;
+
+                // 回复中被伤害则去除回复 buff（治疗针 / 补给包）。
+                buffRegenPerSecond = 0f;
             }
 
             if (health <= 0f)
@@ -101,6 +109,24 @@ namespace HagenDa.Networking
             armor += amount;
         }
 
+        /// <summary>Restore health (大型补给箱). Capped at maxHealth; dead entities ignored.</summary>
+        [Server]
+        public void Heal(float amount)
+        {
+            if (IsDead) return;
+            health = Mathf.Min(maxHealth, health + Mathf.Abs(amount));
+        }
+
+        /// <summary>
+        /// PHASE6: start a temporary HP-per-second regen buff (治疗针 / 补给包).
+        /// Removed on taking damage.
+        /// </summary>
+        [Server]
+        public void StartBuffRegen(float hpPerSecond)
+        {
+            buffRegenPerSecond = Mathf.Max(0f, hpPerSecond);
+        }
+
         // ---------------------------------------------------------------
         // REGENERATION (server)
         // ---------------------------------------------------------------
@@ -109,8 +135,22 @@ namespace HagenDa.Networking
         {
             if (!isServer) return;
             if (IsDead) return;
-            if (health >= maxHealth) return;
+            if (health >= maxHealth)
+            {
+                buffRegenPerSecond = 0f;
+                return;
+            }
 
+            // Buff regen (治疗针 / 补给包): continuous HP/s, independent of the
+            // natural regen delay.
+            if (buffRegenPerSecond > 0f)
+            {
+                health = Mathf.Min(maxHealth, health + buffRegenPerSecond * Time.deltaTime);
+                if (health >= maxHealth)
+                    buffRegenPerSecond = 0f;
+            }
+
+            // Natural regen (unchanged).
             if (Time.time - lastDamageTime >= regenDelay)
             {
                 regenAccumulator += Time.deltaTime;
@@ -162,7 +202,9 @@ namespace HagenDa.Networking
             if (ai != null) ai.SetDead(dead);
         }
 
-        private CapsuleCollider GetActiveCapsule()
+        /// <summary>The enabled capsule collider (stand/crouch/prone), used by bullets
+        /// to derive the hitbox damage multiplier. Public for <see cref="NetworkBullet"/>.</summary>
+        public CapsuleCollider GetActiveCapsule()
         {
             var colliders = GetComponents<CapsuleCollider>();
             foreach (var c in colliders)

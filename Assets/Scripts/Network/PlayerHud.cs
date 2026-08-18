@@ -3,29 +3,37 @@ using UnityEngine;
 namespace HagenDa.Networking
 {
     /// <summary>
-    /// Client-side HUD (PHASE4), drawn with IMGUI using percentage-based sizing
-    /// (all positions/sizes derive from Screen width/height fractions, no pixel
+    /// Client-side HUD (PHASE4 + PHASE5), drawn with IMGUI using percentage-based
+    /// sizing (all positions/sizes derive from Screen width/height fractions, no pixel
     /// constants). Shows:
-    ///   - a white crosshair at screen center,
+    ///   - a white crosshair at screen center that widens with weapon bloom,
     ///   - a white "X" hitmarker (hollow center) for 2 rendered frames after a hit,
     ///   - a bottom-center health bar (white fill, black for missing health),
-    ///   - the current armor as a number right of the bar (hidden when 0).
+    ///   - the current armor as a number right of the bar (hidden when 0),
+    ///   - the current magazine / reserve ammo, fire mode, and reload state.
     /// </summary>
     public class PlayerHud : MonoBehaviour
     {
         public NetworkPlayerHealth health;
 
         private NetworkPlayerController controller;
+        private NetworkGun gun;
+        private NetworkEquipment equipment;
         private int hitmarkerEndFrame = -1;
 
         private Texture2D whiteTex;
         private Texture2D blackTex;
         private GUIStyle armorStyle;
+        private GUIStyle ammoStyle;
+        private GUIStyle modeStyle;
+        private GUIStyle equipmentStyle;
 
         private void Awake()
         {
             controller = GetComponent<NetworkPlayerController>();
             if (health == null) health = GetComponent<NetworkPlayerHealth>();
+            gun = GetComponent<NetworkGun>();
+            equipment = GetComponent<NetworkEquipment>();
         }
 
         private void OnEnable()
@@ -49,10 +57,15 @@ namespace HagenDa.Networking
             DrawHitmarker();
             DrawHealthBar();
             DrawArmor();
+
+            if (equipment != null && controller.activeSlot >= 0)
+                DrawEquipment();
+            else
+                DrawAmmo();
         }
 
         // ---------------------------------------------------------------
-        // CROSSHAIR
+        // CROSSHAIR (spread widens the gap)
         // ---------------------------------------------------------------
         private void DrawCrosshair()
         {
@@ -60,7 +73,11 @@ namespace HagenDa.Networking
             float cy = Screen.height * 0.5f;
             float len = Screen.height * 0.012f;
             float thick = Mathf.Max(2f, Screen.height * 0.004f);
-            float gap = Screen.height * 0.005f;
+
+            // Bloom (degrees) widens the crosshair gap. Full bloom (10°) maps to a
+            // clearly open crosshair; aimed (0.1°) collapses to a tight center.
+            float bloom = gun != null ? gun.bloom : 0f;
+            float gap = Screen.height * (0.005f + bloom * 0.004f);
 
             DrawLine(new Vector2(cx, cy - gap - len), new Vector2(cx, cy - gap), thick);
             DrawLine(new Vector2(cx, cy + gap), new Vector2(cx, cy + gap + len), thick);
@@ -129,11 +146,107 @@ namespace HagenDa.Networking
                 armorStyle.fontSize = Mathf.Max(12, Mathf.RoundToInt(Screen.height * 0.03f));
                 armorStyle.normal.textColor = Color.white;
                 armorStyle.alignment = TextAnchor.MiddleLeft;
+                armorStyle.clipping = TextClipping.Overflow; // don't clip text taller than the rect
             }
 
             string text = Mathf.RoundToInt(health.armor).ToString();
             float tx = x + barW + Screen.width * 0.01f;
-            GUI.Label(new Rect(tx, y, Screen.width * 0.15f, barH), text, armorStyle);
+            float armorH = Screen.height * 0.035f; // room for the full glyph height
+            GUI.Label(new Rect(tx, y, Screen.width * 0.15f, armorH), text, armorStyle);
+        }
+
+        // ---------------------------------------------------------------
+        // AMMO / FIRE MODE / RELOAD (bottom right)
+        // ---------------------------------------------------------------
+        private void DrawAmmo()
+        {
+            if (gun == null || gun.Definition == null) return;
+
+            float y = Screen.height * 0.93f;
+            float x = Screen.width * 0.82f;
+            float h = Screen.height * 0.03f;
+
+            if (ammoStyle == null)
+            {
+                ammoStyle = new GUIStyle(GUI.skin.label);
+                ammoStyle.fontSize = Mathf.Max(14, Mathf.RoundToInt(Screen.height * 0.032f));
+                ammoStyle.normal.textColor = Color.white;
+                ammoStyle.alignment = TextAnchor.MiddleRight;
+                ammoStyle.clipping = TextClipping.Overflow; // don't clip text taller than the rect
+                ApplyCjkFont(ammoStyle);
+            }
+
+            string ammoText = $"{gun.magAmmo} / {gun.reserveAmmo}";
+            if (gun.reloading)
+            {
+                ammoText += gun.reloadPaused ? "  (换弹暂停)" : "  (换弹中...)";
+            }
+            GUI.Label(new Rect(x, y, Screen.width * 0.16f, h), ammoText, ammoStyle);
+
+            if (modeStyle == null)
+            {
+                modeStyle = new GUIStyle(GUI.skin.label);
+                modeStyle.fontSize = Mathf.Max(12, Mathf.RoundToInt(Screen.height * 0.022f));
+                modeStyle.normal.textColor = Color.white;
+                modeStyle.alignment = TextAnchor.MiddleRight;
+                modeStyle.clipping = TextClipping.Overflow; // don't clip text taller than the rect
+                ApplyCjkFont(modeStyle);
+            }
+
+            string mode = FireModeLabel();
+            GUI.Label(new Rect(x, y - h, Screen.width * 0.16f, h), mode, modeStyle);
+        }
+
+        // ---------------------------------------------------------------
+        // EQUIPMENT (PHASE6: 当前选中装备 + 弹药 + 补给度)
+        // ---------------------------------------------------------------
+        private void DrawEquipment()
+        {
+            if (equipment == null) return;
+
+            int idx = Mathf.Clamp(controller.activeSlot, 0, equipment.Count - 1);
+            if (idx >= equipment.Count) return;
+
+            var def = equipment.equipmentList[idx];
+            if (def == null) return;
+
+            float y = Screen.height * 0.93f;
+            float x = Screen.width * 0.82f;
+            float h = Screen.height * 0.03f;
+
+            if (equipmentStyle == null)
+            {
+                equipmentStyle = new GUIStyle(GUI.skin.label);
+                equipmentStyle.fontSize = Mathf.Max(14, Mathf.RoundToInt(Screen.height * 0.032f));
+                equipmentStyle.normal.textColor = Color.white;
+                equipmentStyle.alignment = TextAnchor.MiddleRight;
+                equipmentStyle.clipping = TextClipping.Overflow;
+                ApplyCjkFont(equipmentStyle);
+            }
+
+            string supplyText = def.supplyCost > 0
+                ? $"弹药 {equipment.selectedAmmo} | 补给 {equipment.selectedSupply:F0}/{def.supplyCost}"
+                : $"弹药 {equipment.selectedAmmo}";
+
+            if (equipment.IsEmpDisabled)
+                supplyText += "  [EMP]";
+
+            GUI.Label(new Rect(x, y, Screen.width * 0.16f, h), def.displayName, equipmentStyle);
+            GUI.Label(new Rect(x, y - h, Screen.width * 0.16f, h), supplyText, equipmentStyle);
+        }
+
+        private string FireModeLabel()
+        {
+            var modes = gun.Definition.fireModes;
+            if (modes == null || modes.Count == 0) return "";
+            int idx = ((gun.fireModeIndex % modes.Count) + modes.Count) % modes.Count;
+            switch (modes[idx])
+            {
+                case FireMode.Semi: return "半自动";
+                case FireMode.Burst: return "连射";
+                case FireMode.Bolt: return "栓动";
+                default: return "全自动";
+            }
         }
 
         // ---------------------------------------------------------------
@@ -159,6 +272,15 @@ namespace HagenDa.Networking
             tex.SetPixel(0, 0, color);
             tex.Apply();
             return tex;
+        }
+
+        // IMGUI's default font has no CJK glyphs; use a dynamic OS font for the
+        // Chinese ammo/mode labels.
+        private static void ApplyCjkFont(GUIStyle style)
+        {
+            Font cjk = Font.CreateDynamicFontFromOSFont("Microsoft YaHei", style.fontSize);
+            if (cjk != null)
+                style.font = cjk;
         }
     }
 }

@@ -1,39 +1,101 @@
 fileFormatVersion: 2
-guid: c7741850eebe1df4ea75a80275b16311
+guid: XH0YsSulVnvUkiGdFLLLZVWlNrLTKHwglHns779RuJCwehYRjJ8NUR0=
 ModelImporter:
-  serializedVersion: 23
-  fileIDToRecycleName:
-    100000: Bolt
-    100002: //RootNode
-    100004: Mag
-    100006: Rear_Sight
-    100008: Sight
-    100010: Trigger
-    400000: Bolt
-    400002: //RootNode
-    400004: Mag
-    400006: Rear_Sight
-    400008: Sight
-    400010: Trigger
-    2100000: Mat
-    2300000: Bolt
-    2300002: //RootNode
-    2300004: Mag
-    2300006: Rear_Sight
-    2300008: Sight
-    2300010: Trigger
-    3300000: Bolt
-    3300002: //RootNode
-    3300004: Mag
-    3300006: Rear_Sight
-    3300008: Sight
-    3300010: Trigger
-    4300000: M4_8
-    4300002: Mag
-    4300004: Rear_Sight
-    4300006: Trigger
-    4300008: Bolt
-    4300010: Sight
+  serializedVersion: 22361
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: Bolt
+  - first:
+      1: 100002
+    second: //RootNode
+  - first:
+      1: 100004
+    second: Mag
+  - first:
+      1: 100006
+    second: Rear_Sight
+  - first:
+      1: 100008
+    second: Sight
+  - first:
+      1: 100010
+    second: Trigger
+  - first:
+      4: 400000
+    second: Bolt
+  - first:
+      4: 400002
+    second: //RootNode
+  - first:
+      4: 400004
+    second: Mag
+  - first:
+      4: 400006
+    second: Rear_Sight
+  - first:
+      4: 400008
+    second: Sight
+  - first:
+      4: 400010
+    second: Trigger
+  - first:
+      21: 2100000
+    second: Mat
+  - first:
+      23: 2300000
+    second: Bolt
+  - first:
+      23: 2300002
+    second: //RootNode
+  - first:
+      23: 2300004
+    second: Mag
+  - first:
+      23: 2300006
+    second: Rear_Sight
+  - first:
+      23: 2300008
+    second: Sight
+  - first:
+      23: 2300010
+    second: Trigger
+  - first:
+      33: 3300000
+    second: Bolt
+  - first:
+      33: 3300002
+    second: //RootNode
+  - first:
+      33: 3300004
+    second: Mag
+  - first:
+      33: 3300006
+    second: Rear_Sight
+  - first:
+      33: 3300008
+    second: Sight
+  - first:
+      33: 3300010
+    second: Trigger
+  - first:
+      43: 4300000
+    second: M4_8
+  - first:
+      43: 4300002
+    second: Mag
+  - first:
+      43: 4300004
+    second: Rear_Sight
+  - first:
+      43: 4300006
+    second: Trigger
+  - first:
+      43: 4300008
+    second: Bolt
+  - first:
+      43: 4300010
+    second: Sight
   externalObjects:
   - first:
       type: UnityEngine:Material
@@ -41,7 +103,7 @@ ModelImporter:
       name: Mat
     second: {fileID: 2100000, guid: 28f0b13c7e9707746b5e0b3336181560, type: 2}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -50,6 +112,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
     rigImportErrors: 
     rigImportWarnings: 
@@ -59,7 +122,10 @@ ModelImporter:
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
     importConstraints: 0
-    animationCompression: 1
+    animationCompression: 3
+    aCLCompressionLevel: 3
+    aCLCurvePrecision: 0.01
+    aCLFastSampleMode: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -68,41 +134,188 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations: []
     isReadable: 1
+    tuanjieGIEnable: 0
+    tuanjieGIGenSDFFactor: 1
+    tuanjieGIGenSDFBias: 0.25
+    tuanjieGIDoubleSidedMode: 0
+    tuanjieGIGenFacetNums: 12
   meshes:
     lODScreenPercentages: []
     globalScale: 0.09846544
     meshCompression: 0
+    totalVerticesCount: 12585
+    totalTrianglesCount: 7866
     addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
     importVisibility: 0
     importBlendShapes: 1
     importCameras: 0
     importLights: 0
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
     preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
-    previousCalculatedGlobalScale: 1
-    hasPreviousCalculatedGlobalScale: 0
+    strictVertexDataChecks: 0
+  virtualGeometry:
+    virtualGeometry: 0
+    useTransparent: 0
+    setVGForeachMesh: 0
+    isFirstUse: 1
+    virtualGeometrySettings:
+      generateGeometryBuffer: 0
+      surfaceCompensation: 0
+      allMeshUse: 1
+      ignoreSimpleMesh: 0
+      transformScaleState: 0
+      isPossibleOverflow: 0
+      hasBoneData: 0
+      isBoneCountOverflow: 0
+    virtualGeometryPlatformSettings:
+    - serializedVersion: 0
+      overridden: 0
+      ignorePlatformSupport: 0
+      buildTarget: DefaultVirtualGeometryPlatform
+      positionPrecision: -2147483648
+      normalPrecision: -2147483648
+      tangentPrecision: -2147483648
+      boneWeightPrecision: -2147483648
+      detailedTriangleCount: 0
+      detailedVertexCount: 0
+      rootPageSize: 0
+      streamablePageSize: 0
+      reserveTrianglePercent: 100
+      reserveDetailLevel: 0
+    - serializedVersion: 0
+      overridden: 0
+      ignorePlatformSupport: 0
+      buildTarget: Standalone
+      positionPrecision: -2147483648
+      normalPrecision: -2147483648
+      tangentPrecision: -2147483648
+      boneWeightPrecision: -2147483648
+      detailedTriangleCount: 0
+      detailedVertexCount: 0
+      rootPageSize: 0
+      streamablePageSize: 0
+      reserveTrianglePercent: 100
+      reserveDetailLevel: 0
+    - serializedVersion: 0
+      overridden: 0
+      ignorePlatformSupport: 0
+      buildTarget: iPhone
+      positionPrecision: -2147483648
+      normalPrecision: -2147483648
+      tangentPrecision: -2147483648
+      boneWeightPrecision: -2147483648
+      detailedTriangleCount: 0
+      detailedVertexCount: 0
+      rootPageSize: 0
+      streamablePageSize: 0
+      reserveTrianglePercent: 100
+      reserveDetailLevel: 0
+    - serializedVersion: 0
+      overridden: 0
+      ignorePlatformSupport: 0
+      buildTarget: Android
+      positionPrecision: -2147483648
+      normalPrecision: -2147483648
+      tangentPrecision: -2147483648
+      boneWeightPrecision: -2147483648
+      detailedTriangleCount: 0
+      detailedVertexCount: 0
+      rootPageSize: 0
+      streamablePageSize: 0
+      reserveTrianglePercent: 100
+      reserveDetailLevel: 0
+    selectedVGMeshes:
+    - index: 0
+      meshName: M4_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 1
+      meshName: Mag
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 2
+      meshName: Rear_Sight
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 3
+      meshName: Trigger
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 4
+      meshName: Bolt
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 5
+      meshName: Sight
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    supportVGMeshes:
+    - index: 0
+      meshName: M4_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 1
+      meshName: Mag
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 2
+      meshName: Rear_Sight
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 3
+      meshName: Trigger
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 4
+      meshName: Bolt
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 5
+      meshName: Sight
+      lodLevel: 0
+      meshGeometryBuffer: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 0
-  copyAvatar: 0
+  overrideDefaultPose: 0
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
+    namedPoseList:
+    - name: Default
+      skeleton: []
     armTwist: 0.5
     foreArmTwist: 0.5
     upperLegTwist: 0.5
@@ -110,14 +323,20 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 0.09846544
     rootMotionBoneName: 
-    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    defaultPoseIndex: -1
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 0
   humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

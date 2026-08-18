@@ -24,8 +24,12 @@ namespace HagenDa.Networking
         public bool proneToggle;    // c (edge-triggered)
         public bool crouchHold;     // left ctrl (held)
         public bool fire;           // left mouse (held)
+        public bool aim;            // right mouse (held) - aim down sights
+        public bool reload;         // r (edge-triggered)
+        public bool switchFireMode; // v (edge-triggered)
         public bool throwGrenade;   // g (edge-triggered)
         public bool addArmor;       // j test key: +20 armor (edge-triggered)
         public bool selfRescue;     // h test key: self-rescue (edge-triggered)
+        public int wheelDelta;      // mouse wheel scroll (+1 up / -1 down), latched
     }
 }

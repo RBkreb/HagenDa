@@ -3,39 +3,49 @@ using UnityEngine;
 namespace HagenDa.Networking
 {
     /// <summary>
-    /// Server-only pooled bullet (PHASE4). Not a NetworkBehaviour — the server
-    /// simulates it and clients only see the tracer fired via ClientRpc, so bullets
-    /// are never spawned/despawned on the network (no per-bullet GC / Mirror churn).
+    /// Server-only pooled bullet (PHASE5). Not a NetworkBehaviour — the server
+    /// simulates it and clients only see the tracer via ClientRpc, so bullets are
+    /// never spawned/despawned on the network (no per-bullet GC / Mirror churn).
     ///
-    /// Flight: 750 m/s. Each frame the server raycasts the segment between the
-    /// previous and current position, picks the NEAREST non-owner hit, and:
-    ///   - player/AI (NetworkPlayerHealth) -> apply hitbox damage, keep flying
+    /// Flight: configured muzzle velocity with a constant deceleration. Each frame
+    /// the server raycasts the segment between the previous and current position,
+    /// picks the NEAREST non-owner hit, and:
+    ///   - player/AI (NetworkPlayerHealth) -> distance-decayed hitbox damage, keep flying
     ///   - anything else (wall / shootable target) -> destroy (return to pool)
-    ///   - after <see cref="lifetime"/> (5s) -> return to pool
+    ///   - after <see cref="lifetime"/> -> return to pool
+    ///
+    /// Damage: baseDamage * (1 - distance * decay) * part, floored at minDamage. The
+    /// bullet records its spawn position so each hit computes its own travelled
+    /// distance (penetration keeps PHASE4 behaviour: every penetrated enemy takes
+    /// its own distance-based damage).
     /// </summary>
     public class NetworkBullet : MonoBehaviour
     {
-        public float speed = 750f;
+        public float speed = 800f;
         public float lifetime = 5f;
-        public float damage = 20f;
+        public float damage = 30f;
 
         private Vector3 direction;
+        private Vector3 spawnPosition;
         private float spawnTime;
-        private NetworkCombat owner;
+        private WeaponDefinition definition;
+        private NetworkGun owner;
         private BulletPool pool;
         private Collider[] ownerColliders;
 
         private readonly RaycastHit[] hitBuffer = new RaycastHit[16];
 
-        public void Fire(Vector3 origin, Vector3 dir, float spd, float dmg, float life, NetworkCombat owner)
+        public void Fire(Vector3 origin, Vector3 dir, WeaponDefinition def, NetworkGun owner)
         {
             transform.SetParent(null, true);   // detach to world so it flies independently
             transform.position = origin;
 
             direction = dir.normalized;
-            speed = spd;
-            damage = dmg;
-            lifetime = life;
+            spawnPosition = origin;
+            definition = def;
+            speed = def != null ? def.bulletSpeed : 800f;
+            damage = def != null ? def.baseDamage : 30f;
+            lifetime = def != null ? def.bulletLifetime : 5f;
             this.owner = owner;
 
             ownerColliders = owner != null
@@ -56,64 +66,91 @@ namespace HagenDa.Networking
             Vector3 start = transform.position;
             Vector3 dir = direction;
             float step = speed * Time.deltaTime;
+            if (step <= 0.0001f)
+            {
+                Expire();
+                return;
+            }
+
             Vector3 end = start + dir * step;
 
-            float dist = step;
-            if (dist > 0.0001f)
+            int n = Physics.RaycastNonAlloc(start, dir, hitBuffer, step,
+                                            Physics.DefaultRaycastLayers,
+                                            QueryTriggerInteraction.Ignore);
+
+            // RaycastNonAlloc order is not guaranteed — find the nearest valid hit.
+            bool found = false;
+            RaycastHit best = default;
+            float bestDist = step;
+
+            for (int i = 0; i < n; i++)
             {
-                int n = Physics.RaycastNonAlloc(start, dir, hitBuffer, dist,
-                                                Physics.DefaultRaycastLayers,
-                                                QueryTriggerInteraction.Ignore);
-
-                // RaycastNonAlloc order is not guaranteed — find the nearest valid hit.
-                bool found = false;
-                RaycastHit best = default;
-                float bestDist = dist;
-
-                for (int i = 0; i < n; i++)
+                if (IsOwnerCollider(hitBuffer[i].collider)) continue;
+                if (hitBuffer[i].distance < bestDist)
                 {
-                    if (IsOwnerCollider(hitBuffer[i].collider)) continue;
-                    if (hitBuffer[i].distance < bestDist)
-                    {
-                        bestDist = hitBuffer[i].distance;
-                        best = hitBuffer[i];
-                        found = true;
-                    }
+                    bestDist = hitBuffer[i].distance;
+                    best = hitBuffer[i];
+                    found = true;
                 }
+            }
 
-                if (found)
+            if (found)
+            {
+                owner?.NotifyImpact(best.point);
+
+                var damageable = best.collider.GetComponentInParent<IDamageable>();
+                if (damageable != null)
                 {
-                    // Hit feedback: a small smoke puff at the exact hit point, on any
-                    // hit (living entity, static target, or cover/wall).
-                    owner?.NotifyImpact(best.point);
+                    var health = best.collider.GetComponentInParent<NetworkPlayerHealth>();
+                    bool living = health != null;
 
-                    var damageable = best.collider.GetComponentInParent<IDamageable>();
-                    if (damageable != null)
+                    float part = 1f;
+                    if (living)
+                        part = HitboxUtility.GetMultiplier(health.GetActiveCapsule(), best.point);
+
+                    float finalDamage = ComputeDamage(best.point, part);
+                    damageable.TakeDamage(finalDamage);
+
+                    if (living)
                     {
-                        bool living = best.collider.GetComponentInParent<NetworkPlayerHealth>() != null;
-
-                        damageable.TakeDamage(damage, best.point);
-                        if (living)
-                            owner?.NotifyHit();
-
-                        if (!living)
-                        {
-                            // Hit a non-entity (wall / static target): destroy.
-                            Expire();
-                            return;
-                        }
                         // Living entity: penetrate and keep flying.
+                        owner?.NotifyHit();
                     }
                     else
                     {
-                        // Hit geometry with no IDamageable (wall etc.): destroy.
+                        // Non-entity (wall / static target): destroy.
                         Expire();
                         return;
                     }
                 }
+                else
+                {
+                    // Geometry with no IDamageable (wall etc.): destroy.
+                    Expire();
+                    return;
+                }
+            }
+
+            // Constant deceleration, then advance to the segment end.
+            if (definition != null)
+                speed -= definition.bulletDeceleration * Time.deltaTime;
+            if (speed <= 0f)
+            {
+                Expire();
+                return;
             }
 
             transform.position = end;
+        }
+
+        private float ComputeDamage(Vector3 hitPoint, float part)
+        {
+            if (definition == null)
+                return damage * part;
+
+            float distance = Vector3.Distance(spawnPosition, hitPoint);
+            float decayed = definition.baseDamage * (1f - distance * definition.damageDecay);
+            return Mathf.Max(decayed * part, definition.minDamage);
         }
 
         private bool IsOwnerCollider(Collider c)
