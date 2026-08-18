@@ -81,6 +81,10 @@ namespace HagenDa.Networking
         public float slideEndSpeed = 4f;
         public float slideCooldown = 2f;
 
+        [Header("Dash (快速机动装置)")]
+        public float dashSpeed = 40f;
+        public float dashUpwardSpeed = 1.5f;
+
         //[Tooltip("Seconds after landing during which no horizontal drag/clamp is applied, so the slide check (which runs before forces each tick) sees the full landing speed even if the server's input snapshot lags a tick or two.")]
         //public float landingGrace = 0.15f;
 
@@ -107,6 +111,8 @@ namespace HagenDa.Networking
 
         [Header("Combat")]
         public NetworkCombat combat;
+        public NetworkGun gun;
+        public NetworkEquipment equipment;
 
         [Header("References")]
         public Camera playerCamera;
@@ -118,6 +124,7 @@ namespace HagenDa.Networking
         [SyncVar] public float pitch;
         [SyncVar] public PlayerPosture posture = PlayerPosture.Stand;
         [SyncVar] public bool sliding;
+        [SyncVar] public int activeSlot = -1;   // -1 = 主武器(gun)，0..N-1 = 装备索引
 
         private float yaw;
         private float slideCooldownEnd;
@@ -125,6 +132,7 @@ namespace HagenDa.Networking
 
         // Server-side posture/movement state.
         private bool sprintActive;   // sticky sprint (exits only when forward is released)
+        private float sprintFireHold; // seconds fire held while sprinting (sprint->fire cooldown)
         private bool crouchByHold;   // true when crouch was entered by holding left ctrl
         private bool diving;         // dive in progress (until landing)
         private bool jumpedOrDived;  // was airborne from a jump (for landing shake)
@@ -148,12 +156,16 @@ namespace HagenDa.Networking
         // Client-side input cache (sampled every rendered frame).
         private Vector2 clientMove;
         private bool clientFire;
+        private bool clientAim;
         private bool clientSprint;
         private bool clientCrouchHold;
         private bool jumpRequested;
         private bool crouchToggleRequested;
         private bool proneToggleRequested;
         private bool throwGrenadeRequested;
+        private bool reloadRequested;
+        private bool switchFireModeRequested;
+        private int wheelDeltaRequested;
 
         // Client-side camera transition + shake state.
         private float cameraEyeHeight;
@@ -273,8 +285,13 @@ namespace HagenDa.Networking
 
             clientMove = ReadMove();
             clientFire = m != null && m.leftButton.isPressed;
+            clientAim = m != null && m.rightButton.isPressed;
             clientSprint = k != null && k.leftShiftKey.isPressed;
             clientCrouchHold = k != null && k.leftCtrlKey.isPressed;
+
+            float scroll = m != null ? m.scroll.ReadValue().y : 0f;
+            if (scroll > 0f) wheelDeltaRequested++;
+            else if (scroll < 0f) wheelDeltaRequested--;
 
             if (k == null) return;
 
@@ -282,6 +299,8 @@ namespace HagenDa.Networking
             if (k.xKey.wasPressedThisFrame) crouchToggleRequested = true;
             if (k.cKey.wasPressedThisFrame) proneToggleRequested = true;
             if (k.zKey.wasPressedThisFrame) throwGrenadeRequested = true;
+            if (k.rKey.wasPressedThisFrame) reloadRequested = true;
+            if (k.vKey.wasPressedThisFrame) switchFireModeRequested = true;
             if (k.jKey.wasPressedThisFrame) addArmorRequested = true;
             if (k.hKey.wasPressedThisFrame) selfRescueRequested = true;
         }
@@ -321,7 +340,14 @@ namespace HagenDa.Networking
 
             playerCamera.transform.position =
                 transform.position + Vector3.up * cameraEyeHeight + shakeOffset;
-            playerCamera.transform.rotation = Quaternion.Euler(localPitch, localYaw, 0f);
+
+            // Apply the server's screen recoil (pitch kick up) as a temporary offset
+            // on top of the player's clamped aim pitch. The final rendered pitch is
+            // clamped to the fixed view limits so accumulated recoil can never push
+            // the camera past minPitch/maxPitch.
+            float recoilPitch = gun != null ? gun.recoil : 0f;
+            float renderPitch = Mathf.Clamp(localPitch - recoilPitch, minPitch, maxPitch);
+            playerCamera.transform.rotation = Quaternion.Euler(renderPitch, localYaw, 0f);
         }
 
         private void UpdateCameraHeight()
@@ -411,9 +437,13 @@ namespace HagenDa.Networking
             s.proneToggle = proneToggleRequested; proneToggleRequested = false;
             s.crouchHold = clientCrouchHold;
             s.fire = clientFire;
+            s.aim = clientAim;
+            s.reload = reloadRequested; reloadRequested = false;
+            s.switchFireMode = switchFireModeRequested; switchFireModeRequested = false;
             s.throwGrenade = throwGrenadeRequested; throwGrenadeRequested = false;
             s.addArmor = addArmorRequested; addArmorRequested = false;
             s.selfRescue = selfRescueRequested; selfRescueRequested = false;
+            s.wheelDelta = wheelDeltaRequested; wheelDeltaRequested = 0;
 
             CmdInput(s);
         }
@@ -433,6 +463,14 @@ namespace HagenDa.Networking
             yaw = serverInput.yaw;
             pitch = Mathf.Clamp(serverInput.pitch, minPitch, maxPitch);
             transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+
+            // Mouse wheel: switch the active slot (gun -> equipment list).
+            if (serverInput.wheelDelta != 0 && equipment != null)
+            {
+                int maxSlot = equipment.Count - 1;
+                activeSlot = Mathf.Clamp(activeSlot + serverInput.wheelDelta, -1, maxSlot);
+                equipment.Select(activeSlot >= 0 ? activeSlot : -1);
+            }
 
             // Test keys (server-authoritative debug): J = +20 armor, H = self-rescue.
             if (health != null)
@@ -533,25 +571,32 @@ namespace HagenDa.Networking
             // Movement forces + jump impulse + gravity.
             ApplyMovement(jumpIntent && !jumpConsumed);
 
-            // Combat: fire + throw (routed through the shared NetworkCombat component
-            // so player and AI share an identical attack code path).
-            if (combat != null)
-            {
-                if (serverInput.fire)
-                {
-                    PlayerPosture eff2 = sliding ? PlayerPosture.Crouch : posture;
-                    Vector3 origin = transform.position + Vector3.up * GetEyeHeight(eff2);
-                    Vector3 forward = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
-                    combat.TryFire(origin, forward);
-                }
+            // Combat: shooting (gun) + throwing (combat). Fire/aim are fed every tick;
+            // reload and fire-mode switch are edge-triggered commands.
+            PlayerPosture eff2 = sliding ? PlayerPosture.Crouch : posture;
+            Vector3 eye = transform.position + Vector3.up * GetEyeHeight(eff2);
+            Vector3 forward = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
 
-                if (serverInput.throwGrenade)
-                {
-                    PlayerPosture eff2 = sliding ? PlayerPosture.Crouch : posture;
-                    Vector3 origin = transform.position + Vector3.up * GetEyeHeight(eff2);
-                    Vector3 forward = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
-                    combat.TryThrow(origin, forward);
-                }
+            if (gun != null)
+            {
+                bool gunActive = activeSlot < 0;
+
+                if (serverInput.reload && gunActive) gun.Reload();
+                if (serverInput.switchFireMode && gunActive) gun.SwitchFireMode();
+                gun.Tick(gunActive ? serverInput.fire : false,
+                         gunActive ? serverInput.aim : false,
+                         eye, forward, sprintActive);
+            }
+
+            if (equipment != null && activeSlot >= 0)
+            {
+                equipment.Tick(activeSlot, serverInput.fire, serverInput.aim,
+                               eye, forward, serverInput.move, grounded);
+            }
+
+            if (combat != null && serverInput.throwGrenade)
+            {
+                combat.TryThrow(eye, forward);
             }
         }
 
@@ -559,11 +604,46 @@ namespace HagenDa.Networking
         {
             bool forward = serverInput.move.y > 0.1f;
 
-            if (serverInput.sprint && forward)
-                sprintActive = true;
-            else if (!forward)
-                sprintActive = false;
-            // else: forward held without shift -> keep sprintActive (sticky)
+            if (sprintActive)
+            {
+                if (!forward)
+                {
+                    // Releasing the forward key exits sprint (sticky sprint).
+                    sprintActive = false;
+                    sprintFireHold = 0f;
+                }
+                else if (serverInput.fire)
+                {
+                    // Holding fire while sprinting: exit sprint only after the
+                    // sprint->fire cooldown (the gun blocks firing while sprinting,
+                    // so the cooldown and the sprint exit coincide).
+                    sprintFireHold += Time.fixedDeltaTime;
+                    float cooldown = (gun != null && gun.Definition != null)
+                        ? gun.Definition.sprintFireCooldown
+                        : 0.1f;
+                    if (sprintFireHold >= cooldown)
+                    {
+                        sprintActive = false;
+                        sprintFireHold = 0f;
+                    }
+                }
+                else if (serverInput.aim)
+                {
+                    // Aiming and sprinting are mutually exclusive.
+                    sprintActive = false;
+                    sprintFireHold = 0f;
+                }
+                else
+                {
+                    sprintFireHold = 0f;
+                }
+            }
+            else
+            {
+                // Enter sprint only when not firing / aiming.
+                if (serverInput.sprint && forward && !serverInput.fire && !serverInput.aim)
+                    sprintActive = true;
+            }
         }
 
         private bool ProcessPosture(bool dived, bool jump)
@@ -661,6 +741,25 @@ namespace HagenDa.Networking
             grounded = false;
             jumpedOrDived = true;
             RpcCameraShake(jumpShakeIntensity, jumpShakeDuration, true);
+        }
+
+        /// <summary>
+        /// PHASE6 快速机动装置: an instantaneous horizontal impulse (larger than a
+        /// jump) in the input direction plus a small vertical impulse. Called by
+        /// NetworkEquipment.UseSelfInstant with an already world-space direction.
+        /// </summary>
+        public void Dash(Vector3 dir)
+        {
+            if (rb == null) return;
+
+            if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
+            dir.y = 0f;
+            dir.Normalize();
+
+            rb.AddForce(dir * dashSpeed, ForceMode.Impulse);
+            rb.AddForce(Vector3.up * dashUpwardSpeed, ForceMode.Impulse);
+            grounded = false;
+            jumpedOrDived = true;
         }
 
         private float CurrentMaxSpeed()
@@ -847,8 +946,13 @@ namespace HagenDa.Networking
         // ---------------------------------------------------------------
         // CAMERA SHAKE (server -> owning client)
         // ---------------------------------------------------------------
-        [ClientRpc]
-        private void RpcCameraShake(float intensity, float duration, bool vertical)
+
+        /// <summary>
+        /// Client-side camera shake entry point. Called from an RPC (server-driven
+        /// jump/slide/dive) or directly by the local <see cref="NetworkGun"/> visual
+        /// recoil (already running on the owning client).
+        /// </summary>
+        public void ApplyCameraShake(float intensity, float duration, bool vertical)
         {
             if (!isLocalPlayer || playerCamera == null) return;
 
@@ -856,6 +960,12 @@ namespace HagenDa.Networking
             shakeDuration = duration;
             shakeTime = 0f;
             shakeVertical = vertical;
+        }
+
+        [ClientRpc]
+        private void RpcCameraShake(float intensity, float duration, bool vertical)
+        {
+            ApplyCameraShake(intensity, duration, vertical);
         }
 
         // ---------------------------------------------------------------

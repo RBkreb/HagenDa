@@ -15,8 +15,10 @@ GameObject:
   - component: {fileID: 8165061629808964091}
   - component: {fileID: 674333920905833729}
   - component: {fileID: 2861076355436660845}
+  - component: {fileID: 5783371912108599561}
   - component: {fileID: 3829205206201556184}
   - component: {fileID: 6098297461493983970}
+  - component: {fileID: 7057705317322719540}
   m_Layer: 0
   m_HasEditorInfo: 1
   m_Name: AIEntity
@@ -181,13 +183,6 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  shootDamage: 20
-  fireRate: 0.15
-  bulletSpeed: 750
-  bulletLifetime: 5
-  bulletPoolCapacity: 60
-  bulletPrefab: {fileID: 5926176164332243332, guid: dcb3f61632dbb1746985a4ecc29c1369,
-    type: 3}
   throwPoint: {fileID: 0}
   grenadeThrowablePrefab: {fileID: 3792378269598571763, guid: f8492bd32540f38419c8d1854790070d,
     type: 3}
@@ -197,6 +192,40 @@ MonoBehaviour:
     type: 3}
   throwSpeed: 10
   throwCooldown: 1
+--- !u!114 &5783371912108599561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543077640700298910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e274d8d85823b86439f986b98a33822e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMethod: 0
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  definition: {fileID: 11400000, guid: fb977b69eb03c1c4cb36be57e91644cc, type: 2}
+  bulletPrefab: {fileID: 5926176164332243332, guid: dcb3f61632dbb1746985a4ecc29c1369,
+    type: 3}
+  bulletPoolCapacity: 60
+  gunModel: {fileID: 0}
+  hipPosition: {x: 0.28, y: -0.24, z: 0.45}
+  adsPosition: {x: 0, y: -0.18, z: 0.3}
+  hipEuler: {x: 0, y: 0, z: 0}
+  adsEuler: {x: 0, y: 0, z: 0}
+  controller: {fileID: 0}
+  magAmmo: 0
+  reserveAmmo: 0
+  fireModeIndex: 0
+  recoil: 0
+  bloom: 0
+  aimAmount: 0
+  reloading: 0
+  reloadPaused: 0
 --- !u!114 &3829205206201556184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -219,6 +248,7 @@ MonoBehaviour:
   regenAmount: 5
   health: 0
   armor: 0
+  explosionDamageMultiplier: 1
 --- !u!114 &6098297461493983970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -241,12 +271,54 @@ MonoBehaviour:
   wanderWaitTime: 2
   detectRange: 20
   attackRange: 15
-  attackCooldown: 1.5
   throwInterval: 5
   combat: {fileID: 2861076355436660845}
+  gun: {fileID: 5783371912108599561}
+  equipment: {fileID: 7057705317322719540}
   visual: {fileID: 3619932077785825544}
   standHeight: 1.8
   proneHeight: 0.5
+--- !u!114 &7057705317322719540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543077640700298910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c6b77d70724cfc43b9b50d71bcdc5ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMethod: 0
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  equipmentList:
+  - {fileID: 11400000, guid: 42d81812ae30aee4e8bba5f10a3a1bb0, type: 2}
+  - {fileID: 11400000, guid: 7458bc88180679b44b34d5418928da98, type: 2}
+  - {fileID: 11400000, guid: 7e32db83d8c6b7d45be757f3585cecd0, type: 2}
+  - {fileID: 11400000, guid: 626c4ee3a626f1f4fa1a91ac3a74a415, type: 2}
+  - {fileID: 11400000, guid: d7d244dbe1588e74abbe4d51e38878d9, type: 2}
+  - {fileID: 11400000, guid: a375d8fad34042845be4460a2a61b6f3, type: 2}
+  - {fileID: 11400000, guid: dbc7a218f5696264a9de814c10461097, type: 2}
+  - {fileID: 11400000, guid: fa5523e95ba47e447b67f203ca7a9f5e, type: 2}
+  - {fileID: 11400000, guid: cfe127f5902781444a08800e60fae214, type: 2}
+  - {fileID: 11400000, guid: 69bddee006a421a4b98a9f6276f94f04, type: 2}
+  - {fileID: 11400000, guid: b9bf681d9c53d794fbea8ca10b4c9a33, type: 2}
+  - {fileID: 11400000, guid: 406108a7bed5f7947b85907a256400f5, type: 2}
+  - {fileID: 11400000, guid: e0ead184a3c43b5428750d4d856351ab, type: 2}
+  - {fileID: 11400000, guid: cad4a8be1cf43b84daa1ee06c3ba3157, type: 2}
+  - {fileID: 11400000, guid: f6449bc34f7c8fc4ebc4387f723e440a, type: 2}
+  - {fileID: 11400000, guid: 25d9ef986e04a6048ad67396d3323b84, type: 2}
+  - {fileID: 11400000, guid: 9a734e141d3ed4b4191f0bd919b5f058, type: 2}
+  controller: {fileID: 0}
+  selection: -1
+  selectedAmmo: 0
+  selectedSupply: 0
+  empExposure: 0
+  shieldActive: 0
+  channeling: 0
 --- !u!1 &3619932077785825544
 GameObject:
   m_ObjectHideFlags: 0

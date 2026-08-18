@@ -25,9 +25,10 @@ namespace HagenDa.Networking
         [Header("Combat")]
         public float detectRange = 20f;
         public float attackRange = 15f;
-        public float attackCooldown = 1.5f;
         public float throwInterval = 5f;
         public NetworkCombat combat;
+        public NetworkGun gun;
+        public NetworkEquipment equipment;
 
         [Header("Posture")]
         public GameObject visual;       // upright capsule mesh (Body)
@@ -41,7 +42,6 @@ namespace HagenDa.Networking
         private AIState state = AIState.Wander;
         private NetworkPlayerController target;
         private float targetRefresh;
-        private float nextAttack;
         private float nextThrow;
         private float wanderNext;
         private bool dead;
@@ -59,6 +59,12 @@ namespace HagenDa.Networking
 
             if (combat == null)
                 combat = GetComponent<NetworkCombat>();
+
+            if (gun == null)
+                gun = GetComponent<NetworkGun>();
+
+            if (equipment == null)
+                equipment = GetComponent<NetworkEquipment>();
 
             RefreshTarget();
         }
@@ -227,22 +233,22 @@ namespace HagenDa.Networking
             agent.ResetPath();
             FaceTarget();
 
-            if (combat != null)
+            if (gun != null)
             {
-                if (Time.time >= nextAttack)
-                {
-                    nextAttack = Time.time + attackCooldown;
-                    combat.TryFire(EyePosition(), transform.forward);
-                }
+                // Continuous full-auto fire; the gun's fire-rate gating, spread and
+                // auto-reload apply (identical to the player). No ADS for AI.
+                gun.Tick(true, false, EyePosition(), transform.forward, false);
+            }
 
-                if (Time.time >= nextThrow)
-                {
-                    nextThrow = Time.time + throwInterval;
-                    Vector3 dir = (target.transform.position - EyePosition()).normalized;
-                    dir += Vector3.up * 0.4f;
-                    dir.Normalize();
-                    combat.TryThrow(EyePosition(), dir);
-                }
+            if (equipment != null && Time.time >= nextThrow)
+            {
+                nextThrow = Time.time + throwInterval;
+                Vector3 dir = (target.transform.position - EyePosition()).normalized;
+                dir += Vector3.up * 0.4f;
+                dir.Normalize();
+
+                // AI uses the same equipment runtime (index 0 = first throwable).
+                equipment.Use(0, false, EyePosition(), dir, Vector3.zero, true);
             }
         }
 

@@ -17,12 +17,22 @@ namespace HagenDa.Networking
         public float fuseTime = 2f;
 
         protected Rigidbody rb;
-        private bool detonated;
+        protected bool detonated;
         private float detonateTime;
+
+        /// <summary>The entity (NetworkIdentity) that threw this. Used by supply
+        /// packs to avoid instantly consuming the thrower at spawn.</summary>
+        [HideInInspector] public NetworkIdentity owner;
 
         protected void Awake()
         {
             rb = GetComponent<Rigidbody>();
+        }
+
+        /// <summary>Record the throwing entity so subclasses can ignore it.</summary>
+        public void SetOwner(NetworkIdentity id)
+        {
+            owner = id;
         }
 
         public override void OnStartServer()
@@ -49,21 +59,32 @@ namespace HagenDa.Networking
                 rb.velocity = velocity;
         }
 
-        private void Update()
+        /// <summary>Freeze the body in place (used by sticky charges / supply packs).</summary>
+        protected void FreezePhysics()
+        {
+            if (rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.isKinematic = true;
+            }
+        }
+
+        protected virtual void Update()
         {
             if (!isServer || detonated) return;
             if (fuseTime > 0f && Time.time >= detonateTime)
                 Detonate();
         }
 
-        private void OnCollisionEnter(Collision collision)
+        protected virtual void OnCollisionEnter(Collision collision)
         {
             if (!isServer || detonated) return;
             if (fuseTime <= 0f)
                 Detonate();
         }
 
-        private void Detonate()
+        protected virtual void Detonate()
         {
             detonated = true;
             OnImpact();

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51740e4a59ca7cc4388447b85592d014, type: 3}
+  m_Name: M4Definition
+  m_EditorClassIdentifier: 
+  fireRateRPM: 900
+  fireModes: 000000000200000001000000
+  burstCount: 3
+  boltTime: 0.6
+  magazineCapacity: 30
+  reserveCapacity: 450
+  baseDamage: 30
+  minDamage: 15
+  damageDecay: 0.008333334
+  bulletSpeed: 800
+  bulletDeceleration: 300
+  bulletLifetime: 5
+  reloadFastTime: 2
+  reloadSlowTime: 2.5
+  hipSpreadMin: 3
+  hipSpreadMax: 10
+  adsSpreadMin: 0.1
+  adsSpreadMax: 2
+  spreadPerShot: 0.5
+  spreadRecovery: 6
+  aimTime: 0.25
+  screenRecoilPerShot: 0.5
+  screenRecoilAngle: 90
+  recoilRecovery: 5
+  sprintFireCooldown: 0.1

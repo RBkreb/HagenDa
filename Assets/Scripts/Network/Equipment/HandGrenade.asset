@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbdbf6de009de6c438847ac18fa36f8d, type: 3}
+  m_Name: HandGrenade
+  m_EditorClassIdentifier: 
+  type: 0
+  displayName: "\u624B\u96F7"
+  maxCarry: 1
+  supplyCost: 100
+  ammoRegenInterval: 0
+  empVulnerable: 0
+  useStyle: 0
+  boltTime: 1.5
+  channelTime: 1.5
+  throwablePrefab: {fileID: 4705903072136045240, guid: f2f1e0e705a335c4196c330801002380,
+    type: 3}
+  throwSpeed: 15
+  armorGrant: 25
+  dashCooldown: 15
+  shieldExplosionReduction: 0.6
+  empRadius: 6
+  empLifetime: 10
+  empInterfereDuration: 2

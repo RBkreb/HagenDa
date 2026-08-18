@@ -43,13 +43,25 @@ namespace HagenDa.Networking
                 Vector3 dir = to / dist;
 
                 // Raycast occlusion: skip if something other than the entity blocks
-                // the ray before it reaches the entity.
-                if (Physics.Raycast(center, dir, out RaycastHit hit, dist + 0.05f,
-                                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                // the ray before it reaches the entity. Special cover (PHASE6 特殊掩体)
+                // is penetrable by explosions, so it is filtered out of the blockers.
+                var hits = Physics.RaycastAll(center, dir, dist + 0.05f,
+                                              Physics.DefaultRaycastLayers,
+                                              QueryTriggerInteraction.Ignore);
+
+                bool blocked = false;
+                foreach (var h in hits)
                 {
-                    var blocker = hit.collider.GetComponentInParent<IDamageable>();
-                    if (blocker != target) continue; // wall or another entity in the way
+                    var blocker = h.collider.GetComponentInParent<IDamageable>();
+                    if (blocker != null && blocker == target) continue; // the entity itself
+
+                    if (h.collider.GetComponentInParent<SpecialCover>() != null) continue; // 特殊掩体可穿透
+
+                    blocked = true;
+                    break;
                 }
+
+                if (blocked) continue;
 
                 float falloff = 1f - dist / radius;
                 float damage = yield * falloff;

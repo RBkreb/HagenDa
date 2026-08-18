@@ -1,0 +1,64 @@
+using Mirror;
+using UnityEngine;
+
+namespace HagenDa.Networking
+{
+    /// <summary>
+    /// Interceptor (拦截系统, PHASE6). A placed blue sphere; any damaging throwable
+    /// (grenade / RPG / delayed bomb / signal / wired charge) that enters its radius
+    /// is destroyed. It self-destructs after <see cref="maxIntercepts"/> successful
+    /// interceptions, and is destroyed outright by an EMP (via IEmpTarget).
+    /// </summary>
+    [RequireComponent(typeof(NetworkIdentity))]
+    public class NetworkInterceptor : NetworkBehaviour, IEmpTarget
+    {
+        [Header("Interceptor")]
+        public float radius = 3f;
+        public int maxIntercepts = 3;
+
+        private int intercepts;
+
+        public override void OnStartServer()
+        {
+            DeployableUtil.IgnoreLivingCollision(gameObject);
+        }
+
+        private void Update()
+        {
+            if (!isServer) return;
+
+            foreach (var c in Physics.OverlapSphere(transform.position, radius))
+            {
+                var grenade = c.GetComponentInParent<GrenadeThrowable>();
+                if (grenade != null)
+                {
+                    Intercept(grenade.gameObject);
+                    continue;
+                }
+
+                var charge = c.GetComponentInParent<RemoteChargeThrowable>();
+                if (charge != null)
+                {
+                    Intercept(charge.gameObject);
+                }
+            }
+        }
+
+        private void Intercept(GameObject target)
+        {
+            if (target == null) return;
+            NetworkServer.Destroy(target);
+            intercepts++;
+
+            if (intercepts >= maxIntercepts)
+                NetworkServer.Destroy(gameObject);
+        }
+
+        /// <summary>EMP destroys the interceptor outright.</summary>
+        public void ApplyEmp(float duration)
+        {
+            if (isServer)
+                NetworkServer.Destroy(gameObject);
+        }
+    }
+}
