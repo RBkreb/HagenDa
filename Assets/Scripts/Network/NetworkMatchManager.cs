@@ -42,7 +42,7 @@ namespace HagenDa.Networking
 
         [Header("Team / squad")]
         public int squadsPerTeam = 2;
-        public int squadSize = 2;
+        public int squadSize = 5;
 
         [Header("Redeploy")]
         [Tooltip("死亡后到可重新部署的秒数.")]

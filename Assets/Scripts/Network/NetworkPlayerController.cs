@@ -278,6 +278,13 @@ namespace HagenDa.Networking
         {
             if (!isLocalPlayer) return;
 
+            // 对局结束后仅保留相机控制，冻结所有输入采样与射击。
+            if (NetworkMatchManager.Instance != null && NetworkMatchManager.Instance.matchOver)
+            {
+                UpdateLocalLook();
+                return;
+            }
+
             SampleInput();
             UpdateLocalLook();
         }

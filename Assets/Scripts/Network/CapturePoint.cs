@@ -25,7 +25,7 @@ namespace HagenDa.Networking
         public float captureRate = 1f;          // 每秒每人差值
 
         [SyncVar] public float contention;       // -60..+60
-        [SyncVar] public int ownerTeam = -1;     // -1 中立, 0 红, 1 蓝
+        [SyncVar(hook = nameof(OnOwnerChanged))] public int ownerTeam = -1;     // -1 中立, 0 红, 1 蓝
 
         [Header("Scoring")]
         public int captureScore = 10;
@@ -110,6 +110,44 @@ namespace HagenDa.Networking
                 if (c.teamId == (int)MatchTeam.Red) red++;
                 else if (c.teamId == (int)MatchTeam.Blue) blue++;
             }
+        }
+
+        /// <summary>当前点内红/蓝人数（供 DebugHud 读取）。</summary>
+        public void GetTeamCounts(out int red, out int blue)
+        {
+            CountTeams(out red, out blue);
+        }
+
+        // ---------------------------------------------------------------
+        // VISUAL (owner color)
+        // ---------------------------------------------------------------
+        private void OnOwnerChanged(int oldOwner, int newOwner)
+        {
+            UpdateVisualColor(newOwner);
+        }
+
+        private void UpdateVisualColor(int owner)
+        {
+            var rend = GetComponentInChildren<Renderer>();
+            if (rend == null) return;
+
+            Color c;
+            switch (owner)
+            {
+                case 0: c = new Color(0.7f, 0.15f, 0.15f, 0.25f); break;   // 红
+                case 1: c = new Color(0.15f, 0.3f, 0.7f, 0.25f); break;   // 蓝
+                default: c = new Color(0.8f, 0.8f, 0.2f, 0.15f); break;    // 中立黄
+            }
+
+            var mat = new Material(rend.material);
+            mat.color = c;
+            rend.material = mat;
+        }
+
+        private void Start()
+        {
+            // 初始颜色（中立）。
+            UpdateVisualColor(ownerTeam);
         }
 
         /// <summary>

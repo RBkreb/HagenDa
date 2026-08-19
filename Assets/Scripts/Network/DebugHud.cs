@@ -6,7 +6,9 @@ namespace HagenDa.Networking
 {
     /// <summary>
     /// Top-right on-screen debug HUD for the local player.
-    /// Shows 3D speed, max speed over the last 3s, posture, and slide-trigger state.
+    /// Shows 3D speed, max speed over the last 3s, posture, slide-trigger state,
+    /// and PHASE7 match debug info (team scores, both HQs' contention / owner /
+    /// player count).
     ///
     /// Speed is sampled every rendered frame (authoritative rb.velocity on the host,
     /// position-delta estimate on a pure client). The visible text refreshes every
@@ -40,6 +42,9 @@ namespace HagenDa.Networking
         private string maxText = "";
         private string postureText = "";
         private string slideText = "";
+        private string scoreText = "";
+        private string hq1Text = "";
+        private string hq2Text = "";
 
         private GUIStyle boxStyle;
         private GUIStyle labelStyle;
@@ -108,6 +113,36 @@ namespace HagenDa.Networking
             }
 
             slideText = "滑铲: " + EvaluateSlide();
+
+            // PHASE7 match debug info.
+            var mm = NetworkMatchManager.Instance;
+            if (mm != null)
+            {
+                scoreText = $"分数: 红 {mm.redScore} / 蓝 {mm.blueScore}";
+
+                if (mm.capturePoints != null && mm.capturePoints.Count >= 1)
+                {
+                    hq1Text = FormatHq("HQ_Alpha", mm.capturePoints[0]);
+                    if (mm.capturePoints.Count >= 2)
+                        hq2Text = FormatHq("HQ_Bravo", mm.capturePoints[1]);
+                }
+            }
+        }
+
+        private static string FormatHq(string name, CapturePoint cp)
+        {
+            if (cp == null) return $"{name}: N/A";
+
+            string owner;
+            switch (cp.ownerTeam)
+            {
+                case 0: owner = "红方"; break;
+                case 1: owner = "蓝方"; break;
+                default: owner = "中立"; break;
+            }
+
+            cp.GetTeamCounts(out int red, out int blue);
+            return $"{name}: {owner} | 争夺 {cp.contention:+0.0;-0.0} | 红{red}蓝{blue}";
         }
 
         private string EvaluateSlide()
@@ -133,8 +168,8 @@ namespace HagenDa.Networking
             if (controller == null || !controller.isLocalPlayer) return;
             EnsureStyles();
 
-            float w = 280f;
-            float h = 120f;
+            float w = 320f;
+            float h = 180f;
             float x = Screen.width - w - 10f;
             float y = 10f;
 
@@ -142,13 +177,18 @@ namespace HagenDa.Networking
 
             float lx = x + 10f;
             float ly = y + 10f;
-            float lh = 24f;
+            float lh = 22f;
             float lw = w - 20f;
 
             GUI.Label(new Rect(lx, ly, lw, lh), speedText, labelStyle);
             GUI.Label(new Rect(lx, ly + lh, lw, lh), maxText, labelStyle);
             GUI.Label(new Rect(lx, ly + lh * 2, lw, lh), postureText, labelStyle);
             GUI.Label(new Rect(lx, ly + lh * 3, lw, lh), slideText, labelStyle);
+
+            // PHASE7 debug info
+            GUI.Label(new Rect(lx, ly + lh * 4, lw, lh), scoreText, labelStyle);
+            GUI.Label(new Rect(lx, ly + lh * 5, lw, lh), hq1Text, labelStyle);
+            GUI.Label(new Rect(lx, ly + lh * 6, lw, lh), hq2Text, labelStyle);
         }
 
         private void EnsureStyles()
@@ -159,11 +199,11 @@ namespace HagenDa.Networking
             boxStyle.normal.background = MakeSolidTexture(new Color(0f, 0f, 0f, 0.6f));
 
             labelStyle = new GUIStyle(GUI.skin.label);
-            labelStyle.fontSize = 15;
+            labelStyle.fontSize = 14;
             labelStyle.normal.textColor = Color.white;
 
             // IMGUI's default font has no CJK glyphs; use a dynamic OS font instead.
-            Font cjk = Font.CreateDynamicFontFromOSFont("Microsoft YaHei", 15);
+            Font cjk = Font.CreateDynamicFontFromOSFont("Microsoft YaHei", 14);
             if (cjk != null)
                 labelStyle.font = cjk;
         }
