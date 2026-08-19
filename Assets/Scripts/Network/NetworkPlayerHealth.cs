@@ -275,6 +275,7 @@ namespace HagenDa.Networking
 
             var mm = NetworkMatchManager.Instance;
             if (mm == null) return;
+            if (mm.matchOver) return;   // 对局结束：不再重新部署
 
             bool isHuman = connectionToClient != null;
 
@@ -367,7 +368,7 @@ namespace HagenDa.Networking
             if (controller != null) controller.OnRedeploy();
 
             var ai = GetComponent<NetworkAIController>();
-            if (ai != null) ai.OnRedeploy();
+            if (ai != null) ai.OnRedeploy(pos);
 
             RpcRedeploy();
         }

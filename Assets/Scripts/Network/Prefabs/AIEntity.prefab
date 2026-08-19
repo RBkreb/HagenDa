@@ -292,8 +292,8 @@ MonoBehaviour:
   runSpeed: 7.5
   wanderRadius: 5
   wanderWaitTime: 2
-  detectRange: 20
-  attackRange: 15
+  detectRange: 50
+  attackRange: 40
   throwInterval: 5
   combat: {fileID: 2861076355436660845}
   gun: {fileID: 5783371912108599561}

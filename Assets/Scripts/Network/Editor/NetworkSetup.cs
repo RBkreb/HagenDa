@@ -318,9 +318,9 @@ namespace HagenDa.Networking.EditorTools
             mm.garrisons = new System.Collections.Generic.List<GarrisonZone> { redGr, blueGr };
             mm.capturePoints = new System.Collections.Generic.List<CapturePoint> { hq1, hq2 };
 
-            // --- Spawn points (created BEFORE SetupScene so it doesn't add default ones) ---
-            CreateSpawnPoint("RedSpawn", redGr.GetRandomDeployPoint() + Vector3.up * 1f);
-            CreateSpawnPoint("BlueSpawn", blueGr.GetRandomDeployPoint() + Vector3.up * 1f);
+            // --- Spawn points (player always spawns at red GR) ---
+            CreateSpawnPoint("RedSpawn1", redGr.GetRandomDeployPoint() + Vector3.up * 1f);
+            CreateSpawnPoint("RedSpawn2", redGr.GetRandomDeployPoint() + Vector3.up * 1f);
 
             // --- NetworkManager ---
             SetupScene(playerPrefab, addTargets: false);
@@ -335,16 +335,28 @@ namespace HagenDa.Networking.EditorTools
             BuildNavMeshForFloor();
 
             // --- Entities: 4 red (player + 3 AI), 4 blue AI ---
-            // Red AI (3): placed near red GR, z < 0 so AssignCombatant assigns red.
-            CreateAIEntity(aiPrefab, new Vector3(-5f, 1f, -85f));
-            CreateAIEntity(aiPrefab, new Vector3(5f, 1f, -85f));
-            CreateAIEntity(aiPrefab, new Vector3(0f, 1f, -80f));
+            // Red AI (9): player + 9 AI = 10 red (2 squads × 5). z < 0 → red.
+            CreateAIEntity(aiPrefab, new Vector3(-8f, 1f, -85f));
+            CreateAIEntity(aiPrefab, new Vector3(-4f, 1f, -85f));
+            CreateAIEntity(aiPrefab, new Vector3(0f, 1f, -85f));
+            CreateAIEntity(aiPrefab, new Vector3(4f, 1f, -85f));
+            CreateAIEntity(aiPrefab, new Vector3(8f, 1f, -85f));
+            CreateAIEntity(aiPrefab, new Vector3(-8f, 1f, -80f));
+            CreateAIEntity(aiPrefab, new Vector3(-4f, 1f, -80f));
+            CreateAIEntity(aiPrefab, new Vector3(4f, 1f, -80f));
+            CreateAIEntity(aiPrefab, new Vector3(8f, 1f, -80f));
 
-            // Blue AI (4): placed near blue GR, z > 0 → blue team.
-            CreateAIEntity(aiPrefab, new Vector3(-5f, 1f, 80f));
-            CreateAIEntity(aiPrefab, new Vector3(5f, 1f, 80f));
-            CreateAIEntity(aiPrefab, new Vector3(-5f, 1f, 85f));
-            CreateAIEntity(aiPrefab, new Vector3(5f, 1f, 85f));
+            // Blue AI (10): 2 squads × 5. z > 0 → blue.
+            CreateAIEntity(aiPrefab, new Vector3(-8f, 1f, 80f));
+            CreateAIEntity(aiPrefab, new Vector3(-4f, 1f, 80f));
+            CreateAIEntity(aiPrefab, new Vector3(0f, 1f, 80f));
+            CreateAIEntity(aiPrefab, new Vector3(4f, 1f, 80f));
+            CreateAIEntity(aiPrefab, new Vector3(8f, 1f, 80f));
+            CreateAIEntity(aiPrefab, new Vector3(-8f, 1f, 85f));
+            CreateAIEntity(aiPrefab, new Vector3(-4f, 1f, 85f));
+            CreateAIEntity(aiPrefab, new Vector3(0f, 1f, 85f));
+            CreateAIEntity(aiPrefab, new Vector3(4f, 1f, 85f));
+            CreateAIEntity(aiPrefab, new Vector3(8f, 1f, 85f));
 
             UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, "Assets/Scenes/Phase7.scene");
             AssetDatabase.SaveAssets();
@@ -563,12 +575,22 @@ namespace HagenDa.Networking.EditorTools
             gun.gunModel = weaponPivot.transform;
 
             // Remote visual (capsule body), scaled to match the 1.8m x 0.25m collider.
+            // Player body is green to distinguish from red/blue AI.
             var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             body.name = "Body";
             body.transform.SetParent(root.transform, false);
             body.transform.localPosition = new Vector3(0f, 0.9f, 0f);
             body.transform.localScale = new Vector3(0.5f, 0.9f, 0.5f);
             Object.DestroyImmediate(body.GetComponent<CapsuleCollider>());
+            var playerBodyMat = CreatePersistentMaterial(
+                "Assets/Scripts/Network/Materials/PlayerBodyGreen.mat",
+                new Color(0.2f, 0.8f, 0.3f),
+                new Color(0.1f, 0.5f, 0.2f));
+            if (playerBodyMat != null)
+            {
+                var rend = body.GetComponent<Renderer>();
+                if (rend != null) rend.sharedMaterial = playerBodyMat;
+            }
             controller.visual = body;
 
             // Save
