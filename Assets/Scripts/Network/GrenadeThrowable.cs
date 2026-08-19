@@ -14,7 +14,7 @@ namespace HagenDa.Networking
 
         protected override void OnImpact()
         {
-            ExplosionUtility.ApplyDamage(transform.position, explosionYield, explosionRadius);
+            ExplosionUtility.ApplyDamage(transform.position, explosionYield, explosionRadius, owner);
             RpcExplosionVisual(transform.position, explosionRadius);
         }
 

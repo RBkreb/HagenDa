@@ -31,5 +31,7 @@ namespace HagenDa.Networking
         public bool addArmor;       // j test key: +20 armor (edge-triggered)
         public bool selfRescue;     // h test key: self-rescue (edge-triggered)
         public int wheelDelta;      // mouse wheel scroll (+1 up / -1 down), latched
+        public bool mark;           // q key: mark enemy (edge-triggered, PHASE7)
+        public int deployChoice;    // 1=GR / 2=HQ / 3=squad (edge-triggered, PHASE7)
     }
 }

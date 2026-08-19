@@ -84,7 +84,7 @@ namespace HagenDa.Networking
         }
 
         /// <summary>
-        /// Called by NetworkPlayerHealth on death/rescue. Mirrors the player: death
+        /// Called by <see cref="NetworkPlayerHealth"/> on death/rescue. Mirrors the player: death
         /// forces prone (capsule + visual lie flat), stops the NavMeshAgent, and
         /// zeroes residual momentum so the zero-friction capsule doesn't keep sliding.
         /// Rescue restores the upright posture and resumes the agent.
@@ -119,6 +119,37 @@ namespace HagenDa.Networking
             // material (all movement friction is applied manually as forces).
             if (capsule != null)
                 capsule.sharedMaterial = value ? null : aliveMaterial;
+        }
+
+        /// <summary>PHASE7: 重新部署落地后恢复站姿并恢复 AI 行为。</summary>
+        public void OnRedeploy()
+        {
+            dead = false;
+            state = AIState.Wander;
+
+            if (agent == null)
+                agent = GetComponent<NavMeshAgent>();
+            if (agent != null)
+            {
+                agent.isStopped = false;
+                agent.ResetPath();
+                agent.Warp(transform.position);
+            }
+
+            SetProne(false);
+
+            if (rb == null)
+                rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+
+            if (capsule == null)
+                capsule = GetComponent<CapsuleCollider>();
+            if (capsule != null)
+                capsule.sharedMaterial = aliveMaterial;
         }
 
         private void SetProne(bool prone)
@@ -293,11 +324,18 @@ namespace HagenDa.Networking
             NetworkPlayerController best = null;
             float bestDist = float.PositiveInfinity;
 
+            var self = GetComponent<NetworkCombatant>();
+            int myTeam = self != null ? self.teamId : -1;
+
             foreach (var p in Object.FindObjectsOfType<NetworkPlayerController>())
             {
                 if (p == null) continue;
                 var health = p.GetComponent<NetworkPlayerHealth>();
                 if (health != null && health.IsDead) continue;
+
+                // PHASE7: only target hostile entities.
+                var c = p.GetComponent<NetworkCombatant>();
+                if (c != null && c.teamId >= 0 && myTeam >= 0 && c.teamId == myTeam) continue;
 
                 float d = Vector3.Distance(transform.position, p.transform.position);
                 if (d < bestDist)
