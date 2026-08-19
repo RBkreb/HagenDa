@@ -35,7 +35,15 @@ namespace HagenDa.Networking
         {
             spawnTime = Time.time;
 
-            // Hide any collider the prefab may carry; detection is a manual overlap.
+            // The EMP field must stay at the impact position — disable ALL physics
+            // so gravity doesn't make it fall through the ground.
+            var rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.useGravity = false;
+            }
+
             var col = GetComponent<Collider>();
             if (col != null) col.enabled = false;
         }
@@ -55,12 +63,21 @@ namespace HagenDa.Networking
                 return;
             }
 
-            var colliders = Physics.OverlapSphere(transform.position, radius);
-            foreach (var c in colliders)
+            // Use FindObjectsOfType instead of OverlapSphere + GetComponentInParent<IEmpTarget>:
+            // Unity's GetComponentInParent<T> with an interface type is unreliable.
+            Vector3 pos = transform.position;
+            float r2 = radius * radius;
+
+            foreach (var eq in Object.FindObjectsOfType<NetworkEquipment>())
             {
-                var target = c.GetComponentInParent<IEmpTarget>();
-                if (target != null)
-                    target.ApplyEmp(interfereDuration);
+                if ((eq.transform.position - pos).sqrMagnitude <= r2)
+                    eq.ApplyEmp(interfereDuration);
+            }
+
+            foreach (var ic in Object.FindObjectsOfType<NetworkInterceptor>())
+            {
+                if ((ic.transform.position - pos).sqrMagnitude <= r2)
+                    ic.ApplyEmp(interfereDuration);
             }
         }
 

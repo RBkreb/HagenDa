@@ -178,3 +178,4 @@ MonoBehaviour:
   interval: 5
   supplyPerTick: 25
   healthPerTick: 25
+  gunReservePerTick: 60

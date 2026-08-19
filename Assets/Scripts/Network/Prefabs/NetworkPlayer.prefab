@@ -209,6 +209,8 @@ MonoBehaviour:
   slideTriggerSpeed: 5
   slideEndSpeed: 4
   slideCooldown: 2
+  dashForce: 200
+  dashDuration: 0.2
   diveSpeed: 15
   diveTriggerSpeed: 4
   lookSensitivity: 0.05793

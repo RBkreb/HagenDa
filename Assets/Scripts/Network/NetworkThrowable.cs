@@ -16,6 +16,9 @@ namespace HagenDa.Networking
         [Tooltip("Seconds before detonation. >0 = fuse; <=0 = impact only.")]
         public float fuseTime = 2f;
 
+        [Tooltip("If true, freeze physics on first ground/wall contact (no bounce).")]
+        public bool freezeOnContact = false;
+
         protected Rigidbody rb;
         protected bool detonated;
         private float detonateTime;
@@ -80,6 +83,10 @@ namespace HagenDa.Networking
         protected virtual void OnCollisionEnter(Collision collision)
         {
             if (!isServer || detonated) return;
+
+            if (freezeOnContact)
+                FreezePhysics();
+
             if (fuseTime <= 0f)
                 Detonate();
         }

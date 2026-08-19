@@ -793,6 +793,7 @@ namespace HagenDa.Networking.EditorTools
             var c = root.AddComponent<RemoteChargeThrowable>();
             c.explosionYield = 200f;
             c.explosionRadius = 7f;
+            c.freezeOnContact = true;
 
             return SaveThrowable(root, SignalChargePrefabPath);
         }
@@ -806,6 +807,7 @@ namespace HagenDa.Networking.EditorTools
             var c = root.AddComponent<RemoteChargeThrowable>();
             c.explosionYield = 180f;
             c.explosionRadius = 6f;
+            c.freezeOnContact = true;
 
             return SaveThrowable(root, WiredChargePrefabPath);
         }
@@ -820,6 +822,7 @@ namespace HagenDa.Networking.EditorTools
             g.fuseTime = 3f;               // 延时 3s
             g.explosionYield = 200f;
             g.explosionRadius = 5f;
+            g.freezeOnContact = true;
 
             return SaveThrowable(root, DelayedBombPrefabPath);
         }

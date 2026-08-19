@@ -96,22 +96,24 @@ namespace HagenDa.Networking
             }
         }
 
-        /// <summary>Add supply to the currently selected equipment's independent meter.</summary>
+        /// <summary>对**所有**配备同时增加补给度，每件独立判定是否到达成本。</summary>
         [Server]
         public void GrantSupply(int amount)
         {
-            if (selection < 0 || selection >= Count) return;
-            var def = equipmentList[selection];
-            if (def == null) return;
-
-            supply[selection] += amount;
-
-            // 到达成本 -> +1 并重置（每件装备独立补给度）。
-            if (supply[selection] >= def.supplyCost)
+            for (int i = 0; i < Count; i++)
             {
-                if (ammo[selection] < def.maxCarry)
-                    ammo[selection]++;
-                supply[selection] = 0f;
+                var def = equipmentList[i];
+                if (def == null) continue;
+
+                supply[i] += amount;
+
+                // 到达成本 -> +1 并重置（每件装备独立补给度）。
+                if (supply[i] >= def.supplyCost)
+                {
+                    if (ammo[i] < def.maxCarry)
+                        ammo[i]++;
+                    supply[i] = 0f;
+                }
             }
 
             SyncSelected();
@@ -264,10 +266,8 @@ namespace HagenDa.Networking
         {
             if (!use || Time.time < nextUseTime[i]) return;
             if (IsEmpDisabled && def.empVulnerable) return;
-            if (!grounded || move.sqrMagnitude < 0.0001f) return;
-
             // move is the local WASD vector (x strafe / y forward) — convert to a
-            // world-space horizontal direction before applying the dash impulse.
+            // world-space horizontal direction. No input defaults to forward.
             Vector3 worldDir = transform.forward * move.y + transform.right * move.x;
             worldDir.y = 0f;
             if (worldDir.sqrMagnitude < 0.0001f) worldDir = transform.forward;
@@ -431,7 +431,7 @@ namespace HagenDa.Networking
                     break;
 
                 case EquipmentType.Defibrillator:
-                    ReviveNearestFriendly(channelEye);
+                    ReviveNearestFriendly(transform.position);
                     break;
             }
 
@@ -441,10 +441,10 @@ namespace HagenDa.Networking
 
         private void ReviveNearestFriendly(Vector3 center)
         {
-            // 测试阶段：没有友方概念，除颤仪对所有实体（除使用者自身）生效。
+            // 测试阶段：没有友方概念，除颤仪对所有死亡实体（除使用者自身）生效。
             var self = GetComponent<NetworkPlayerHealth>();
             NetworkPlayerHealth best = null;
-            float bestDist = 1f; // 1m radius
+            float bestDist = 2f; // 2m radius
 
             foreach (var h in Object.FindObjectsOfType<NetworkPlayerHealth>())
             {

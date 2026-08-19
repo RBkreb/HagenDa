@@ -139,6 +139,14 @@ namespace HagenDa.Networking
             reloadPaused = false;
         }
 
+        /// <summary>Add reserve ammo (补给箱/补给包). Capped at reserveCapacity.</summary>
+        [Server]
+        public void AddReserveAmmo(int amount)
+        {
+            if (definition == null) return;
+            reserveAmmo = Mathf.Min(definition.reserveCapacity, reserveAmmo + amount);
+        }
+
         /// <summary>Freeze the reload timer (weapon switch / death). Keeps the gun usable later.</summary>
         [Server]
         public void PauseReload()

@@ -17,12 +17,25 @@ namespace HagenDa.Networking
         public float interval = 5f;
         public int supplyPerTick = 25;
         public float healthPerTick = 25f;
+        public int gunReservePerTick = 60;  // 主武器备弹补充量
 
         private float acc;
 
         public override void OnStartServer()
         {
             DeployableUtil.IgnoreLivingCollision(gameObject);
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            // 接触地面后立刻静止，去除物理防止漂移。
+            var rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.isKinematic = true;
+            }
         }
 
         private void Update()
@@ -43,6 +56,11 @@ namespace HagenDa.Networking
                 var eq = health.GetComponent<NetworkEquipment>();
                 if (eq != null)
                     eq.GrantSupply(supplyPerTick);
+
+                // 主武器备弹
+                var gun = health.GetComponent<NetworkGun>();
+                if (gun != null)
+                    gun.AddReserveAmmo(gunReservePerTick);
             }
         }
     }

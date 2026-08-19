@@ -176,6 +176,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   fuseTime: 0
+  freezeOnContact: 0
+  owner: {fileID: 0}
   explosionYield: 250
   explosionRadius: 3
 --- !u!1001 &299474234548609690

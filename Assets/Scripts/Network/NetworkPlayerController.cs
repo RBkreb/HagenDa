@@ -82,8 +82,8 @@ namespace HagenDa.Networking
         public float slideCooldown = 2f;
 
         [Header("Dash (快速机动装置)")]
-        public float dashSpeed = 40f;
-        public float dashUpwardSpeed = 1.5f;
+        public float dashForce = 200f;
+        public float dashDuration = 0.2f;
 
         //[Tooltip("Seconds after landing during which no horizontal drag/clamp is applied, so the slide check (which runs before forces each tick) sees the full landing speed even if the server's input snapshot lags a tick or two.")]
         //public float landingGrace = 0.15f;
@@ -136,6 +136,11 @@ namespace HagenDa.Networking
         private bool crouchByHold;   // true when crouch was entered by holding left ctrl
         private bool diving;         // dive in progress (until landing)
         private bool jumpedOrDived;  // was airborne from a jump (for landing shake)
+
+        // Dash state (快速机动装置): continuous horizontal force over dashDuration.
+        private bool dashing;
+        private float dashRemaining;
+        private Vector3 dashDir;
 
         // Client-side look state (client-authoritative aim).
         private float localYaw;
@@ -571,6 +576,16 @@ namespace HagenDa.Networking
             // Movement forces + jump impulse + gravity.
             ApplyMovement(jumpIntent && !jumpConsumed);
 
+            // Dash (快速机动装置): continuous horizontal force over dashDuration.
+            if (dashing)
+            {
+                float dt = Time.fixedDeltaTime;
+                rb.AddForce(dashDir * dashForce * dt, ForceMode.Impulse);
+                dashRemaining -= dt;
+                if (dashRemaining <= 0f)
+                    dashing = false;
+            }
+
             // Combat: shooting (gun) + throwing (combat). Fire/aim are fed every tick;
             // reload and fire-mode switch are edge-triggered commands.
             PlayerPosture eff2 = sliding ? PlayerPosture.Crouch : posture;
@@ -744,9 +759,9 @@ namespace HagenDa.Networking
         }
 
         /// <summary>
-        /// PHASE6 快速机动装置: an instantaneous horizontal impulse (larger than a
-        /// jump) in the input direction plus a small vertical impulse. Called by
-        /// NetworkEquipment.UseSelfInstant with an already world-space direction.
+        /// PHASE6 快速机动装置: start a continuous horizontal force over
+        /// <see cref="dashDuration"/> seconds in the input direction. No vertical
+        /// force. Can be used in the air.
         /// </summary>
         public void Dash(Vector3 dir)
         {
@@ -756,10 +771,9 @@ namespace HagenDa.Networking
             dir.y = 0f;
             dir.Normalize();
 
-            rb.AddForce(dir * dashSpeed, ForceMode.Impulse);
-            rb.AddForce(Vector3.up * dashUpwardSpeed, ForceMode.Impulse);
-            grounded = false;
-            jumpedOrDived = true;
+            dashing = true;
+            dashRemaining = dashDuration;
+            dashDir = dir;
         }
 
         private float CurrentMaxSpeed()
