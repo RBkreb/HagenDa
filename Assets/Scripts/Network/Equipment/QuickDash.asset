@@ -24,7 +24,7 @@ MonoBehaviour:
   throwablePrefab: {fileID: 0}
   throwSpeed: 15
   armorGrant: 25
-  dashCooldown: 5
+  dashCooldown: 15
   shieldExplosionReduction: 0.6
   empRadius: 6
   empLifetime: 10

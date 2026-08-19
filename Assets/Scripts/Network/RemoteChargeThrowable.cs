@@ -45,7 +45,7 @@ namespace HagenDa.Networking
                 Stick();
 
             exploded = true;
-            ExplosionUtility.ApplyDamage(transform.position, explosionYield, explosionRadius);
+            ExplosionUtility.ApplyDamage(transform.position, explosionYield, explosionRadius, owner);
             RpcExplosionVisual(transform.position, explosionRadius);
 
             // Hide + freeze immediately, but DELAY the network destroy: destroying

@@ -261,6 +261,172 @@ namespace HagenDa.Networking.EditorTools
             Debug.Log("[NetworkSetup] Done. Created Assets/Scenes/Phase6.scene with the equipment system, EMP, and AI.");
         }
 
+        [MenuItem("HagenDa/Create Phase7 Scene")]
+        public static void CreatePhase7Scene()
+        {
+            EnsureFolder("Assets", "Scenes");
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            EnsureFolder("Assets/Scripts/Network", "Equipment");
+
+            // Build all equipment assets + throwable prefabs (idempotent).
+            List<EquipmentDefinition> equipmentList = BuildEquipmentAssets();
+
+            // Legacy throwables + bullet.
+            GameObject grenadePrefab = BuildGrenadePrefab();
+            GameObject smokePrefab = BuildSmokePrefab();
+            GameObject rescuePrefab = BuildRescuePrefab();
+            GameObject bulletPrefab = BuildBulletPrefab();
+
+            // Player + AI with the M4 gun + equipment list.
+            GameObject playerPrefab = BuildPlayerPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab, equipmentList);
+            GameObject aiPrefab = BuildAIEntityPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab, equipmentList);
+
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(
+                UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Single);
+
+            EnsureLighting();
+
+            // --- 100 x 200 map: long axis = Z, red GR at z=-100, blue GR at z=+100 ---
+            const float mapW = 100f;   // X
+            const float mapL = 200f;   // Z
+            const float wallH = 6f;
+
+            // Floor.
+            var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            floor.name = "Floor";
+            floor.transform.position = Vector3.zero;
+            floor.transform.localScale = new Vector3(mapW / 10f, 1f, mapL / 10f);
+
+            // Perimeter walls (rigidbody colliders).
+            CreateWall(new Vector3(0f, wallH * 0.5f, mapL * 0.5f), new Vector3(mapW, wallH, 1f));  // north
+            CreateWall(new Vector3(0f, wallH * 0.5f, -mapL * 0.5f), new Vector3(mapW, wallH, 1f)); // south
+            CreateWall(new Vector3(-mapW * 0.5f, wallH * 0.5f, 0f), new Vector3(1f, wallH, mapL)); // west
+            CreateWall(new Vector3(mapW * 0.5f, wallH * 0.5f, 0f), new Vector3(1f, wallH, mapL));  // east
+
+            // --- Garrisons ---
+            var redGr = CreateGarrison("RedGarrison", new Vector3(0f, 0f, -mapL * 0.45f), (int)MatchTeam.Red, 20f);
+            var blueGr = CreateGarrison("BlueGarrison", new Vector3(0f, 0f, mapL * 0.45f), (int)MatchTeam.Blue, 20f);
+
+            // --- Capture Points (2 HQ in the middle) ---
+            var hq1 = CreateCapturePoint("HQ_Alpha", new Vector3(-15f, 0f, 0f), 12f);
+            var hq2 = CreateCapturePoint("HQ_Bravo", new Vector3(15f, 0f, 0f), 12f);
+
+            // --- Match Manager ---
+            var mmGo = new GameObject("MatchManager");
+            var mm = mmGo.AddComponent<NetworkMatchManager>();
+            mm.garrisons = new System.Collections.Generic.List<GarrisonZone> { redGr, blueGr };
+            mm.capturePoints = new System.Collections.Generic.List<CapturePoint> { hq1, hq2 };
+
+            // --- Spawn points (created BEFORE SetupScene so it doesn't add default ones) ---
+            CreateSpawnPoint("RedSpawn", redGr.GetRandomDeployPoint() + Vector3.up * 1f);
+            CreateSpawnPoint("BlueSpawn", blueGr.GetRandomDeployPoint() + Vector3.up * 1f);
+
+            // --- NetworkManager ---
+            SetupScene(playerPrefab, addTargets: false);
+            RegisterSpawnPrefabs(grenadePrefab, smokePrefab, rescuePrefab, aiPrefab);
+            foreach (var def in equipmentList)
+                if (def != null && def.throwablePrefab != null)
+                    RegisterSpawnPrefabs(def.throwablePrefab);
+            var empField = AssetDatabase.LoadAssetAtPath<GameObject>(EmpFieldPrefabPath);
+            if (empField != null) RegisterSpawnPrefabs(empField);
+
+            // --- NavMesh ---
+            BuildNavMeshForFloor();
+
+            // --- Entities: 4 red (player + 3 AI), 4 blue AI ---
+            // Red AI (3): placed near red GR, z < 0 so AssignCombatant assigns red.
+            CreateAIEntity(aiPrefab, new Vector3(-5f, 1f, -85f));
+            CreateAIEntity(aiPrefab, new Vector3(5f, 1f, -85f));
+            CreateAIEntity(aiPrefab, new Vector3(0f, 1f, -80f));
+
+            // Blue AI (4): placed near blue GR, z > 0 → blue team.
+            CreateAIEntity(aiPrefab, new Vector3(-5f, 1f, 80f));
+            CreateAIEntity(aiPrefab, new Vector3(5f, 1f, 80f));
+            CreateAIEntity(aiPrefab, new Vector3(-5f, 1f, 85f));
+            CreateAIEntity(aiPrefab, new Vector3(5f, 1f, 85f));
+
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, "Assets/Scenes/Phase7.scene");
+            AssetDatabase.SaveAssets();
+            Debug.Log("[NetworkSetup] Done. Created Assets/Scenes/Phase7.scene with match system, HQ, garrisons, and 4v4 teams.");
+        }
+
+        private static GarrisonZone CreateGarrison(string name, Vector3 pos, int teamId, float radius)
+        {
+            var go = new GameObject(name);
+            go.transform.position = pos;
+            go.AddComponent<NetworkIdentity>();
+            var gz = go.AddComponent<GarrisonZone>();
+            gz.teamId = teamId;
+            gz.radius = radius;
+
+            // Visual: a large transparent cylinder to show the zone boundary.
+            var vis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            vis.name = "Visual";
+            vis.transform.SetParent(go.transform, false);
+            vis.transform.localPosition = Vector3.zero;
+            vis.transform.localScale = new Vector3(radius * 2f, 0.01f, radius * 2f);
+            Object.DestroyImmediate(vis.GetComponent<Collider>());
+            var rend = vis.GetComponent<Renderer>();
+            if (rend != null)
+            {
+                var mat = CreatePersistentMaterial(
+                    "Assets/Scripts/Network/Materials/GarrisonZone.mat",
+                    teamId == (int)MatchTeam.Red ? new Color(0.6f, 0.1f, 0.1f, 0.15f) : new Color(0.1f, 0.2f, 0.6f, 0.15f));
+                if (mat != null) rend.sharedMaterial = mat;
+            }
+
+            // Deploy points: 3 points around the garrison center.
+            for (int i = 0; i < 3; i++)
+            {
+                var dp = new GameObject($"DeployPoint_{i}");
+                dp.transform.SetParent(go.transform, false);
+                float a = (i / 3f) * Mathf.PI * 2f;
+                dp.transform.localPosition = new Vector3(Mathf.Cos(a) * 3f, 0f, Mathf.Sin(a) * 3f);
+                gz.deployPoints.Add(dp.transform);
+            }
+
+            return gz;
+        }
+
+        private static CapturePoint CreateCapturePoint(string name, Vector3 pos, float radius)
+        {
+            var go = new GameObject(name);
+            go.transform.position = pos;
+            go.AddComponent<NetworkIdentity>();
+            var cp = go.AddComponent<CapturePoint>();
+            cp.radius = radius;
+
+            // Visual: a flat ring on the ground.
+            var vis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            vis.name = "Visual";
+            vis.transform.SetParent(go.transform, false);
+            vis.transform.localPosition = Vector3.zero;
+            vis.transform.localScale = new Vector3(radius * 2f, 0.01f, radius * 2f);
+            Object.DestroyImmediate(vis.GetComponent<Collider>());
+            var rend = vis.GetComponent<Renderer>();
+            if (rend != null)
+            {
+                var mat = CreatePersistentMaterial(
+                    "Assets/Scripts/Network/Materials/CapturePoint.mat",
+                    new Color(0.8f, 0.8f, 0.2f, 0.15f));
+                if (mat != null) rend.sharedMaterial = mat;
+            }
+
+            // Deploy points: 2 points on opposite sides of the HQ.
+            var dp1 = new GameObject("DeployPoint_A");
+            dp1.transform.SetParent(go.transform, false);
+            dp1.transform.localPosition = new Vector3(radius * 0.7f, 0f, 0f);
+            cp.deployPoints.Add(dp1.transform);
+
+            var dp2 = new GameObject("DeployPoint_B");
+            dp2.transform.SetParent(go.transform, false);
+            dp2.transform.localPosition = new Vector3(-radius * 0.7f, 0f, 0f);
+            cp.deployPoints.Add(dp2.transform);
+
+            return cp;
+        }
+
         // ---------------------------------------------------------------
         // PREFAB
         // ---------------------------------------------------------------
@@ -325,6 +491,7 @@ namespace HagenDa.Networking.EditorTools
             // Behaviour
             var controller = root.AddComponent<NetworkPlayerController>();
             root.AddComponent<NetworkPlayerHealth>();
+            root.AddComponent<NetworkCombatant>();
             root.AddComponent<DebugHud>();
             root.AddComponent<PlayerHud>();
 
@@ -1200,6 +1367,7 @@ namespace HagenDa.Networking.EditorTools
 
             // Health (same as player).
             root.AddComponent<NetworkPlayerHealth>();
+            root.AddComponent<NetworkCombatant>();
 
             // AI controller.
             var ai = root.AddComponent<NetworkAIController>();

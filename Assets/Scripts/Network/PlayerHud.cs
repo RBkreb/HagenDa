@@ -3,14 +3,18 @@ using UnityEngine;
 namespace HagenDa.Networking
 {
     /// <summary>
-    /// Client-side HUD (PHASE4 + PHASE5), drawn with IMGUI using percentage-based
-    /// sizing (all positions/sizes derive from Screen width/height fractions, no pixel
-    /// constants). Shows:
+    /// Client-side HUD (PHASE4 + PHASE5 + PHASE7), drawn with IMGUI using
+    /// percentage-based sizing. Shows:
     ///   - a white crosshair at screen center that widens with weapon bloom,
     ///   - a white "X" hitmarker (hollow center) for 2 rendered frames after a hit,
     ///   - a bottom-center health bar (white fill, black for missing health),
     ///   - the current armor as a number right of the bar (hidden when 0),
     ///   - the current magazine / reserve ammo, fire mode, and reload state.
+    ///
+    /// PHASE7 additions:
+    ///   - top-center team score (红 / 蓝),
+    ///   - death redeploy menu (1=GR / 2=HQ / 3=小队) with countdown,
+    ///   - match-over victory / defeat overlay.
     /// </summary>
     public class PlayerHud : MonoBehaviour
     {
@@ -19,14 +23,22 @@ namespace HagenDa.Networking
         private NetworkPlayerController controller;
         private NetworkGun gun;
         private NetworkEquipment equipment;
+        private NetworkCombatant combatant;
         private int hitmarkerEndFrame = -1;
 
         private Texture2D whiteTex;
         private Texture2D blackTex;
+        private Texture2D redTex;
+        private Texture2D blueTex;
+        private Texture2D semiTransparentTex;
         private GUIStyle armorStyle;
         private GUIStyle ammoStyle;
         private GUIStyle modeStyle;
         private GUIStyle equipmentStyle;
+        private GUIStyle scoreStyle;
+        private GUIStyle deployStyle;
+        private GUIStyle deployKeyStyle;
+        private GUIStyle matchOverStyle;
 
         private void Awake()
         {
@@ -34,12 +46,16 @@ namespace HagenDa.Networking
             if (health == null) health = GetComponent<NetworkPlayerHealth>();
             gun = GetComponent<NetworkGun>();
             equipment = GetComponent<NetworkEquipment>();
+            combatant = GetComponent<NetworkCombatant>();
         }
 
         private void OnEnable()
         {
             if (whiteTex == null) whiteTex = MakeSolidTexture(Color.white);
             if (blackTex == null) blackTex = MakeSolidTexture(Color.black);
+            if (redTex == null) redTex = MakeSolidTexture(new Color(0.8f, 0.15f, 0.15f));
+            if (blueTex == null) blueTex = MakeSolidTexture(new Color(0.15f, 0.3f, 0.8f));
+            if (semiTransparentTex == null) semiTransparentTex = MakeSolidTexture(new Color(0f, 0f, 0f, 0.7f));
         }
 
         /// <summary>Show the hitmarker for 2 rendered frames.</summary>
@@ -53,15 +69,124 @@ namespace HagenDa.Networking
             if (controller == null || !controller.isLocalPlayer) return;
             if (health == null) return;
 
+            DrawScore();
+
+            // Match over: show victory / defeat overlay, suppress the rest.
+            var mm = NetworkMatchManager.Instance;
+            if (mm != null && mm.matchOver)
+            {
+                DrawMatchOver(mm);
+                return;
+            }
+
             DrawCrosshair();
             DrawHitmarker();
             DrawHealthBar();
             DrawArmor();
 
-            if (equipment != null && controller.activeSlot >= 0)
-                DrawEquipment();
+            if (health.awaitingRedeploy)
+                DrawRedeployMenu();
             else
-                DrawAmmo();
+            {
+                if (equipment != null && controller.activeSlot >= 0)
+                    DrawEquipment();
+                else
+                    DrawAmmo();
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // TEAM SCORE (top center)
+        // ---------------------------------------------------------------
+        private void DrawScore()
+        {
+            var mm = NetworkMatchManager.Instance;
+            if (mm == null) return;
+
+            if (scoreStyle == null)
+            {
+                scoreStyle = new GUIStyle(GUI.skin.label);
+                scoreStyle.fontSize = Mathf.Max(18, Mathf.RoundToInt(Screen.height * 0.035f));
+                scoreStyle.alignment = TextAnchor.MiddleCenter;
+                ApplyCjkFont(scoreStyle);
+            }
+
+            float w = Screen.width * 0.22f;
+            float h = Screen.height * 0.04f;
+            float x = (Screen.width - w) * 0.5f;
+            float y = Screen.height * 0.02f;
+
+            string teamLabel = combatant != null && combatant.teamId == (int)MatchTeam.Blue
+                ? "蓝方" : "红方";
+            scoreStyle.normal.textColor = Color.white;
+            string text = $"红方 {mm.redScore}  —  蓝方 {mm.blueScore}  [{teamLabel}]";
+            GUI.Label(new Rect(x, y, w, h), text, scoreStyle);
+        }
+
+        // ---------------------------------------------------------------
+        // REDEPLOY MENU (death deploy selection)
+        // ---------------------------------------------------------------
+        private void DrawRedeployMenu()
+        {
+            if (deployStyle == null)
+            {
+                deployStyle = new GUIStyle(GUI.skin.label);
+                deployStyle.fontSize = Mathf.Max(16, Mathf.RoundToInt(Screen.height * 0.03f));
+                deployStyle.alignment = TextAnchor.MiddleCenter;
+                deployStyle.normal.textColor = Color.white;
+                ApplyCjkFont(deployStyle);
+
+                deployKeyStyle = new GUIStyle(GUI.skin.label);
+                deployKeyStyle.fontSize = Mathf.Max(14, Mathf.RoundToInt(Screen.height * 0.025f));
+                deployKeyStyle.alignment = TextAnchor.MiddleCenter;
+                deployKeyStyle.normal.textColor = new Color(0.8f, 0.85f, 1f);
+                ApplyCjkFont(deployKeyStyle);
+            }
+
+            float w = Screen.width * 0.35f;
+            float h = Screen.height * 0.22f;
+            float x = (Screen.width - w) * 0.5f;
+            float y = (Screen.height - h) * 0.4f;
+
+            GUI.DrawTexture(new Rect(x, y, w, h), semiTransparentTex);
+
+            float lineH = h * 0.2f;
+            float cy = y + lineH * 0.5f;
+
+            GUI.Label(new Rect(x, cy, w, lineH), "等待重新部署", deployStyle);
+            cy += lineH;
+            GUI.Label(new Rect(x, cy, w, lineH), "[1] 驻地 (GR)", deployKeyStyle);
+            cy += lineH;
+            GUI.Label(new Rect(x, cy, w, lineH), "[2] 据点 (HQ)", deployKeyStyle);
+            cy += lineH;
+            GUI.Label(new Rect(x, cy, w, lineH), "[3] 小队成员", deployKeyStyle);
+        }
+
+        // ---------------------------------------------------------------
+        // MATCH OVER (victory / defeat)
+        // ---------------------------------------------------------------
+        private void DrawMatchOver(NetworkMatchManager mm)
+        {
+            if (matchOverStyle == null)
+            {
+                matchOverStyle = new GUIStyle(GUI.skin.label);
+                matchOverStyle.fontSize = Mathf.Max(28, Mathf.RoundToInt(Screen.height * 0.06f));
+                matchOverStyle.alignment = TextAnchor.MiddleCenter;
+                ApplyCjkFont(matchOverStyle);
+            }
+
+            bool playerIsRed = combatant == null || combatant.teamId == (int)MatchTeam.Red;
+            bool won = (mm.winner == (int)MatchTeam.Red) == playerIsRed;
+
+            matchOverStyle.normal.textColor = won ? new Color(0.3f, 1f, 0.4f) : new Color(1f, 0.25f, 0.25f);
+
+            string text = won ? "胜利!" : "失败";
+            GUI.Label(new Rect(0, Screen.height * 0.35f, Screen.width, Screen.height * 0.1f), text, matchOverStyle);
+
+            matchOverStyle.fontSize = Mathf.Max(16, Mathf.RoundToInt(Screen.height * 0.03f));
+            matchOverStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(0, Screen.height * 0.5f, Screen.width, Screen.height * 0.05f),
+                $"红方 {mm.redScore}  —  蓝方 {mm.blueScore}", matchOverStyle);
         }
 
         // ---------------------------------------------------------------
@@ -69,6 +194,9 @@ namespace HagenDa.Networking
         // ---------------------------------------------------------------
         private void DrawCrosshair()
         {
+            // Suppress crosshair while in the redeploy menu.
+            if (health.awaitingRedeploy) return;
+
             float cx = Screen.width * 0.5f;
             float cy = Screen.height * 0.5f;
             float len = Screen.height * 0.012f;
@@ -146,12 +274,12 @@ namespace HagenDa.Networking
                 armorStyle.fontSize = Mathf.Max(12, Mathf.RoundToInt(Screen.height * 0.03f));
                 armorStyle.normal.textColor = Color.white;
                 armorStyle.alignment = TextAnchor.MiddleLeft;
-                armorStyle.clipping = TextClipping.Overflow; // don't clip text taller than the rect
+                armorStyle.clipping = TextClipping.Overflow;
             }
 
             string text = Mathf.RoundToInt(health.armor).ToString();
             float tx = x + barW + Screen.width * 0.01f;
-            float armorH = Screen.height * 0.035f; // room for the full glyph height
+            float armorH = Screen.height * 0.035f;
             GUI.Label(new Rect(tx, y, Screen.width * 0.15f, armorH), text, armorStyle);
         }
 
@@ -172,7 +300,7 @@ namespace HagenDa.Networking
                 ammoStyle.fontSize = Mathf.Max(14, Mathf.RoundToInt(Screen.height * 0.032f));
                 ammoStyle.normal.textColor = Color.white;
                 ammoStyle.alignment = TextAnchor.MiddleRight;
-                ammoStyle.clipping = TextClipping.Overflow; // don't clip text taller than the rect
+                ammoStyle.clipping = TextClipping.Overflow;
                 ApplyCjkFont(ammoStyle);
             }
 
@@ -189,7 +317,7 @@ namespace HagenDa.Networking
                 modeStyle.fontSize = Mathf.Max(12, Mathf.RoundToInt(Screen.height * 0.022f));
                 modeStyle.normal.textColor = Color.white;
                 modeStyle.alignment = TextAnchor.MiddleRight;
-                modeStyle.clipping = TextClipping.Overflow; // don't clip text taller than the rect
+                modeStyle.clipping = TextClipping.Overflow;
                 ApplyCjkFont(modeStyle);
             }
 

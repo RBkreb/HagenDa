@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5498135400834884255}
   - component: {fileID: 7971186896382879504}
   - component: {fileID: 8416130353467528664}
+  - component: {fileID: 5080247031457176463}
   - component: {fileID: 5519252547045945658}
   - component: {fileID: 7066042554987163495}
   - component: {fileID: 3271674328394960880}
@@ -257,6 +258,28 @@ MonoBehaviour:
   health: 0
   armor: 0
   explosionDamageMultiplier: 1
+  lastAttacker: {fileID: 0}
+  unrevivable: 0
+  awaitingRedeploy: 0
+--- !u!114 &5080247031457176463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634328753906994812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89256e99e1062ea409edfdaf5ea75135, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMethod: 0
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  teamId: -1
+  squadId: -1
+  markedUntil: -1
 --- !u!114 &5519252547045945658
 MonoBehaviour:
   m_ObjectHideFlags: 0

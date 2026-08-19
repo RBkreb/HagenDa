@@ -83,11 +83,13 @@
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerControl.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\Identifiable.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Weapons\IWeaponControllerProvider.cs" />
+    <Compile Include="Assets\Scripts\Network\CapturePoint.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Movement\IPlayerMovementProvider.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkMatchManager.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\TurretEditor.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\Utilities\DestroyMe.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\InputManager.cs" />
@@ -194,6 +196,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\WeaponState\WeaponDefaultState.cs" />
+    <Compile Include="Assets\Scripts\Network\GarrisonZone.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkGun.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Weapon Behaviours\SpreadSystem.cs" />
@@ -301,6 +304,7 @@
     <Compile Include="Assets\Cowsins\Scripts\Behaviours\Movement Behaviours\SpeedLinesBehaviour.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\PointCapture.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Extra\GravitonWeapon.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkCombatant.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerState\PlayerClimbState.cs" />
     <Compile Include="Assets\Cowsins\Scripts\CustomAttributes\TitleDrawer.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />

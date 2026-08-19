@@ -1,0 +1,240 @@
+using System.Collections.Generic;
+using Mirror;
+using UnityEngine;
+using UnityEngine.AI;
+
+namespace HagenDa.Networking
+{
+    /// <summary>Two opposing teams (PHASE7).</summary>
+    public enum MatchTeam
+    {
+        Red = 0,
+        Blue = 1
+    }
+
+    /// <summary>
+    /// Server-authoritative match state (PHASE7). A single scene object that:
+    ///
+    ///  - registers every <see cref="NetworkCombatant"/> (player + AI) and assigns
+    ///    them a team / squad (human player fixed to red),
+    ///  - tracks team scores, awards kills / captures / hold ticks, and ends the
+    ///    match at <see cref="winScore"/> (freezing combat),
+    ///  - answers deploy-point queries for garrison / HQ / squad redeployment.
+    ///
+    /// Scores and winner are SyncVars so the HUD reads them directly.
+    /// </summary>
+    [RequireComponent(typeof(NetworkIdentity))]
+    public class NetworkMatchManager : NetworkBehaviour
+    {
+        public static NetworkMatchManager Instance { get; private set; }
+
+        [Header("Score")]
+        [Tooltip("先到该分的一方获胜（测试阶段 100）。")]
+        public int winScore = 100;
+
+        [SyncVar] public int redScore;
+        [SyncVar] public int blueScore;
+
+        [Tooltip("-1 = 进行中, 0 = 红方胜, 1 = 蓝方胜.")]
+        [SyncVar] public int winner = -1;
+
+        [SyncVar] public bool matchOver;
+
+        [Header("Team / squad")]
+        public int squadsPerTeam = 2;
+        public int squadSize = 2;
+
+        [Header("Redeploy")]
+        [Tooltip("死亡后到可重新部署的秒数.")]
+        public float redeployDelay = 10f;
+        [Tooltip("玩家进入部署菜单后，无操作自动部署回 GR 的秒数.")]
+        public float autoDeployTimeout = 10f;
+
+        [Header("Zones")]
+        public List<CapturePoint> capturePoints = new List<CapturePoint>();
+        public List<GarrisonZone> garrisons = new List<GarrisonZone>();
+
+        // ---- server-only registry ----
+        private readonly List<NetworkCombatant> combatants = new List<NetworkCombatant>();
+        private readonly int[] nextSquad = new int[2];
+
+        // Combatants whose OnStartServer ran before this manager's (registered
+        // statically, drained once the manager starts).
+        private static readonly List<NetworkCombatant> pending = new List<NetworkCombatant>();
+
+        public override void OnStartServer()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+
+            winner = -1;
+            matchOver = false;
+            redScore = 0;
+            blueScore = 0;
+
+            if (capturePoints == null) capturePoints = new List<CapturePoint>();
+            if (garrisons == null) garrisons = new List<GarrisonZone>();
+
+            // Drain combatants registered before this manager started.
+            foreach (var c in pending)
+                AddCombatant(c);
+            pending.Clear();
+
+            // Scene objects spawned at server start.
+            foreach (var c in FindObjectsOfType<NetworkCombatant>())
+                AddCombatant(c);
+        }
+
+        public override void OnStartClient()
+        {
+            if (Instance == null) Instance = this;
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
+        /// <summary>Called by <see cref="NetworkCombatant.OnStartServer"/>.</summary>
+        public static void RegisterCombatant(NetworkCombatant c)
+        {
+            if (c == null) return;
+            if (Instance != null) Instance.AddCombatant(c);
+            else pending.Add(c);
+        }
+
+        private void AddCombatant(NetworkCombatant c)
+        {
+            if (c == null || combatants.Contains(c)) return;
+            combatants.Add(c);
+            AssignCombatant(c);
+        }
+
+        // ---------------------------------------------------------------
+        // TEAM / SQUAD ASSIGNMENT
+        // ---------------------------------------------------------------
+
+        private void AssignCombatant(NetworkCombatant c)
+        {
+            if (c.teamId >= 0) return;   // already assigned
+
+            // Human player (has a client connection) is fixed to red (confirmed).
+            bool isHuman = c.connectionToClient != null;
+            int team;
+            if (isHuman)
+            {
+                team = (int)MatchTeam.Red;
+            }
+            else
+            {
+                // AI: assign by initial position — north half (z>0) = blue, south = red.
+                team = c.transform.position.z < 0f ? (int)MatchTeam.Red : (int)MatchTeam.Blue;
+            }
+
+            int squad = nextSquad[team];
+            nextSquad[team] = (nextSquad[team] + 1) % Mathf.Max(1, squadsPerTeam);
+
+            c.teamId = team;
+            c.squadId = squad;
+        }
+
+        // ---------------------------------------------------------------
+        // SCORING
+        // ---------------------------------------------------------------
+
+        [Server]
+        public void AddScore(MatchTeam team, int amount)
+        {
+            if (matchOver) return;
+
+            if (team == MatchTeam.Red) redScore += amount;
+            else blueScore += amount;
+
+            if (redScore >= winScore) EndMatch(MatchTeam.Red);
+            else if (blueScore >= winScore) EndMatch(MatchTeam.Blue);
+        }
+
+        [Server]
+        public void ReportKill(NetworkCombatant attacker, NetworkCombatant victim)
+        {
+            if (attacker == null || victim == null) return;
+            if (attacker.teamId < 0 || victim.teamId < 0) return;
+            if (attacker.teamId == victim.teamId) return;   // 友军击杀不计分
+            AddScore((MatchTeam)attacker.teamId, 1);
+        }
+
+        [Server]
+        private void EndMatch(MatchTeam team)
+        {
+            if (matchOver) return;
+            winner = (int)team;
+            matchOver = true;
+        }
+
+        // ---------------------------------------------------------------
+        // DEPLOY POINT QUERIES
+        // ---------------------------------------------------------------
+
+        [Server]
+        public Vector3? GetGarrisonDeployPoint(MatchTeam team)
+        {
+            foreach (var g in garrisons)
+            {
+                if (g == null || (MatchTeam)g.teamId != team) continue;
+                return g.GetRandomDeployPoint();
+            }
+            return null;
+        }
+
+        [Server]
+        public Vector3? GetHqDeployPoint(MatchTeam team)
+        {
+            CapturePoint best = null;
+            foreach (var cp in capturePoints)
+            {
+                if (cp == null || (MatchTeam)cp.ownerTeam != team) continue;
+                best = cp;
+                break;   // first owned HQ; use its safe deploy point
+            }
+            if (best == null) return null;
+            return best.GetSafeDeployPoint(team);
+        }
+
+        [Server]
+        public Vector3? GetSquadDeployPoint(int team, int squad, NetworkCombatant self)
+        {
+            var alive = new List<NetworkCombatant>();
+            foreach (var c in combatants)
+            {
+                if (c == null || c == self) continue;
+                if (c.teamId != team || c.squadId != squad) continue;
+                if (c.IsDead) continue;
+                alive.Add(c);
+            }
+            if (alive.Count == 0) return null;
+
+            var member = alive[Random.Range(0, alive.Count)];
+
+            // 2m 内无遮挡位置（最多尝试 10 次）。
+            for (int i = 0; i < 10; i++)
+            {
+                Vector2 o = Random.insideUnitCircle * 2f;
+                Vector3 p = member.transform.position + new Vector3(o.x, 0f, o.y);
+                p.y = member.transform.position.y;
+
+                if (NavMesh.SamplePosition(p, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+                    p = hit.position;
+
+                if (!Physics.CheckSphere(p + Vector3.up * 0.9f, 0.5f,
+                                         Physics.DefaultRaycastLayers,
+                                         QueryTriggerInteraction.Ignore))
+                    return p;
+            }
+            return member.transform.position;
+        }
+    }
+}

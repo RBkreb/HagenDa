@@ -171,6 +171,8 @@ namespace HagenDa.Networking
         private bool reloadRequested;
         private bool switchFireModeRequested;
         private int wheelDeltaRequested;
+        private bool markRequested;          // q key (PHASE7)
+        private int deployChoiceRequested;    // 1/2/3 keys (PHASE7)
 
         // Client-side camera transition + shake state.
         private float cameraEyeHeight;
@@ -308,6 +310,12 @@ namespace HagenDa.Networking
             if (k.vKey.wasPressedThisFrame) switchFireModeRequested = true;
             if (k.jKey.wasPressedThisFrame) addArmorRequested = true;
             if (k.hKey.wasPressedThisFrame) selfRescueRequested = true;
+
+            // PHASE7: Q 标记敌人；1/2/3 选择重新部署点。
+            if (k.qKey.wasPressedThisFrame) markRequested = true;
+            if (k.digit1Key.wasPressedThisFrame) deployChoiceRequested = 1;
+            else if (k.digit2Key.wasPressedThisFrame) deployChoiceRequested = 2;
+            else if (k.digit3Key.wasPressedThisFrame) deployChoiceRequested = 3;
         }
 
         private Vector2 ReadMove()
@@ -449,6 +457,8 @@ namespace HagenDa.Networking
             s.addArmor = addArmorRequested; addArmorRequested = false;
             s.selfRescue = selfRescueRequested; selfRescueRequested = false;
             s.wheelDelta = wheelDeltaRequested; wheelDeltaRequested = 0;
+            s.mark = markRequested; markRequested = false;
+            s.deployChoice = deployChoiceRequested; deployChoiceRequested = 0;
 
             CmdInput(s);
         }
@@ -464,6 +474,14 @@ namespace HagenDa.Networking
         // ---------------------------------------------------------------
         private void SimulateServer()
         {
+            // 对局结束：冻结战斗（不再处理输入/移动/开火），仅让空中身体落地。
+            if (NetworkMatchManager.Instance != null && NetworkMatchManager.Instance.matchOver)
+            {
+                if (!grounded)
+                    rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
+                return;
+            }
+
             // Look: adopt the client's absolute view (client-authoritative aim).
             yaw = serverInput.yaw;
             pitch = Mathf.Clamp(serverInput.pitch, minPitch, maxPitch);
@@ -490,6 +508,10 @@ namespace HagenDa.Networking
             // gravity so an airborne corpse settles onto the ground.
             if (dead)
             {
+                // PHASE7: 死亡状态下处理重新部署选择（1/2/3 键）。
+                if (health != null && serverInput.deployChoice != 0)
+                    health.RequestDeploy(serverInput.deployChoice);
+
                 Vector3 hVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
                 if (hVel.sqrMagnitude > 0.0001f)
                     rb.AddForce(-hVel * stoppingFriction, ForceMode.Acceleration);
@@ -591,6 +613,10 @@ namespace HagenDa.Networking
             PlayerPosture eff2 = sliding ? PlayerPosture.Crouch : posture;
             Vector3 eye = transform.position + Vector3.up * GetEyeHeight(eff2);
             Vector3 forward = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
+
+            // PHASE7: Q 标记敌人。
+            if (serverInput.mark)
+                TryMark(eye, forward);
 
             if (gun != null)
             {
@@ -774,6 +800,59 @@ namespace HagenDa.Networking
             dashing = true;
             dashRemaining = dashDuration;
             dashDir = dir;
+        }
+
+        /// <summary>
+        /// PHASE7: 重新部署落地后重置状态为站姿、清除滑铲/飞扑/冲刺。
+        /// </summary>
+        public void OnRedeploy()
+        {
+            dead = false;
+            sliding = false;
+            diving = false;
+            jumpedOrDived = false;
+            sprintActive = false;
+
+            if (rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+
+            SetPosture(PlayerPosture.Stand);
+        }
+
+        /// <summary>
+        /// PHASE7 标记：从相机射线标记第一个敌方实体（穿过友军，遇墙停止）。
+        /// </summary>
+        [Server]
+        private void TryMark(Vector3 eye, Vector3 forward)
+        {
+            const float range = 200f;
+            var hits = Physics.RaycastAll(eye, forward, range);
+            if (hits.Length == 0) return;
+
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            var self = GetComponent<NetworkCombatant>();
+
+            foreach (var h in hits)
+            {
+                var c = h.collider.GetComponentInParent<NetworkCombatant>();
+                if (c != null)
+                {
+                    // 敌方：标记；友军/自身：穿过继续。
+                    if (c.teamId >= 0 && (self == null || c.teamId != self.teamId))
+                    {
+                        c.SetMarked(NetworkTime.time + 10.0);
+                        return;
+                    }
+                    continue;
+                }
+
+                // 非实体几何：遮挡，停止。
+                break;
+            }
         }
 
         private float CurrentMaxSpeed()

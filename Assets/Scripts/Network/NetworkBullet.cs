@@ -30,6 +30,8 @@ namespace HagenDa.Networking
         private float spawnTime;
         private WeaponDefinition definition;
         private NetworkGun owner;
+        private NetworkCombatant ownerCombatant;   // 射击者（击杀归属 / 友军判定）
+        private int ownerTeam = -1;
         private BulletPool pool;
         private Collider[] ownerColliders;
 
@@ -47,6 +49,9 @@ namespace HagenDa.Networking
             damage = def != null ? def.baseDamage : 30f;
             lifetime = def != null ? def.bulletLifetime : 5f;
             this.owner = owner;
+
+            ownerCombatant = owner != null ? owner.GetComponent<NetworkCombatant>() : null;
+            ownerTeam = ownerCombatant != null ? ownerCombatant.teamId : -1;
 
             ownerColliders = owner != null
                 ? owner.GetComponentsInChildren<Collider>(true)
@@ -98,34 +103,32 @@ namespace HagenDa.Networking
             {
                 owner?.NotifyImpact(best.point);
 
-                var damageable = best.collider.GetComponentInParent<IDamageable>();
-                if (damageable != null)
+                var health = best.collider.GetComponentInParent<NetworkPlayerHealth>();
+                if (health != null)
                 {
-                    var health = best.collider.GetComponentInParent<NetworkPlayerHealth>();
-                    bool living = health != null;
+                    // Living entity: penetrate and keep flying (PHASE4).
+                    var targetCombatant = health.GetComponent<NetworkCombatant>();
+                    bool friendly = ownerTeam >= 0 && targetCombatant != null &&
+                                    targetCombatant.teamId == ownerTeam;
 
-                    float part = 1f;
-                    if (living)
-                        part = HitboxUtility.GetMultiplier(health.GetActiveCapsule(), best.point);
-
-                    float finalDamage = ComputeDamage(best.point, part);
-                    damageable.TakeDamage(finalDamage);
-
-                    if (living)
+                    if (!friendly)
                     {
-                        // Living entity: penetrate and keep flying.
+                        float part = HitboxUtility.GetMultiplier(health.GetActiveCapsule(), best.point);
+                        float finalDamage = ComputeDamage(best.point, part);
+                        health.TakeDamage(finalDamage, best.point, ownerCombatant);
                         owner?.NotifyHit();
                     }
-                    else
-                    {
-                        // Non-entity (wall / static target): destroy.
-                        Expire();
-                        return;
-                    }
+                    // 友军：不伤害，子弹继续飞行。
                 }
                 else
                 {
-                    // Geometry with no IDamageable (wall etc.): destroy.
+                    var damageable = best.collider.GetComponentInParent<IDamageable>();
+                    if (damageable != null)
+                    {
+                        float finalDamage = ComputeDamage(best.point, 1f);
+                        damageable.TakeDamage(finalDamage);
+                    }
+                    // Non-entity (wall / static target): destroy.
                     Expire();
                     return;
                 }

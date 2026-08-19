@@ -11,8 +11,9 @@ namespace HagenDa.Networking
     ///    0.5s until full.
     ///  - Armor (default 0) absorbs damage before health and never regenerates.
     ///  - Death: the entity goes prone, all 3C + combat is disabled, and no further
-    ///    damage is received. There is no auto-respawn; a RescueThrowable (or the H
-    ///    test key) revives it, keeping the prone posture and restoring 100 HP.
+    ///    damage is received. A RescueThrowable (or the H test key) revives it during
+    ///    the down window; after 10s (PHASE7) the entity redeploys (player chooses a
+    ///    point, AI picks GR/HQ). GR force-kill is unrevivable.
     /// </summary>
     public class NetworkPlayerHealth : NetworkBehaviour, IDamageable
     {
@@ -44,12 +45,35 @@ namespace HagenDa.Networking
 
         private float buffRegenPerSecond;   // >0 = syringe / supply-pack temporary regen
 
+        // ---------------------------------------------------------------
+        // PHASE7 match / redeploy
+        // ---------------------------------------------------------------
+        [Tooltip("最近一次造成伤害的实体（击杀归属）。")]
+        public NetworkCombatant lastAttacker;
+
+        [Tooltip("GR 强制击杀：不可被救援。")]
+        public bool unrevivable;
+
+        [SyncVar] public bool awaitingRedeploy;   // 死亡 10s 后进入部署菜单
+
+        private Rigidbody rb;
+        private float redeployDeadline;           // server-only
+        public float RedeployDelay => redeployDeadline - Time.time;
+
+        private void Awake()
+        {
+            rb = GetComponent<Rigidbody>();
+        }
+
         public override void OnStartServer()
         {
             health = maxHealth;
             armor = 0f;
             lastDamageTime = Time.time;
             deathHandled = false;
+            unrevivable = false;
+            awaitingRedeploy = false;
+            lastAttacker = null;
         }
 
         // ---------------------------------------------------------------
@@ -67,6 +91,23 @@ namespace HagenDa.Networking
         [Server]
         public void TakeDamage(float damage, Vector3 hitPoint)
         {
+            float mult = HitboxUtility.GetMultiplier(GetActiveCapsule(), hitPoint);
+            TakeDamageInternal(damage, mult);
+        }
+
+        /// <summary>Area damage with attacker attribution (PHASE7 击杀归属).</summary>
+        [Server]
+        public void TakeDamage(float damage, NetworkCombatant attacker)
+        {
+            lastAttacker = attacker;
+            TakeDamageInternal(damage * explosionDamageMultiplier, 1f);
+        }
+
+        /// <summary>Hitbox-aware damage with attacker attribution (PHASE7 击杀归属).</summary>
+        [Server]
+        public void TakeDamage(float damage, Vector3 hitPoint, NetworkCombatant attacker)
+        {
+            lastAttacker = attacker;
             float mult = HitboxUtility.GetMultiplier(GetActiveCapsule(), hitPoint);
             TakeDamageInternal(damage, mult);
         }
@@ -134,6 +175,9 @@ namespace HagenDa.Networking
         private void Update()
         {
             if (!isServer) return;
+
+            HandleRedeploy();
+
             if (IsDead) return;
             if (health >= maxHealth)
             {
@@ -174,22 +218,168 @@ namespace HagenDa.Networking
         [Server]
         public void Die()
         {
+            DieInternal();
+        }
+
+        /// <summary>GR 强制击杀：不可救援（PHASE7）。</summary>
+        [Server]
+        public void ForceKill()
+        {
+            if (deathHandled) return;
+            unrevivable = true;
+            DieInternal();
+        }
+
+        [Server]
+        private void DieInternal()
+        {
             if (deathHandled) return;
             deathHandled = true;
             health = 0f;
+            awaitingRedeploy = false;
             SetDeadState(true);
             RpcDie();
+
+            // 击杀归属计分（仅敌方击杀）。
+            var self = GetComponent<NetworkCombatant>();
+            NetworkMatchManager.Instance?.ReportKill(lastAttacker, self);
+
+            // 死亡 10s 后可重新部署。
+            var mm = NetworkMatchManager.Instance;
+            redeployDeadline = Time.time + (mm != null ? mm.redeployDelay : 10f);
         }
 
         [Server]
         public void Rescue()
         {
             if (!deathHandled) return;
+            if (unrevivable) return;   // GR 强制击杀不可救援
+
             deathHandled = false;
+            awaitingRedeploy = false;
             health = maxHealth;
+            lastAttacker = null;
             SetDeadState(false);
             RpcRescue();
         }
+
+        // ---------------------------------------------------------------
+        // PHASE7 REDEPLOY
+        // ---------------------------------------------------------------
+
+        [Server]
+        private void HandleRedeploy()
+        {
+            if (!deathHandled) return;
+            if (Time.time < redeployDeadline) return;
+
+            var mm = NetworkMatchManager.Instance;
+            if (mm == null) return;
+
+            bool isHuman = connectionToClient != null;
+
+            if (!isHuman)
+            {
+                // AI：随机 GR 或 HQ 自动部署。
+                Vector3? pos = AiChooseDeploy();
+                if (pos.HasValue) DoRedeploy(pos.Value);
+                return;
+            }
+
+            // 玩家：进入部署菜单，无操作超时后自动部署回 GR。
+            awaitingRedeploy = true;
+
+            if (Time.time >= redeployDeadline + (mm.autoDeployTimeout))
+            {
+                Vector3? pos = mm.GetGarrisonDeployPoint(MyTeam());
+                if (pos.HasValue) DoRedeploy(pos.Value);
+            }
+        }
+
+        [Server]
+        private Vector3? AiChooseDeploy()
+        {
+            var mm = NetworkMatchManager.Instance;
+            if (mm == null) return null;
+
+            if (Random.value < 0.5f)
+            {
+                var hq = mm.GetHqDeployPoint(MyTeam());
+                if (hq.HasValue) return hq;
+            }
+            return mm.GetGarrisonDeployPoint(MyTeam());
+        }
+
+        /// <summary>Player deploy choice (1=GR / 2=HQ / 3=squad).</summary>
+        [Server]
+        public void RequestDeploy(int choice)
+        {
+            if (!deathHandled) return;
+            if (Time.time < redeployDeadline) return;
+
+            var mm = NetworkMatchManager.Instance;
+            if (mm == null) return;
+
+            var self = GetComponent<NetworkCombatant>();
+            int team = self != null && self.teamId >= 0 ? self.teamId : (int)MatchTeam.Red;
+            int squad = self != null ? self.squadId : -1;
+
+            Vector3? pos = null;
+            switch (choice)
+            {
+                case 1: pos = mm.GetGarrisonDeployPoint((MatchTeam)team); break;
+                case 2: pos = mm.GetHqDeployPoint((MatchTeam)team); break;
+                case 3: pos = mm.GetSquadDeployPoint(team, squad, self); break;
+            }
+
+            if (!pos.HasValue)
+                pos = mm.GetGarrisonDeployPoint((MatchTeam)team);   // fallback GR
+            if (!pos.HasValue) return;
+
+            DoRedeploy(pos.Value);
+        }
+
+        [Server]
+        private void DoRedeploy(Vector3 pos)
+        {
+            deathHandled = false;
+            unrevivable = false;
+            awaitingRedeploy = false;
+            lastAttacker = null;
+            health = maxHealth;
+            armor = 0f;
+
+            // 传送：先清动量再设位置。
+            if (rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.position = pos;
+            }
+            else
+            {
+                transform.position = pos;
+            }
+
+            SetDeadState(false);
+
+            var controller = GetComponent<NetworkPlayerController>();
+            if (controller != null) controller.OnRedeploy();
+
+            var ai = GetComponent<NetworkAIController>();
+            if (ai != null) ai.OnRedeploy();
+
+            RpcRedeploy();
+        }
+
+        private MatchTeam MyTeam()
+        {
+            var c = GetComponent<NetworkCombatant>();
+            return c != null && c.teamId >= 0 ? (MatchTeam)c.teamId : MatchTeam.Red;
+        }
+
+        [ClientRpc]
+        private void RpcRedeploy() { }
 
         /// <summary>Disable/re-enable 3C and combat on the owning controller (player or AI).</summary>
         [Server]

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 namespace HagenDa.Networking
 {
@@ -16,9 +17,13 @@ namespace HagenDa.Networking
         /// Entities behind cover (a ray from the centre hits something other than
         /// the entity first) take no damage.
         /// </summary>
-        public static void ApplyDamage(Vector3 center, float yield, float radius)
+        public static void ApplyDamage(Vector3 center, float yield, float radius,
+                                        NetworkIdentity attacker = null)
         {
             if (radius <= 0f) return;
+
+            var attackerCombatant = attacker != null ? attacker.GetComponent<NetworkCombatant>() : null;
+            int attackerTeam = attackerCombatant != null ? attackerCombatant.teamId : -1;
 
             var colliders = Physics.OverlapSphere(center, radius);
             var damaged = new HashSet<IDamageable>();
@@ -36,7 +41,13 @@ namespace HagenDa.Networking
                 if (dist <= 0.0001f)
                 {
                     damaged.Add(target);
-                    target.TakeDamage(yield);
+                    if (IsHostile(target, attackerTeam))
+                    {
+                        if (target is NetworkPlayerHealth h)
+                            h.TakeDamage(yield, attackerCombatant);
+                        else
+                            target.TakeDamage(yield);
+                    }
                     continue;
                 }
 
@@ -68,7 +79,13 @@ namespace HagenDa.Networking
                 if (damage > 0f)
                 {
                     damaged.Add(target);
-                    target.TakeDamage(damage);
+                    if (IsHostile(target, attackerTeam))
+                    {
+                        if (target is NetworkPlayerHealth h)
+                            h.TakeDamage(damage, attackerCombatant);
+                        else
+                            target.TakeDamage(damage);
+                    }
                 }
             }
         }
@@ -169,6 +186,22 @@ namespace HagenDa.Networking
             // so checking Name for "HighDefinition" always fails. Check FullName too.
             var t = pipeline.GetType();
             return t.FullName.Contains("HighDefinition") || t.Name.Contains("HDRenderPipeline");
+        }
+
+        /// <summary>
+        /// Returns true if the target is hostile to the attacker (different team).
+        /// No attacker team (-1) = hostile to everyone (neutral damage source).
+        /// </summary>
+        private static bool IsHostile(IDamageable target, int attackerTeam)
+        {
+            if (target is NetworkPlayerHealth h)
+            {
+                var c = h.GetComponent<NetworkCombatant>();
+                if (c == null || c.teamId < 0) return true;
+                if (attackerTeam < 0) return true;
+                return c.teamId != attackerTeam;
+            }
+            return true;   // 非玩家/AI 实体（射击靶等）：始终受伤
         }
     }
 }
