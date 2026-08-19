@@ -176,6 +176,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   fuseTime: 0
+  freezeOnContact: 0
+  owner: {fileID: 0}
   empFieldPrefab: {fileID: 8531979713549649885, guid: cc29f0198599153439044358dda5ba50,
     type: 3}
   radius: 6

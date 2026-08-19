@@ -23,6 +23,18 @@ namespace HagenDa.Networking
             DeployableUtil.IgnoreLivingCollision(gameObject);
         }
 
+        private void OnCollisionEnter(Collision collision)
+        {
+            // 接触地面后立刻静止，去除物理防止漂移。
+            var rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.isKinematic = true;
+            }
+        }
+
         private void Update()
         {
             if (!isServer) return;

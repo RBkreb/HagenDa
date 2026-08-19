@@ -14,31 +14,31 @@ namespace HagenDa.Networking
     {
         [Header("Supply")]
         public int supplyAmount = 80;
+        public int gunReserveAmount = 30;  // 主武器备弹补充量
         public float detectRadius = 0.4f;
         public float regenHpPerSecond = 10f;
 
-        private float activateTime;   // 投出后短暂宽限期，避免出生即被投出者消耗
+        private float activateTime;   // 投出后延迟，1s 后才可被触碰使用
 
         public override void OnStartServer()
         {
             base.OnStartServer();
 
-            // 与所有活体无碰撞，只与普通刚体（地面/墙体）碰撞。
             DeployableUtil.IgnoreLivingCollision(gameObject);
 
-            activateTime = Time.time + 0.15f;
+            activateTime = Time.time + 1f;
         }
 
         protected override void OnCollisionEnter(Collision collision)
         {
-            // 不引爆：补给包停留在地面/墙边，等待活体进入检测半径。
+            FreezePhysics();
         }
 
         protected override void Update()
         {
             base.Update();
             if (!isServer) return;
-            if (Time.time < activateTime) return;   // 宽限期：先真正投出
+            if (Time.time < activateTime) return;   // 1s 延迟
 
             var colliders = Physics.OverlapSphere(transform.position, detectRadius);
             foreach (var c in colliders)
@@ -46,13 +46,14 @@ namespace HagenDa.Networking
                 var health = c.GetComponentInParent<NetworkPlayerHealth>();
                 if (health == null || health.IsDead) continue;
 
-                // 忽略投出者自身。
-                if (owner != null && health.GetComponent<NetworkIdentity>() == owner)
-                    continue;
-
                 var equipment = health.GetComponent<NetworkEquipment>();
                 if (equipment != null)
                     equipment.GrantSupply(supplyAmount);
+
+                // 主武器备弹
+                var gun = health.GetComponent<NetworkGun>();
+                if (gun != null)
+                    gun.AddReserveAmmo(gunReserveAmount);
 
                 health.StartBuffRegen(regenHpPerSecond);
 

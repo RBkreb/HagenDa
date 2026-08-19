@@ -175,6 +175,9 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   fuseTime: 0
+  freezeOnContact: 0
+  owner: {fileID: 0}
   supplyAmount: 80
+  gunReserveAmount: 30
   detectRadius: 0.4
   regenHpPerSecond: 10

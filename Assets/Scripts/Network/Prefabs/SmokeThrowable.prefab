@@ -175,6 +175,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   fuseTime: 1
+  freezeOnContact: 0
+  owner: {fileID: 0}
   concentration: 0.6
   radius: 5
   decayTime: 5
