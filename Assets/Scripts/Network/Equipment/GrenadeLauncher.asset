@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: "\u69B4\u5F39\u70AE"
   category: 0
   instantUse: 0
+  deployCap: 0
   maxCarry: 5
   supplyCost: 100
   ammoRegenInterval: 0

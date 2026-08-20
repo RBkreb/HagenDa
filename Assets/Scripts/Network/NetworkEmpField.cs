@@ -79,6 +79,13 @@ namespace HagenDa.Networking
                 if ((ic.transform.position - pos).sqrMagnitude <= r2)
                     ic.ApplyEmp(interfereDuration);
             }
+
+            // PHASE8 感应器：EMP 直接摧毁。
+            foreach (var s in Object.FindObjectsOfType<SensorProbe>())
+            {
+                if ((s.transform.position - pos).sqrMagnitude <= r2)
+                    s.ApplyEmp(interfereDuration);
+            }
         }
 
         [ClientRpc]

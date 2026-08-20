@@ -352,6 +352,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f6449bc34f7c8fc4ebc4387f723e440a, type: 2}
   - {fileID: 11400000, guid: 25d9ef986e04a6048ad67396d3323b84, type: 2}
   - {fileID: 11400000, guid: 9a734e141d3ed4b4191f0bd919b5f058, type: 2}
+  - {fileID: 11400000, guid: 84ce2a9bbc201ee44b8e58519b2b24d7, type: 2}
   controller: {fileID: 0}
   selection: -1
   selectedAmmo: 0
@@ -363,6 +364,7 @@ MonoBehaviour:
   opt2Index: -1
   specialIndex: -1
   throwableIndex: -1
+  dashCooldownRemaining: 0
 --- !u!114 &3308931702653194175
 MonoBehaviour:
   m_ObjectHideFlags: 0

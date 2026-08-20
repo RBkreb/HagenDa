@@ -78,6 +78,7 @@
     <Compile Include="Assets\Cowsins\Scripts\UI\UIEffects.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerStatsEditor.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
+    <Compile Include="Assets\Scripts\Network\DeployableSlot.cs" />
     <Compile Include="Assets\Cowsins\Scripts\PickUpSystem\InteractManagerEditor.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Effects\WeaponSpecificEffects.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Player\PlayerControl.cs" />
@@ -232,6 +233,7 @@
     <Compile Include="Assets\Scripts\Network\NetworkExplosion.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\Scripts\Network\GameHud.cs" />
+    <Compile Include="Assets\Scripts\Network\SensorProbe.cs" />
     <Compile Include="Assets\Cowsins\Scripts\Managers\AddonManager.cs" />
     <Compile Include="Assets\Scripts\Network\SupplyPackThrowable.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
