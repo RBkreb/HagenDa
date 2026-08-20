@@ -30,6 +30,16 @@ namespace HagenDa.Networking
             new Dictionary<NetworkCombatant, float>();
         private readonly Collider[] buffer = new Collider[64];
 
+        private void Start()
+        {
+            // PHASE8: 纯色 + 中心字母标记（替换旧高亮环）。颜色由队伍决定。
+            var c = teamId == (int)MatchTeam.Blue
+                ? new Color(0.15f, 0.3f, 0.7f)
+                : new Color(0.7f, 0.15f, 0.15f);
+            var marker = gameObject.AddComponent<MapPointMarker>();
+            marker.Init("G", Mathf.Max(12f, radius * 0.7f), c);
+        }
+
         private void Update()
         {
             if (!isServer) return;

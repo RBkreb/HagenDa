@@ -115,8 +115,11 @@ namespace HagenDa.Networking
                     {
                         float part = HitboxUtility.GetMultiplier(health.GetActiveCapsule(), best.point);
                         float finalDamage = ComputeDamage(best.point, part);
-                        health.TakeDamage(finalDamage, best.point, ownerCombatant);
-                        owner?.NotifyHit();
+                        health.TakeBulletDamage(finalDamage, best.point, direction, ownerCombatant);
+
+                        bool headshot = part >= HitboxUtility.HeadMultiplier;
+                        bool killed = health.health <= 0f;
+                        owner?.NotifyHit(headshot, killed);
                     }
                     // 友军：不伤害，子弹继续飞行。
                 }

@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 13
   displayName: "\u62A4\u7532\u677F"
+  category: 0
+  instantUse: 1
   maxCarry: 2
   supplyCost: 80
   ammoRegenInterval: 0

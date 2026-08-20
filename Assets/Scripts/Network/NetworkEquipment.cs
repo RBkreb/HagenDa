@@ -31,6 +31,13 @@ namespace HagenDa.Networking
         [SyncVar(hook = nameof(OnShieldActiveChanged))] public bool shieldActive;
         [SyncVar] public bool channeling;
 
+        [Header("Loadout slots (PHASE8)")]
+        [Tooltip("槽位 → 库存索引。0=可选1, 1=可选2, 2=特有, 3=投掷物.")]
+        [SyncVar] public int opt1Index = -1;
+        [SyncVar] public int opt2Index = -1;
+        [SyncVar] public int specialIndex = -1;
+        [SyncVar] public int throwableIndex = -1;
+
         // ---- per-equipment server-only state (indexed by equipmentList) ----
         private int[] ammo;
         private float[] supply;
@@ -54,8 +61,47 @@ namespace HagenDa.Networking
         private BlastShield serverShield;
         private BlastShield clientShield;
 
+        // PHASE8: 5 个配装槽位的剩余次数同步（客户端 HUD 读取）。
+        public readonly SyncList<int> slotAmmo = new SyncList<int>();
+
+        // PHASE8: 瞬发型装备（快速机动装置）冷却剩余秒数（客户端 HUD 显示）。
+        [SyncVar] public float dashCooldownRemaining;
+
         public int Count => equipmentList != null ? equipmentList.Count : 0;
         public bool IsEmpDisabled => empExposure > 0f;
+
+        /// <summary>槽位剩余使用次数。服务器读权威数组，客户端读同步列表。</summary>
+        public int GetSlotAmmo(int slot)
+        {
+            if (slot < 0 || slot > 4) return 0;
+            if (isServer)
+            {
+                int i = GetSlotIndex(slot);
+                if (i < 0 || ammo == null || i >= ammo.Length) return 0;
+                return ammo[i];
+            }
+            if (slotAmmo == null || slot >= slotAmmo.Count) return 0;
+            return slotAmmo[slot];
+        }
+
+        /// <summary>把 5 个槽位的剩余次数同步给客户端（服务器在弹药变化后调用）。</summary>
+        [Server]
+        private void SyncSlotAmmo()
+        {
+            if (slotAmmo == null) return;
+            while (slotAmmo.Count < 5) slotAmmo.Add(0);
+            for (int s = 0; s < 5; s++)
+            {
+                int i = GetSlotIndex(s);
+                slotAmmo[s] = (i >= 0 && ammo != null && i < ammo.Length) ? ammo[i] : 0;
+            }
+        }
+
+        /// <summary>槽位是否还有剩余次数（服务器端；剩余为 0 不能切换）。</summary>
+        public bool HasAmmoInSlot(int slot)
+        {
+            return GetSlotAmmo(slot) > 0;
+        }
 
         public override void OnStartServer()
         {
@@ -74,6 +120,14 @@ namespace HagenDa.Networking
                 if (def != null)
                     ammo[i] = def.maxCarry;
             }
+
+            // PHASE8: 默认配装（可选1=快速机动, 可选2=护甲板, 特有=治疗针, 投掷=手雷）。
+            opt1Index = IndexOfType(EquipmentType.QuickDash);
+            opt2Index = IndexOfType(EquipmentType.ArmorPlate);
+            specialIndex = IndexOfType(EquipmentType.HealingSyringe);
+            throwableIndex = IndexOfType(EquipmentType.Grenade);
+
+            SyncSlotAmmo();
         }
 
         // ---------------------------------------------------------------
@@ -85,6 +139,135 @@ namespace HagenDa.Networking
         {
             selection = index;
             SyncSelected();
+        }
+
+        // ---------------------------------------------------------------
+        // PHASE8 LOADOUT SLOTS
+        // ---------------------------------------------------------------
+
+        /// <summary>Slot id (0=可选1, 1=可选2, 2=特有, 3=投掷物) → inventory index.</summary>
+        public int GetSlotIndex(int slot)
+        {
+            switch (slot)
+            {
+                case 0: return opt1Index;
+                case 1: return opt2Index;
+                case 2: return specialIndex;
+                case 3: return throwableIndex;
+                default: return -1;
+            }
+        }
+
+        public EquipmentDefinition GetSlotDefinition(int slot)
+        {
+            int i = GetSlotIndex(slot);
+            return i >= 0 && i < Count ? equipmentList[i] : null;
+        }
+
+        /// <summary>
+        /// Handle a slot key press (1/3/4/G/Z). Returns true if the slot's item was
+        /// an instant-use item (used immediately, no active-slot switch); false if it
+        /// is a normal item (the slot becomes the active selection).
+        /// </summary>
+        [Server]
+        public bool HandleSlotKey(int slot, Vector3 eye, Vector3 forward,
+                                  Vector3 move, bool grounded)
+        {
+            var def = GetSlotDefinition(slot);
+            if (def == null) return false;
+
+            int idx = GetSlotIndex(slot);
+            if (def.instantUse)
+            {
+                Use(idx, false, eye, forward, move, grounded);
+                return true;
+            }
+
+            Select(idx);
+            return false;
+        }
+
+        /// <summary>Server: apply a validated loadout to the synced slot indices.</summary>
+        [Server]
+        public void ApplyLoadout(LoadoutDefinition loadout)
+        {
+            if (loadout == null) return;
+            opt1Index = ClampIndex(loadout.optional1);
+            opt2Index = ClampIndex(loadout.optional2);
+            specialIndex = ClampIndex(loadout.special);
+            throwableIndex = ClampIndex(loadout.throwable);
+            SyncSlotAmmo();
+        }
+
+        /// <summary>
+        /// PHASE8 重新部署：重置所有配备弹药到携带上限、清空补给度与冷却、
+        /// 清除已投出的遥控炸药、关闭防爆盾与引导。
+        /// </summary>
+        [Server]
+        public void ResetForRedeploy()
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                var def = equipmentList[i];
+                if (def == null) continue;
+                ammo[i] = def.maxCarry;
+                supply[i] = 0f;
+                nextUseTime[i] = 0f;
+                ammoRegenAccum[i] = 0f;
+            }
+
+            // 清除已投出的信号/线控炸药。
+            for (int k = placedCharges.Count - 1; k >= 0; k--)
+            {
+                var c = placedCharges[k];
+                if (c != null && c.gameObject != null)
+                    NetworkServer.Destroy(c.gameObject);
+                placedCharges.RemoveAt(k);
+            }
+
+            // 关闭防爆盾（服务器碰撞体）。
+            if (serverShield != null)
+            {
+                Destroy(serverShield.gameObject);
+                serverShield = null;
+            }
+            shieldActive = false;
+            var health = controller != null ? controller.GetComponent<NetworkPlayerHealth>() : null;
+            if (health != null)
+                health.explosionDamageMultiplier = 1f;
+
+            channeling = false;
+            channelIndex = -1;
+            channelDef = null;
+            dashCooldownRemaining = 0f;
+
+            SyncSelected();
+            SyncSlotAmmo();
+        }
+
+        /// <summary>Server: validate a loadout against the inventory categories.</summary>
+        [Server]
+        public bool ValidateLoadout(LoadoutDefinition loadout, out string reason)
+        {
+            return LoadoutRules.Validate(loadout, equipmentList, out reason);
+        }
+
+        private bool IsCategory(int idx, EquipmentCategory cat)
+        {
+            return LoadoutRules.IsCategory(equipmentList, idx, cat);
+        }
+
+        private int ClampIndex(int idx)
+        {
+            return idx >= 0 && idx < Count ? idx : -1;
+        }
+
+        private int IndexOfType(EquipmentType type)
+        {
+            for (int i = 0; i < Count; i++)
+                if (equipmentList[i] != null && equipmentList[i].type == type)
+                    return i;
+            return -1;
         }
 
         private void SyncSelected()
@@ -117,6 +300,7 @@ namespace HagenDa.Networking
             }
 
             SyncSelected();
+            SyncSlotAmmo();
         }
 
         // ---------------------------------------------------------------
@@ -199,6 +383,7 @@ namespace HagenDa.Networking
             ammo[i]--;
             SpawnThrowable(def, eye, forward);
             SyncSelected();
+            SyncSlotAmmo();
         }
 
         private void UseBoltLauncher(EquipmentDefinition def, int i, bool use, Vector3 eye, Vector3 forward)
@@ -211,6 +396,7 @@ namespace HagenDa.Networking
             nextUseTime[i] = Time.time + def.boltTime;
             SpawnThrowable(def, eye, forward);
             SyncSelected();
+            SyncSlotAmmo();
         }
 
         private void UseRemoteCharge(EquipmentDefinition def, int i, bool use, bool useAlt,
@@ -245,6 +431,7 @@ namespace HagenDa.Networking
             }
 
             SyncSelected();
+            SyncSlotAmmo();
         }
 
         private void UseDeploy(EquipmentDefinition def, int i, bool use, Vector3 eye, Vector3 forward)
@@ -260,6 +447,7 @@ namespace HagenDa.Networking
             var go = Instantiate(def.throwablePrefab, pos, Quaternion.identity);
             NetworkServer.Spawn(go);
             SyncSelected();
+            SyncSlotAmmo();
         }
 
         private void UseSelfInstant(EquipmentDefinition def, int i, bool use, Vector3 move, bool grounded)
@@ -277,6 +465,7 @@ namespace HagenDa.Networking
                 controller.Dash(worldDir);
 
             nextUseTime[i] = Time.time + def.dashCooldown;
+            dashCooldownRemaining = def.dashCooldown;   // 同步冷却倒计时给 HUD
         }
 
         private void UseSelfChannel(EquipmentDefinition def, int i, bool use)
@@ -290,6 +479,7 @@ namespace HagenDa.Networking
             channelIndex = i;
             channelDef = def;
             SyncSelected();
+            SyncSlotAmmo();
         }
 
         private void UseTargetChannel(EquipmentDefinition def, int i, bool use, Vector3 eye)
@@ -304,6 +494,7 @@ namespace HagenDa.Networking
             channelDef = def;
             channelEye = eye;
             SyncSelected();
+            SyncSlotAmmo();
         }
 
         private void UseShieldToggle(EquipmentDefinition def, bool use)
@@ -387,6 +578,10 @@ namespace HagenDa.Networking
             if (empExposure > 0f)
                 empExposure = Mathf.Max(0f, empExposure - dt);
 
+            // 快速机动装置冷却倒计时（HUD 显示）。
+            if (dashCooldownRemaining > 0f)
+                dashCooldownRemaining = Mathf.Max(0f, dashCooldownRemaining - dt);
+
             // Channeled-use completion.
             if (channeling)
             {
@@ -408,6 +603,7 @@ namespace HagenDa.Networking
                     ammoRegenAccum[i] -= def.ammoRegenInterval;
                     ammo[i] = Mathf.Min(def.maxCarry, ammo[i] + 1);
                     if (i == selection) SyncSelected();
+                    SyncSlotAmmo();
                 }
             }
         }

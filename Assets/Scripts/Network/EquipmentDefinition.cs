@@ -51,6 +51,18 @@ namespace HagenDa.Networking
     }
 
     /// <summary>
+    /// Loadout slot category (PHASE8). Every equipment item belongs to one of the
+    /// three selectable categories in the deploy loadout picker:
+    ///   主武器 | 可选配备 | 特有配备 | 通用投掷物
+    /// </summary>
+    public enum EquipmentCategory
+    {
+        Optional,   // 可选配备（可选1 / 可选2）
+        Special,    // 特有配备
+        Throwable   // 通用投掷物
+    }
+
+    /// <summary>
     /// Data-driven equipment template (PHASE6). A single ScriptableObject holds
     /// every tunable of an equipment item, driven by the shared
     /// <see cref="NetworkEquipment"/> runtime (player & AI).
@@ -66,6 +78,13 @@ namespace HagenDa.Networking
         [Header("Identity")]
         public EquipmentType type;
         public string displayName = "装备";
+
+        [Header("Loadout (PHASE8)")]
+        [Tooltip("所属配装槽类别：可选 / 特有 / 通用投掷物。")]
+        public EquipmentCategory category = EquipmentCategory.Optional;
+
+        [Tooltip("瞬发型：按槽位键直接生效，不切换到该配备；普通型：切换后才能使用。")]
+        public bool instantUse = false;
 
         [Header("Carry / Supply")]
         [Tooltip("携带上限（弹药/次数）。")]

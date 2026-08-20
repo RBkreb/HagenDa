@@ -23,7 +23,6 @@ namespace HagenDa.Networking
             if (radius <= 0f) return;
 
             var attackerCombatant = attacker != null ? attacker.GetComponent<NetworkCombatant>() : null;
-            int attackerTeam = attackerCombatant != null ? attackerCombatant.teamId : -1;
 
             var colliders = Physics.OverlapSphere(center, radius);
             var damaged = new HashSet<IDamageable>();
@@ -41,10 +40,10 @@ namespace HagenDa.Networking
                 if (dist <= 0.0001f)
                 {
                     damaged.Add(target);
-                    if (IsHostile(target, attackerTeam))
+                    if (IsHostile(target, attackerCombatant))
                     {
                         if (target is NetworkPlayerHealth h)
-                            h.TakeDamage(yield, attackerCombatant);
+                            h.TakeExplosionDamage(yield, attackerCombatant, center);
                         else
                             target.TakeDamage(yield);
                     }
@@ -79,10 +78,10 @@ namespace HagenDa.Networking
                 if (damage > 0f)
                 {
                     damaged.Add(target);
-                    if (IsHostile(target, attackerTeam))
+                    if (IsHostile(target, attackerCombatant))
                     {
                         if (target is NetworkPlayerHealth h)
-                            h.TakeDamage(damage, attackerCombatant);
+                            h.TakeExplosionDamage(damage, attackerCombatant, center);
                         else
                             target.TakeDamage(damage);
                     }
@@ -192,14 +191,19 @@ namespace HagenDa.Networking
         /// Returns true if the target is hostile to the attacker (different team).
         /// No attacker team (-1) = hostile to everyone (neutral damage source).
         /// </summary>
-        private static bool IsHostile(IDamageable target, int attackerTeam)
+        /// <remarks>
+        /// PHASE8: 爆炸可伤害使用者自己（自伤）与敌方，但对小队队员/友军不造成伤害。
+        /// </remarks>
+        private static bool IsHostile(IDamageable target, NetworkCombatant attacker)
         {
             if (target is NetworkPlayerHealth h)
             {
                 var c = h.GetComponent<NetworkCombatant>();
                 if (c == null || c.teamId < 0) return true;
-                if (attackerTeam < 0) return true;
-                return c.teamId != attackerTeam;
+                // 使用者自己：爆炸伤害对自身生效（与敌方一视同仁）。
+                if (attacker != null && c == attacker) return true;
+                if (attacker == null || attacker.teamId < 0) return true;   // 中立爆炸：全部受伤
+                return c.teamId != attacker.teamId;   // 友军/小队：不受伤
             }
             return true;   // 非玩家/AI 实体（射击靶等）：始终受伤
         }

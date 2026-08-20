@@ -18,8 +18,10 @@ GameObject:
   - component: {fileID: 5783371912108599561}
   - component: {fileID: 3829205206201556184}
   - component: {fileID: 1238050597131074024}
+  - component: {fileID: 1078101726408592051}
   - component: {fileID: 6098297461493983970}
   - component: {fileID: 7057705317322719540}
+  - component: {fileID: 3308931702653194175}
   m_Layer: 0
   m_HasEditorInfo: 1
   m_Name: AIEntity
@@ -253,6 +255,7 @@ MonoBehaviour:
   lastAttacker: {fileID: 0}
   unrevivable: 0
   awaitingRedeploy: 0
+  awaitingInitialDeploy: 0
 --- !u!114 &1238050597131074024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -272,6 +275,20 @@ MonoBehaviour:
   teamId: -1
   squadId: -1
   markedUntil: -1
+--- !u!114 &1078101726408592051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543077640700298910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40acf4ff51f8aae4a92106db5ddc7b53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  diameter: 4
+  friendlyRevealRadius: 50
 --- !u!114 &6098297461493983970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -342,6 +359,25 @@ MonoBehaviour:
   empExposure: 0
   shieldActive: 0
   channeling: 0
+  opt1Index: -1
+  opt2Index: -1
+  specialIndex: -1
+  throwableIndex: -1
+--- !u!114 &3308931702653194175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543077640700298910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc2e0c3ced26c546abada6aacdd8427, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  diameter: 0.15
+  headOffset: 0.1
+  revealRadius: 50
 --- !u!1 &3619932077785825544
 GameObject:
   m_ObjectHideFlags: 0

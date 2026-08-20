@@ -90,8 +90,7 @@ namespace HagenDa.Networking
         /// </summary>
         [Server]
         public void Tick(bool fire, bool aim, Vector3 origin, Vector3 forward, bool sprint)
-        {
-            fireHeld = fire;
+        {            fireHeld = fire;
             aimHeld = aim;
             aimOrigin = origin;
             aimForward = forward;
@@ -110,6 +109,29 @@ namespace HagenDa.Networking
             // Empty magazine with reserve remaining: auto-trigger a (slow) reload.
             if (reloadState == ReloadState.Idle && magAmmo <= 0 && reserveAmmo > 0)
                 Reload();
+        }
+
+        /// <summary>
+        /// PHASE8 重新部署：重置弹匣/备弹到满、清空散布/后座/瞄准/换弹状态。
+        /// </summary>
+        [Server]
+        public void ResetForRedeploy()
+        {
+            if (definition != null)
+            {
+                magAmmo = definition.magazineCapacity;
+                reserveAmmo = definition.reserveCapacity;
+            }
+            bloom = 0f;
+            recoil = 0f;
+            aimAmount = 0f;
+            reloadState = ReloadState.Idle;
+            reloading = false;
+            reloadPaused = false;
+            reloadRemaining = 0f;
+            nextFireTime = 0f;
+            burstRemaining = 0;
+            boltCooldownEnd = 0f;
         }
 
         // ---------------------------------------------------------------
@@ -355,17 +377,17 @@ namespace HagenDa.Networking
         // ---------------------------------------------------------------
 
         [Server]
-        public void NotifyHit()
+        public void NotifyHit(bool headshot, bool kill)
         {
             if (connectionToClient == null) return;
-            TargetRpcHitmarker();
+            TargetRpcHitmarker(headshot, kill);
         }
 
         [TargetRpc]
-        private void TargetRpcHitmarker()
+        private void TargetRpcHitmarker(bool headshot, bool kill)
         {
-            var hud = GetComponent<PlayerHud>();
-            if (hud != null) hud.ShowHitmarker();
+            HitKind kind = kill ? HitKind.Kill : (headshot ? HitKind.Headshot : HitKind.Normal);
+            GameHud.Instance?.ShowHitmarker(kind);
         }
 
         [Server]

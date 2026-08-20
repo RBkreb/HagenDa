@@ -146,6 +146,12 @@ namespace HagenDa.Networking
         private float localYaw;
         private float localPitch;
 
+        // PHASE8 受击反馈：FOV 脉冲（2 渲染帧）。
+        private float baseFov = 90f;
+        private float fovPulseAmount;
+        private int fovPulseFrames;
+        private const int fovPulseTotal = 2;
+
         private Rigidbody rb;
         private bool grounded;
         private bool wasGrounded;
@@ -153,8 +159,6 @@ namespace HagenDa.Networking
 
         private bool dead;               // server: 3C + combat disabled, forced prone
         private NetworkPlayerHealth health;
-        private bool addArmorRequested;
-        private bool selfRescueRequested;
         private PhysicMaterial aliveStandMat;   // cached no-friction material (stand)
         private PhysicMaterial aliveCrouchMat;   // cached no-friction material (crouch)
 
@@ -167,12 +171,17 @@ namespace HagenDa.Networking
         private bool jumpRequested;
         private bool crouchToggleRequested;
         private bool proneToggleRequested;
-        private bool throwGrenadeRequested;
         private bool reloadRequested;
         private bool switchFireModeRequested;
-        private int wheelDeltaRequested;
         private bool markRequested;          // q key (PHASE7)
         private int deployChoiceRequested;    // 1/2/3 keys (PHASE7)
+
+        // PHASE8 配装槽位键（edge-triggered）。
+        private bool slotPrimaryRequested;
+        private bool slotOpt1Requested;
+        private bool slotOpt2Requested;
+        private bool slotSpecialRequested;
+        private bool slotThrowableRequested;
 
         // Client-side camera transition + shake state.
         private float cameraEyeHeight;
@@ -263,7 +272,15 @@ namespace HagenDa.Networking
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
-                if (playerCamera != null) playerCamera.enabled = true;
+                if (playerCamera != null)
+                {
+                    playerCamera.enabled = true;
+                    baseFov = playerCamera.fieldOfView;
+                    // PHASE8: 主相机不渲染实体地图球体（MapIndicator），但保留
+                    // GR/HQ 地面高亮（MapHighlight）。
+                    if (MapLayers.Indicator >= 0)
+                        playerCamera.cullingMask &= ~(1 << MapLayers.Indicator);
+                }
                 if (visual != null) visual.SetActive(false);
                 cameraEyeHeight = GetEyeHeight(PlayerPosture.Stand);
             }
@@ -303,26 +320,26 @@ namespace HagenDa.Networking
             clientSprint = k != null && k.leftShiftKey.isPressed;
             clientCrouchHold = k != null && k.leftCtrlKey.isPressed;
 
-            float scroll = m != null ? m.scroll.ReadValue().y : 0f;
-            if (scroll > 0f) wheelDeltaRequested++;
-            else if (scroll < 0f) wheelDeltaRequested--;
-
             if (k == null) return;
 
             if (k.spaceKey.wasPressedThisFrame) jumpRequested = true;
             if (k.xKey.wasPressedThisFrame) crouchToggleRequested = true;
             if (k.cKey.wasPressedThisFrame) proneToggleRequested = true;
-            if (k.zKey.wasPressedThisFrame) throwGrenadeRequested = true;
             if (k.rKey.wasPressedThisFrame) reloadRequested = true;
             if (k.vKey.wasPressedThisFrame) switchFireModeRequested = true;
-            if (k.jKey.wasPressedThisFrame) addArmorRequested = true;
-            if (k.hKey.wasPressedThisFrame) selfRescueRequested = true;
 
             // PHASE7: Q 标记敌人；1/2/3 选择重新部署点。
             if (k.qKey.wasPressedThisFrame) markRequested = true;
             if (k.digit1Key.wasPressedThisFrame) deployChoiceRequested = 1;
             else if (k.digit2Key.wasPressedThisFrame) deployChoiceRequested = 2;
             else if (k.digit3Key.wasPressedThisFrame) deployChoiceRequested = 3;
+
+            // PHASE8: 配装槽位键（1 主武器 / 3 可选1 / 4 可选2 / g 特有 / z 投掷物）。
+            if (k.digit1Key.wasPressedThisFrame) slotPrimaryRequested = true;
+            if (k.digit3Key.wasPressedThisFrame) slotOpt1Requested = true;
+            if (k.digit4Key.wasPressedThisFrame) slotOpt2Requested = true;
+            if (k.gKey.wasPressedThisFrame) slotSpecialRequested = true;
+            if (k.zKey.wasPressedThisFrame) slotThrowableRequested = true;
         }
 
         private Vector2 ReadMove()
@@ -368,6 +385,18 @@ namespace HagenDa.Networking
             float recoilPitch = gun != null ? gun.recoil : 0f;
             float renderPitch = Mathf.Clamp(localPitch - recoilPitch, minPitch, maxPitch);
             playerCamera.transform.rotation = Quaternion.Euler(renderPitch, localYaw, 0f);
+
+            // PHASE8 受击反馈：FOV 增大 2% 并在 2 渲染帧内快速回到正常值。
+            if (fovPulseFrames > 0)
+            {
+                playerCamera.fieldOfView = baseFov + fovPulseAmount * (fovPulseFrames / (float)fovPulseTotal);
+                fovPulseFrames--;
+                if (fovPulseFrames <= 0) fovPulseAmount = 0f;
+            }
+            else
+            {
+                playerCamera.fieldOfView = baseFov;
+            }
         }
 
         private void UpdateCameraHeight()
@@ -460,12 +489,15 @@ namespace HagenDa.Networking
             s.aim = clientAim;
             s.reload = reloadRequested; reloadRequested = false;
             s.switchFireMode = switchFireModeRequested; switchFireModeRequested = false;
-            s.throwGrenade = throwGrenadeRequested; throwGrenadeRequested = false;
-            s.addArmor = addArmorRequested; addArmorRequested = false;
-            s.selfRescue = selfRescueRequested; selfRescueRequested = false;
-            s.wheelDelta = wheelDeltaRequested; wheelDeltaRequested = 0;
             s.mark = markRequested; markRequested = false;
             s.deployChoice = deployChoiceRequested; deployChoiceRequested = 0;
+
+            // PHASE8 配装槽位键。
+            s.slotPrimary = slotPrimaryRequested; slotPrimaryRequested = false;
+            s.slotOpt1 = slotOpt1Requested; slotOpt1Requested = false;
+            s.slotOpt2 = slotOpt2Requested; slotOpt2Requested = false;
+            s.slotSpecial = slotSpecialRequested; slotSpecialRequested = false;
+            s.slotThrowable = slotThrowableRequested; slotThrowableRequested = false;
 
             CmdInput(s);
         }
@@ -489,25 +521,18 @@ namespace HagenDa.Networking
                 return;
             }
 
+            // PHASE8: 首次部署前（观战/大厅）冻结 3C 与战斗，仅让身体落地。
+            if (health != null && health.awaitingInitialDeploy)
+            {
+                if (!grounded)
+                    rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
+                return;
+            }
+
             // Look: adopt the client's absolute view (client-authoritative aim).
             yaw = serverInput.yaw;
             pitch = Mathf.Clamp(serverInput.pitch, minPitch, maxPitch);
             transform.rotation = Quaternion.Euler(0f, yaw, 0f);
-
-            // Mouse wheel: switch the active slot (gun -> equipment list).
-            if (serverInput.wheelDelta != 0 && equipment != null)
-            {
-                int maxSlot = equipment.Count - 1;
-                activeSlot = Mathf.Clamp(activeSlot + serverInput.wheelDelta, -1, maxSlot);
-                equipment.Select(activeSlot >= 0 ? activeSlot : -1);
-            }
-
-            // Test keys (server-authoritative debug): J = +20 armor, H = self-rescue.
-            if (health != null)
-            {
-                if (serverInput.addArmor) health.AddArmor(20f);
-                if (serverInput.selfRescue) health.Rescue();
-            }
 
             // Dead: stay prone, no 3C / combat. Apply horizontal drag so a corpse
             // that was moving at the moment of death bleeds off its momentum and
@@ -625,27 +650,58 @@ namespace HagenDa.Networking
             if (serverInput.mark)
                 TryMark(eye, forward);
 
-            if (gun != null)
-            {
-                bool gunActive = activeSlot < 0;
+            // PHASE8: 配装槽位键（1 主武器 / 3 可选1 / 4 可选2 / g 特有 / z 投掷物）。
+            ProcessSlotKeys(eye, forward);
 
-                if (serverInput.reload && gunActive) gun.Reload();
-                if (serverInput.switchFireMode && gunActive) gun.SwitchFireMode();
-                gun.Tick(gunActive ? serverInput.fire : false,
-                         gunActive ? serverInput.aim : false,
-                         eye, forward, sprintActive);
+            bool gunActive = activeSlot < 0;
+            int equipIndex = gunActive ? -1 : equipment.GetSlotIndex(activeSlot);
+
+            if (gun != null && gunActive)
+            {
+                if (serverInput.reload) gun.Reload();
+                if (serverInput.switchFireMode) gun.SwitchFireMode();
+                gun.Tick(serverInput.fire, serverInput.aim, eye, forward, sprintActive);
             }
-
-            if (equipment != null && activeSlot >= 0)
+            else if (equipment != null && equipIndex >= 0)
             {
-                equipment.Tick(activeSlot, serverInput.fire, serverInput.aim,
+                equipment.Tick(equipIndex, serverInput.fire, serverInput.aim,
                                eye, forward, serverInput.move, grounded);
             }
+        }
 
-            if (combat != null && serverInput.throwGrenade)
+        /// <summary>
+        /// PHASE8: 处理配装槽位键。瞬发型直接使用（不切换），普通型切换 activeSlot。
+        /// </summary>
+        private void ProcessSlotKeys(Vector3 eye, Vector3 forward)
+        {
+            if (equipment == null) return;
+
+            if (serverInput.slotPrimary)
             {
-                combat.TryThrow(eye, forward);
+                activeSlot = -1;   // 主武器
             }
+
+            TrySlotKey(0, serverInput.slotOpt1, eye, forward);
+            TrySlotKey(1, serverInput.slotOpt2, eye, forward);
+            TrySlotKey(2, serverInput.slotSpecial, eye, forward);
+            TrySlotKey(3, serverInput.slotThrowable, eye, forward);
+        }
+
+        private void TrySlotKey(int slot, bool pressed, Vector3 eye, Vector3 forward)
+        {
+            if (!pressed) return;
+
+            var def = equipment.GetSlotDefinition(slot);
+            if (def == null) return;
+
+            // 普通型：剩余使用次数为 0 的不能切换；全部为 0 时自然保持手持物。
+            if (!def.instantUse && !equipment.HasAmmoInSlot(slot))
+                return;
+
+            bool instant = equipment.HandleSlotKey(slot, eye, forward,
+                                                   serverInput.move, grounded);
+            if (!instant)
+                activeSlot = slot;   // 普通型：切换为该槽位
         }
 
         private void UpdateSprint()
@@ -1060,6 +1116,18 @@ namespace HagenDa.Networking
             shakeDuration = duration;
             shakeTime = 0f;
             shakeVertical = vertical;
+        }
+
+        /// <summary>
+        /// PHASE8 受击反馈：轻微相机震动 + FOV 增大 2%，在 2 渲染帧内快速回到正常值。
+        /// </summary>
+        public void ApplyDamageFeedback(float damage)
+        {
+            if (!isLocalPlayer || playerCamera == null) return;
+
+            fovPulseFrames = fovPulseTotal;
+            fovPulseAmount = baseFov * 0.02f;
+            ApplyCameraShake(0.06f, 0.06f, false);
         }
 
         [ClientRpc]
