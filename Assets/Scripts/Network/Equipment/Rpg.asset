@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: RPG
   category: 0
   instantUse: 0
+  deployCap: 0
   maxCarry: 5
   supplyCost: 120
   ammoRegenInterval: 0

@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dbdbf6de009de6c438847ac18fa36f8d, type: 3}
-  m_Name: EmpGrenade
+  m_Name: Sensor
   m_EditorClassIdentifier: 
-  type: 2
-  displayName: "\u7535\u78C1\u624B\u96F7"
-  category: 2
+  type: 17
+  displayName: "\u611F\u5E94\u5668"
+  category: 1
   instantUse: 1
-  deployCap: 0
+  deployCap: 1
   maxCarry: 1
-  supplyCost: 100
-  ammoRegenInterval: 0
-  empVulnerable: 0
-  useStyle: 0
+  supplyCost: 0
+  ammoRegenInterval: 30
+  empVulnerable: 1
+  useStyle: 3
   boltTime: 1.5
   channelTime: 1.5
-  throwablePrefab: {fileID: 3353086404573385061, guid: 93bb527668e0935408a3ba0243b54ec4,
+  throwablePrefab: {fileID: 5069804218679272120, guid: 05dd0c943c6b6ea4297da357674570ac,
     type: 3}
   throwSpeed: 15
   armorGrant: 25

@@ -32,7 +32,8 @@ namespace HagenDa.Networking
         ArmorPlate,         // 护甲板
         BlastShield,        // 防爆盾
         HealingSyringe,     // 治疗针（特有）
-        Defibrillator       // 除颤仪（特有）
+        Defibrillator,      // 除颤仪（特有）
+        Sensor              // 感应器（特有，固定地面标记敌方）
     }
 
     /// <summary>
@@ -85,6 +86,10 @@ namespace HagenDa.Networking
 
         [Tooltip("瞬发型：按槽位键直接生效，不切换到该配备；普通型：切换后才能使用。")]
         public bool instantUse = false;
+
+        [Header("Deploy cap (PHASE8 互斥)")]
+        [Tooltip("同一实体可同时在世界中部署的数量上限（0 = 不限）。超出时摧毁最早部署的。")]
+        public int deployCap = 0;
 
         [Header("Carry / Supply")]
         [Tooltip("携带上限（弹药/次数）。")]

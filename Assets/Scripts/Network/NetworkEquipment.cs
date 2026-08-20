@@ -53,6 +53,9 @@ namespace HagenDa.Networking
         // ---- remote charges placed by signal/wired charge (server-only) ----
         private readonly List<RemoteChargeThrowable> placedCharges = new List<RemoteChargeThrowable>();
 
+        // PHASE8 配备互斥：该实体已部署到世界中的配备（按类型限制上限）。
+        private readonly List<DeployableSlot> placedDeployables = new List<DeployableSlot>();
+
         // ---- edge detection (server-only) ----
         private bool prevUse;
         private bool prevUseAlt;
@@ -225,6 +228,15 @@ namespace HagenDa.Networking
                 placedCharges.RemoveAt(k);
             }
 
+            // 清除该实体已部署的配备（大型补给箱/拦截/感应器等）。
+            for (int k = placedDeployables.Count - 1; k >= 0; k--)
+            {
+                var d = placedDeployables[k];
+                if (d != null && d.gameObject != null)
+                    NetworkServer.Destroy(d.gameObject);
+                placedDeployables.RemoveAt(k);
+            }
+
             // 关闭防爆盾（服务器碰撞体）。
             if (serverShield != null)
             {
@@ -276,6 +288,61 @@ namespace HagenDa.Networking
             {
                 selectedAmmo = ammo[selection];
                 selectedSupply = supply[selection];
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // PHASE8 配备互斥（部署上限）
+        // ---------------------------------------------------------------
+
+        /// <summary>
+        /// 登记一个部署到世界中的配备。若该类型已超出 <see cref="EquipmentDefinition.deployCap"/>，
+        /// 摧毁最早部署的同类型配备（先进先出）。
+        /// </summary>
+        [Server]
+        public void RegisterDeployable(GameObject go, EquipmentDefinition def)
+        {
+            if (go == null || def == null || def.deployCap <= 0) return;
+
+            var slot = go.GetComponent<DeployableSlot>();
+            if (slot == null) slot = go.AddComponent<DeployableSlot>();
+            slot.Init(GetComponent<NetworkIdentity>(), def.type);
+
+            PrunePlacedDeployables();
+
+            placedDeployables.Add(slot);
+
+            // 超出上限：摧毁最早部署的（同类型）。
+            int count = 0;
+            foreach (var d in placedDeployables)
+                if (d != null && d.type == def.type)
+                    count++;
+
+            while (count > def.deployCap)
+            {
+                DeployableSlot oldest = null;
+                foreach (var d in placedDeployables)
+                {
+                    if (d == null || d.type != def.type) continue;
+                    if (oldest == null || d.deployTime < oldest.deployTime)
+                        oldest = d;
+                }
+                if (oldest == null) break;
+
+                placedDeployables.Remove(oldest);
+                if (oldest.gameObject != null)
+                    NetworkServer.Destroy(oldest.gameObject);
+                count--;
+            }
+        }
+
+        /// <summary>移除已销毁的部署记录。</summary>
+        private void PrunePlacedDeployables()
+        {
+            for (int i = placedDeployables.Count - 1; i >= 0; i--)
+            {
+                if (placedDeployables[i] == null)
+                    placedDeployables.RemoveAt(i);
             }
         }
 
@@ -381,7 +448,10 @@ namespace HagenDa.Networking
             if (def.throwablePrefab == null) return;
 
             ammo[i]--;
-            SpawnThrowable(def, eye, forward);
+            var t = SpawnThrowable(def, eye, forward);
+            // 小型补给包：计入部署上限互斥。
+            if (t != null && def.deployCap > 0)
+                RegisterDeployable(t.gameObject, def);
             SyncSelected();
             SyncSlotAmmo();
         }
@@ -417,6 +487,9 @@ namespace HagenDa.Networking
                 var charge = t != null ? t.GetComponent<RemoteChargeThrowable>() : null;
                 if (charge != null)
                     placedCharges.Add(charge);
+                // 信号/线控炸药：计入部署上限互斥。
+                if (t != null && def.deployCap > 0)
+                    RegisterDeployable(t.gameObject, def);
             }
             else if (use)
             {
@@ -446,6 +519,19 @@ namespace HagenDa.Networking
 
             var go = Instantiate(def.throwablePrefab, pos, Quaternion.identity);
             NetworkServer.Spawn(go);
+
+            // 感应器：传入部署者队伍（放置物无 NetworkCombatant）。
+            var sensor = go.GetComponent<SensorProbe>();
+            if (sensor != null)
+            {
+                var my = GetComponent<NetworkCombatant>();
+                if (my != null) sensor.SetOwnerTeam(my.teamId);
+            }
+
+            // 大型补给箱/拦截装置/感应器：计入部署上限互斥。
+            if (def.deployCap > 0)
+                RegisterDeployable(go, def);
+
             SyncSelected();
             SyncSlotAmmo();
         }
@@ -573,6 +659,9 @@ namespace HagenDa.Networking
         {
             if (!isServer) return;
             float dt = Time.deltaTime;
+
+            // PHASE8 配备互斥：清理已销毁的部署记录。
+            PrunePlacedDeployables();
 
             // EMP interference timer decays.
             if (empExposure > 0f)

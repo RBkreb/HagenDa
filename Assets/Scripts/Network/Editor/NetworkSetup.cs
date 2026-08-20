@@ -45,6 +45,7 @@ namespace HagenDa.Networking.EditorTools
         private const string SupplyPackPrefabPath = "Assets/Scripts/Network/Prefabs/SupplyPack.prefab";
         private const string LargeSupplyCratePrefabPath = "Assets/Scripts/Network/Prefabs/LargeSupplyCrate.prefab";
         private const string InterceptorPrefabPath = "Assets/Scripts/Network/Prefabs/Interceptor.prefab";
+        private const string SensorProbePrefabPath = "Assets/Scripts/Network/Prefabs/SensorProbe.prefab";
 
         private const string RgdModelPath = "Assets/Low Poly Weapons VOL.1/Prefabs/RGD-5.prefab";
         private const string SmokeModelPath = "Assets/Low Poly Weapons VOL.1/Prefabs/Smoke.prefab";
@@ -1081,6 +1082,110 @@ namespace HagenDa.Networking.EditorTools
         }
 
         // ---------------------------------------------------------------
+        // PHASE8 感应器（蓝色圆锥，固定地面标记敌方）
+        // ---------------------------------------------------------------
+
+        private static GameObject BuildSensorProbePrefab()
+        {
+            var root = new GameObject("SensorProbe");
+            root.AddComponent<NetworkIdentity>();
+
+            // 圆锥 mesh 必须保存为资产：内存 mesh 无法序列化进 prefab（会变 fileID:0，
+            // 导致渲染与碰撞丢失）。
+            EnsureFolder("Assets/Scripts/Network", "Materials");
+            const string meshPath = "Assets/Scripts/Network/Materials/SensorConeMesh.asset";
+            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
+            if (mesh == null)
+            {
+                mesh = CreateConeMesh(0.25f, 0.6f, 16);
+                mesh.name = "SensorConeMesh";
+                AssetDatabase.CreateAsset(mesh, meshPath);
+                AssetDatabase.SaveAssets();
+            }
+            // 新建资产需重新加载才能拿到有效资产实例（否则保存进 prefab 会变 fileID:0）。
+            mesh = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
+
+            var mf = root.AddComponent<MeshFilter>();
+            mf.sharedMesh = mesh;
+
+            var mr = root.AddComponent<MeshRenderer>();
+            var mat = CreatePersistentMaterial(
+                "Assets/Scripts/Network/Materials/SensorBlue.mat",
+                new Color(0.2f, 0.45f, 1f),
+                new Color(0.1f, 0.2f, 0.6f));
+            if (mat != null) mr.sharedMaterial = mat;
+
+            // 圆锥与地面碰撞（放置），对活体无碰撞。
+            var mc = root.AddComponent<MeshCollider>();
+            mc.sharedMesh = mesh;
+            mc.convex = true;
+
+            var rb = root.AddComponent<Rigidbody>();
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            rb.useGravity = true;
+            rb.mass = 1f;
+
+            var sensor = root.AddComponent<SensorProbe>();
+            sensor.radius = 20f;
+            sensor.interval = 5f;
+            sensor.markDuration = 3f;
+
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, SensorProbePrefabPath);
+            Object.DestroyImmediate(root);
+            return prefab;
+        }
+
+        /// <summary>程序化生成圆锥 mesh（顶点朝上，底部圆盘）。</summary>
+        private static Mesh CreateConeMesh(float radius, float height, int segments)
+        {
+            var mesh = new Mesh();
+            int n = Mathf.Max(3, segments);
+
+            var verts = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var tris = new List<int>();
+
+            // Apex.
+            int apex = 0;
+            verts.Add(new Vector3(0f, height, 0f));
+            normals.Add(Vector3.up);
+
+            // Base ring.
+            int baseStart = 1;
+            for (int i = 0; i < n; i++)
+            {
+                float a = (i / (float)n) * Mathf.PI * 2f;
+                verts.Add(new Vector3(Mathf.Cos(a) * radius, 0f, Mathf.Sin(a) * radius));
+                normals.Add(Vector3.down);
+            }
+
+            // Cone side (two triangles per segment, using the apex).
+            for (int i = 0; i < n; i++)
+            {
+                int b = baseStart + i;
+                int c = baseStart + ((i + 1) % n);
+                tris.Add(apex); tris.Add(c); tris.Add(b);
+            }
+
+            // Base cap (fan, facing down).
+            for (int i = 0; i < n; i++)
+            {
+                int b = baseStart + i;
+                int c = baseStart + ((i + 1) % n);
+                tris.Add(b); tris.Add(c); tris.Add(baseStart + n);   // 中心点
+            }
+            verts.Add(Vector3.zero);
+            normals.Add(Vector3.down);
+
+            mesh.vertices = verts.ToArray();
+            mesh.normals = normals.ToArray();
+            mesh.triangles = tris.ToArray();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        // ---------------------------------------------------------------
         // PHASE6 EQUIPMENT ASSETS
         // ---------------------------------------------------------------
 
@@ -1220,14 +1325,27 @@ namespace HagenDa.Networking.EditorTools
             lc.throwablePrefab = BuildLargeSupplyCratePrefab();
             list.Add(lc);
 
-            // 11. 拦截系统（Deploy）
+            // 11. 拦截系统（Deploy，部署上限 3）
             var it = GetOrCreateEquipmentDef("Interceptor");
             it.type = EquipmentType.Interceptor;
             it.displayName = "拦截系统";
             it.useStyle = EquipmentUseStyle.Deploy;
             it.maxCarry = 1; it.supplyCost = 100;
+            it.deployCap = 3;
             it.throwablePrefab = BuildInterceptorPrefab();
             list.Add(it);
+
+            // 11b. 感应器（特有，Deploy，瞬发型，部署上限 1，30s 回复，EMP 可摧毁）
+            var sn = GetOrCreateEquipmentDef("Sensor");
+            sn.type = EquipmentType.Sensor;
+            sn.displayName = "感应器";
+            sn.useStyle = EquipmentUseStyle.Deploy;
+            sn.maxCarry = 1; sn.supplyCost = 0;
+            sn.ammoRegenInterval = 30f;
+            sn.empVulnerable = true;
+            sn.deployCap = 1;
+            sn.throwablePrefab = BuildSensorProbePrefab();
+            list.Add(sn);
 
             // 12. 快速机动装置（EMP 可禁）
             var qd = GetOrCreateEquipmentDef("QuickDash");
@@ -1270,7 +1388,7 @@ namespace HagenDa.Networking.EditorTools
             bs.maxCarry = 1; bs.supplyCost = 0; bs.shieldExplosionReduction = 0.6f;
             list.Add(bs);
 
-            // PHASE8: 按类型统一赋值 category + instantUse。
+            // PHASE8: 按类型统一赋值 category + instantUse + deployCap。
             foreach (var d in list)
             {
                 if (d == null) continue;
@@ -1279,6 +1397,7 @@ namespace HagenDa.Networking.EditorTools
                 {
                     case EquipmentType.HealingSyringe:
                     case EquipmentType.Defibrillator:
+                    case EquipmentType.Sensor:
                         d.category = EquipmentCategory.Special;
                         break;
                     case EquipmentType.Grenade:
@@ -1299,10 +1418,32 @@ namespace HagenDa.Networking.EditorTools
                     case EquipmentType.HealingSyringe:
                     case EquipmentType.ArmorPlate:
                     case EquipmentType.Grenade:   // 手雷：瞬发型（z 键直接投掷）
+                    case EquipmentType.SmokeGrenade:   // 烟雾手雷：瞬发型
+                    case EquipmentType.EmpGrenade:     // 电磁手雷：瞬发型
+                    case EquipmentType.Sensor:         // 感应器：瞬发型特有（g 键直接部署）
                         d.instantUse = true;
                         break;
                     default:
                         d.instantUse = false;
+                        break;
+                }
+
+                switch (d.type)
+                {
+                    case EquipmentType.LargeSupplyCrate:
+                        d.deployCap = 1;
+                        break;
+                    case EquipmentType.SmallSupplyPack:
+                    case EquipmentType.Interceptor:
+                    case EquipmentType.SignalCharge:
+                    case EquipmentType.WiredCharge:
+                        d.deployCap = 3;
+                        break;
+                    case EquipmentType.Sensor:
+                        d.deployCap = 1;
+                        break;
+                    default:
+                        d.deployCap = 0;
                         break;
                 }
             }
