@@ -56,6 +56,9 @@ namespace HagenDa.Networking
 
         [SyncVar] public bool awaitingRedeploy;   // 死亡 10s 后进入部署菜单
 
+        [Tooltip("首次部署：玩家连接后处于观战/大厅状态，选定部署点+配装前不进入世界。")]
+        [SyncVar] public bool awaitingInitialDeploy;
+
         private Rigidbody rb;
         private float redeployDeadline;           // server-only
         public float RedeployDelay => redeployDeadline - Time.time;
@@ -73,6 +76,7 @@ namespace HagenDa.Networking
             deathHandled = false;
             unrevivable = false;
             awaitingRedeploy = false;
+            awaitingInitialDeploy = connectionToClient != null;   // 真人首次进入部署
             lastAttacker = null;
         }
 
@@ -80,14 +84,14 @@ namespace HagenDa.Networking
         // DAMAGE
         // ---------------------------------------------------------------
 
-        /// <summary>Full-body / area damage (explosions).</summary>
+        /// <summary>Full-body / area damage (explosions, no attacker).</summary>
         [Server]
         public void TakeDamage(float damage)
         {
             TakeDamageInternal(damage * explosionDamageMultiplier, 1f);
         }
 
-        /// <summary>Hitbox-aware damage (bullets).</summary>
+        /// <summary>Hitbox-aware damage (bullets, no attacker).</summary>
         [Server]
         public void TakeDamage(float damage, Vector3 hitPoint)
         {
@@ -103,13 +107,21 @@ namespace HagenDa.Networking
             TakeDamageInternal(damage * explosionDamageMultiplier, 1f);
         }
 
-        /// <summary>Hitbox-aware damage with attacker attribution (PHASE7 击杀归属).</summary>
+        /// <summary>Hitbox-aware bullet damage (PHASE7 击杀归属 + 部位倍率).</summary>
         [Server]
-        public void TakeDamage(float damage, Vector3 hitPoint, NetworkCombatant attacker)
+        public void TakeBulletDamage(float damage, Vector3 hitPoint, Vector3 bulletDir, NetworkCombatant attacker)
         {
             lastAttacker = attacker;
             float mult = HitboxUtility.GetMultiplier(GetActiveCapsule(), hitPoint);
             TakeDamageInternal(damage, mult);
+        }
+
+        /// <summary>Explosion damage (PHASE7 击杀归属).</summary>
+        [Server]
+        public void TakeExplosionDamage(float damage, NetworkCombatant attacker, Vector3 center)
+        {
+            lastAttacker = attacker;
+            TakeDamageInternal(damage * explosionDamageMultiplier, 1f);
         }
 
         [Server]
@@ -140,8 +152,18 @@ namespace HagenDa.Networking
                 buffRegenPerSecond = 0f;
             }
 
+            // PHASE8: 受击反馈（相机震动 + FOV 脉冲）。
+            if (connectionToClient != null && amount > 0f)
+                TargetRpcDamageFeedback(amount);
+
             if (health <= 0f)
                 Die();
+        }
+
+        [TargetRpc]
+        private void TargetRpcDamageFeedback(float amount)
+        {
+            GameHud.Instance?.ShowDamageFeedback(amount);
         }
 
         [Server]
@@ -264,7 +286,7 @@ namespace HagenDa.Networking
         }
 
         // ---------------------------------------------------------------
-        // PHASE7 REDEPLOY
+        // PHASE7/8 DEPLOY
         // ---------------------------------------------------------------
 
         [Server]
@@ -283,18 +305,12 @@ namespace HagenDa.Networking
             {
                 // AI：随机 GR 或 HQ 自动部署。
                 Vector3? pos = AiChooseDeploy();
-                if (pos.HasValue) DoRedeploy(pos.Value);
+                if (pos.HasValue) DoDeploy(pos.Value);
                 return;
             }
 
-            // 玩家：进入部署菜单，无操作超时后自动部署回 GR。
+            // 玩家：进入部署菜单，等待玩家主动点选部署（不再自动超时部署）。
             awaitingRedeploy = true;
-
-            if (Time.time >= redeployDeadline + (mm.autoDeployTimeout))
-            {
-                Vector3? pos = mm.GetGarrisonDeployPoint(MyTeam());
-                if (pos.HasValue) DoRedeploy(pos.Value);
-            }
         }
 
         [Server]
@@ -311,41 +327,80 @@ namespace HagenDa.Networking
             return mm.GetGarrisonDeployPoint(MyTeam());
         }
 
-        /// <summary>Player deploy choice (1=GR / 2=HQ / 3=squad).</summary>
+        /// <summary>统一部署点解析（1=GR / 2=HQ / 3=squad，fallback GR）。</summary>
         [Server]
-        public void RequestDeploy(int choice)
+        private Vector3? ResolveDeployPoint(int choice)
         {
-            if (!deathHandled) return;
-            if (Time.time < redeployDeadline) return;
-
             var mm = NetworkMatchManager.Instance;
-            if (mm == null) return;
+            if (mm == null) return null;
 
             var self = GetComponent<NetworkCombatant>();
             int team = self != null && self.teamId >= 0 ? self.teamId : (int)MatchTeam.Red;
             int squad = self != null ? self.squadId : -1;
 
-            Vector3? pos = null;
             switch (choice)
             {
-                case 1: pos = mm.GetGarrisonDeployPoint((MatchTeam)team); break;
-                case 2: pos = mm.GetHqDeployPoint((MatchTeam)team); break;
-                case 3: pos = mm.GetSquadDeployPoint(team, squad, self); break;
+                case 2:
+                    var hq = mm.GetHqDeployPoint((MatchTeam)team);
+                    if (hq.HasValue) return hq;
+                    break;
+                case 3:
+                    var sq = mm.GetSquadDeployPoint(team, squad, self);
+                    if (sq.HasValue) return sq;
+                    break;
             }
+            return mm.GetGarrisonDeployPoint((MatchTeam)team);
+        }
 
-            if (!pos.HasValue)
-                pos = mm.GetGarrisonDeployPoint((MatchTeam)team);   // fallback GR
+        /// <summary>Player deploy choice (1=GR / 2=HQ / 3=squad) — legacy 1/2/3 keys.</summary>
+        [Server]
+        public void RequestDeploy(int choice)
+        {
+            if (!deathHandled && !awaitingInitialDeploy) return;
+            if (deathHandled && Time.time < redeployDeadline) return;
+            if (NetworkMatchManager.Instance != null && NetworkMatchManager.Instance.matchOver) return;
+
+            Vector3? pos = ResolveDeployPoint(choice);
             if (!pos.HasValue) return;
 
-            DoRedeploy(pos.Value);
+            DoDeploy(pos.Value);
+        }
+
+        /// <summary>
+        /// PHASE8 部署界面确认（带配装）。客户端选好部署点 + 配装后调用。
+        /// </summary>
+        [Command]
+        public void CmdDeploy(int choice, LoadoutDefinition loadout)
+        {
+            if (!deathHandled && !awaitingInitialDeploy) return;
+            if (deathHandled && Time.time < redeployDeadline) return;
+            if (NetworkMatchManager.Instance != null && NetworkMatchManager.Instance.matchOver) return;
+
+            var eq = GetComponent<NetworkEquipment>();
+            if (eq != null && loadout != null)
+            {
+                string reason;
+                if (!eq.ValidateLoadout(loadout, out reason))
+                {
+                    Debug.LogWarning($"[Deploy] 配装无效: {reason}");
+                    return;
+                }
+                eq.ApplyLoadout(loadout);
+            }
+
+            Vector3? pos = ResolveDeployPoint(choice);
+            if (!pos.HasValue) return;
+
+            DoDeploy(pos.Value);
         }
 
         [Server]
-        private void DoRedeploy(Vector3 pos)
+        private void DoDeploy(Vector3 pos)
         {
             deathHandled = false;
             unrevivable = false;
             awaitingRedeploy = false;
+            awaitingInitialDeploy = false;
             lastAttacker = null;
             health = maxHealth;
             armor = 0f;
@@ -363,6 +418,12 @@ namespace HagenDa.Networking
             }
 
             SetDeadState(false);
+
+            // PHASE8: 重新部署后重置所有配备弹药/补给/冷却 + 主武器弹匣/备弹。
+            var eq = GetComponent<NetworkEquipment>();
+            if (eq != null) eq.ResetForRedeploy();
+            var gun = GetComponent<NetworkGun>();
+            if (gun != null) gun.ResetForRedeploy();
 
             var controller = GetComponent<NetworkPlayerController>();
             if (controller != null) controller.OnRedeploy();

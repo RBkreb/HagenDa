@@ -264,9 +264,26 @@ namespace HagenDa.Networking.EditorTools
         [MenuItem("HagenDa/Create Phase7 Scene")]
         public static void CreatePhase7Scene()
         {
+            BuildMatchScene("Assets/Scenes/Phase7.scene");
+        }
+
+        [MenuItem("HagenDa/Create Phase8 Scene")]
+        public static void CreatePhase8Scene()
+        {
+            BuildMatchScene("Assets/Scenes/Phase8.scene");
+        }
+
+        /// <summary>
+        /// Builds the PHASE7/8 100×200 match scene (GR + 2 HQ + teams + NavMesh) with
+        /// the current player/AI prefabs (which now include the PHASE8 MapIndicator,
+        /// GameHud and DeployScreen components).
+        /// </summary>
+        private static void BuildMatchScene(string scenePath)
+        {
             EnsureFolder("Assets", "Scenes");
             EnsureFolder("Assets/Scripts/Network", "Prefabs");
             EnsureFolder("Assets/Scripts/Network", "Equipment");
+            EnsureMapLayers();
 
             // Build all equipment assets + throwable prefabs (idempotent).
             List<EquipmentDefinition> equipmentList = BuildEquipmentAssets();
@@ -311,6 +328,8 @@ namespace HagenDa.Networking.EditorTools
             // --- Capture Points (2 HQ in the middle) ---
             var hq1 = CreateCapturePoint("HQ_Alpha", new Vector3(-15f, 0f, 0f), 12f);
             var hq2 = CreateCapturePoint("HQ_Bravo", new Vector3(15f, 0f, 0f), 12f);
+            hq1.letter = "A";
+            hq2.letter = "B";
 
             // --- Match Manager ---
             var mmGo = new GameObject("MatchManager");
@@ -334,8 +353,7 @@ namespace HagenDa.Networking.EditorTools
             // --- NavMesh ---
             BuildNavMeshForFloor();
 
-            // --- Entities: 4 red (player + 3 AI), 4 blue AI ---
-            // Red AI (9): player + 9 AI = 10 red (2 squads × 5). z < 0 → red.
+            // --- Entities: red AI in the south (z<0), blue AI in the north (z>0). ---
             CreateAIEntity(aiPrefab, new Vector3(-8f, 1f, -85f));
             CreateAIEntity(aiPrefab, new Vector3(-4f, 1f, -85f));
             CreateAIEntity(aiPrefab, new Vector3(0f, 1f, -85f));
@@ -346,7 +364,6 @@ namespace HagenDa.Networking.EditorTools
             CreateAIEntity(aiPrefab, new Vector3(4f, 1f, -80f));
             CreateAIEntity(aiPrefab, new Vector3(8f, 1f, -80f));
 
-            // Blue AI (10): 2 squads × 5. z > 0 → blue.
             CreateAIEntity(aiPrefab, new Vector3(-8f, 1f, 80f));
             CreateAIEntity(aiPrefab, new Vector3(-4f, 1f, 80f));
             CreateAIEntity(aiPrefab, new Vector3(0f, 1f, 80f));
@@ -358,9 +375,9 @@ namespace HagenDa.Networking.EditorTools
             CreateAIEntity(aiPrefab, new Vector3(4f, 1f, 85f));
             CreateAIEntity(aiPrefab, new Vector3(8f, 1f, 85f));
 
-            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, "Assets/Scenes/Phase7.scene");
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, scenePath);
             AssetDatabase.SaveAssets();
-            Debug.Log("[NetworkSetup] Done. Created Assets/Scenes/Phase7.scene with match system, HQ, garrisons, and 4v4 teams.");
+            Debug.Log($"[NetworkSetup] Done. Created {scenePath} with match system, HQ, garrisons, and teams.");
         }
 
         private static GarrisonZone CreateGarrison(string name, Vector3 pos, int teamId, float radius)
@@ -504,8 +521,10 @@ namespace HagenDa.Networking.EditorTools
             var controller = root.AddComponent<NetworkPlayerController>();
             root.AddComponent<NetworkPlayerHealth>();
             root.AddComponent<NetworkCombatant>();
-            root.AddComponent<DebugHud>();
-            root.AddComponent<PlayerHud>();
+            root.AddComponent<GameHud>();
+            root.AddComponent<DeployScreen>();
+            root.AddComponent<MapIndicator>();
+            root.AddComponent<HeadMarker>();
 
             // Shared combat (projectile shooting + throwing). Reuse prefabs if already built.
             if (grenadePrefab == null)
@@ -1251,6 +1270,43 @@ namespace HagenDa.Networking.EditorTools
             bs.maxCarry = 1; bs.supplyCost = 0; bs.shieldExplosionReduction = 0.6f;
             list.Add(bs);
 
+            // PHASE8: 按类型统一赋值 category + instantUse。
+            foreach (var d in list)
+            {
+                if (d == null) continue;
+
+                switch (d.type)
+                {
+                    case EquipmentType.HealingSyringe:
+                    case EquipmentType.Defibrillator:
+                        d.category = EquipmentCategory.Special;
+                        break;
+                    case EquipmentType.Grenade:
+                    case EquipmentType.SmokeGrenade:
+                    case EquipmentType.EmpGrenade:
+                        d.category = EquipmentCategory.Throwable;
+                        break;
+                    default:
+                        d.category = EquipmentCategory.Optional;
+                        break;
+                }
+
+                switch (d.type)
+                {
+                    case EquipmentType.LargeSupplyCrate:
+                    case EquipmentType.SmallSupplyPack:
+                    case EquipmentType.QuickDash:
+                    case EquipmentType.HealingSyringe:
+                    case EquipmentType.ArmorPlate:
+                    case EquipmentType.Grenade:   // 手雷：瞬发型（z 键直接投掷）
+                        d.instantUse = true;
+                        break;
+                    default:
+                        d.instantUse = false;
+                        break;
+                }
+            }
+
             foreach (var d in list)
                 if (d != null) EditorUtility.SetDirty(d);
 
@@ -1390,6 +1446,8 @@ namespace HagenDa.Networking.EditorTools
             // Health (same as player).
             root.AddComponent<NetworkPlayerHealth>();
             root.AddComponent<NetworkCombatant>();
+            root.AddComponent<MapIndicator>();
+            root.AddComponent<HeadMarker>();
 
             // AI controller.
             var ai = root.AddComponent<NetworkAIController>();
@@ -1572,6 +1630,38 @@ namespace HagenDa.Networking.EditorTools
             string full = parent + "/" + folder;
             if (!AssetDatabase.IsValidFolder(full))
                 AssetDatabase.CreateFolder(parent, folder);
+        }
+
+        /// <summary>
+        /// PHASE8: make sure the map indicator / highlight layers exist in
+        /// TagManager (idempotent). Called by every scene builder so freshly built
+        /// scenes reference valid layers.
+        /// </summary>
+        private static void EnsureMapLayers()
+        {
+            var tagManager = new SerializedObject(
+                AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+
+            var layersProp = tagManager.FindProperty("layers");
+            EnsureLayerAt(layersProp, MapLayers.IndicatorName);
+            EnsureLayerAt(layersProp, MapLayers.HighlightName);
+            tagManager.ApplyModifiedProperties();
+        }
+
+        private static void EnsureLayerAt(SerializedProperty layersProp, string layerName)
+        {
+            // Layers 0-7 are reserved (built-in). Insert into the first empty slot.
+            for (int i = 8; i < layersProp.arraySize; i++)
+            {
+                var slot = layersProp.GetArrayElementAtIndex(i);
+                if (string.IsNullOrEmpty(slot.stringValue))
+                {
+                    slot.stringValue = layerName;
+                    return;
+                }
+                if (slot.stringValue == layerName)
+                    return;   // already present
+            }
         }
 
         // Removes any MonoBehaviour with an unresolved script reference (missing

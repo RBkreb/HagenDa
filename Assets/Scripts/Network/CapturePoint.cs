@@ -121,6 +121,11 @@ namespace HagenDa.Networking
         // ---------------------------------------------------------------
         // VISUAL (owner color)
         // ---------------------------------------------------------------
+        [Tooltip("PHASE8 地图标记的字母（HQ A/B…）。")]
+        public string letter = "A";
+
+        private MapPointMarker marker;
+
         private void OnOwnerChanged(int oldOwner, int newOwner)
         {
             UpdateVisualColor(newOwner);
@@ -128,25 +133,23 @@ namespace HagenDa.Networking
 
         private void UpdateVisualColor(int owner)
         {
-            var rend = GetComponentInChildren<Renderer>();
-            if (rend == null) return;
-
             Color c;
             switch (owner)
             {
-                case 0: c = new Color(0.7f, 0.15f, 0.15f, 0.25f); break;   // 红
-                case 1: c = new Color(0.15f, 0.3f, 0.7f, 0.25f); break;   // 蓝
-                default: c = new Color(0.8f, 0.8f, 0.2f, 0.15f); break;    // 中立黄
+                case 0: c = new Color(0.7f, 0.15f, 0.15f); break;   // 红
+                case 1: c = new Color(0.15f, 0.3f, 0.7f); break;    // 蓝
+                default: c = new Color(0.8f, 0.75f, 0.2f); break;    // 中立黄
             }
 
-            var mat = new Material(rend.material);
-            mat.color = c;
-            rend.material = mat;
+            if (marker != null)
+                marker.SetColor(c);
         }
 
         private void Start()
         {
-            // 初始颜色（中立）。
+            // PHASE8: 纯色 + 中心字母标记（替换旧高亮环）。
+            marker = gameObject.AddComponent<MapPointMarker>();
+            marker.Init(letter, Mathf.Max(10f, radius * 1.2f), new Color(0.8f, 0.75f, 0.2f));
             UpdateVisualColor(ownerTeam);
         }
 
