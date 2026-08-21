@@ -24,8 +24,8 @@ namespace HagenDa.Networking
         {
             if (broadcaster == null || enemy == null) return;
 
-            var providers = Object.FindObjectsOfType<AIDataProvider>();
-            for (int i = 0; i < providers.Length; i++)
+            var providers = CombatantRegistry.AllProviders;
+            for (int i = 0; i < providers.Count; i++)
             {
                 var p = providers[i];
                 if (p == null) continue;

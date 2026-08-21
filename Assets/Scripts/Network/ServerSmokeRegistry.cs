@@ -61,6 +61,26 @@ namespace HagenDa.Networking
             return false;
         }
 
+        /// <summary>True when <paramref name="pos"/> is inside a sufficiently dense smoke cloud.</summary>
+        public static bool IsInsideSmoke(Vector3 pos, float threshold = BlockThreshold)
+        {
+            if (Clouds.Count == 0) return false;
+
+            Cleanup();
+
+            for (int i = 0; i < Clouds.Count; i++)
+            {
+                var s = Clouds[i];
+                float t = Mathf.Clamp01((Time.time - s.startTime) / s.decayTime);
+                float current = s.concentration * (1f - t);
+                if (current <= threshold) continue;
+
+                if ((pos - s.position).sqrMagnitude <= s.radius * s.radius)
+                    return true;
+            }
+            return false;
+        }
+
         /// <summary>Reset all smoke (safe on domain reload / play-mode restart).</summary>
         public static void Clear() => Clouds.Clear();
 

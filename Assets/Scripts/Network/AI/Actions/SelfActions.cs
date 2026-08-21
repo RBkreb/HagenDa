@@ -104,54 +104,78 @@ namespace HagenDa.Networking.AI
     }
 
     /// <summary>
-    /// Revive a downed ally with the defibrillator. On arrival, evaluates safety near
-    /// the ally — if enemies are nearby, throws smoke for cover before reviving.
-    /// The channel takes 2s; the action waits for it to complete.
+    /// Revive a downed ally with the defibrillator. While approaching, throws smoke
+    /// toward the downed ally if enemies are nearby. On arrival, starts the defibrillator
+    /// channel (2s) and waits for it to complete.
     /// </summary>
     public class UseDefibrillatorAction : GoapActionBase<UseDefibrillatorAction.Data>
     {
         private const float SafetyRadius = 15f;
+        private const float SmokeThrowRange = 30f;   // throw smoke when within this distance of ally
 
         public override void Start(IMonoAgent agent, Data data)
         {
             data.Timer = 0f;
             data.SmokeUsed = false;
-            var self = agent.Transform;
-            Vector3 eye = self.position + Vector3.up * 0.8f;
-
-            // Evaluate safety near the downed ally.
-            var ally = data.DataProvider.GetNearestDownedAlly();
-            if (ally == null) return;
-
-            bool enemiesNearAlly = data.DataProvider.IsEnemyNearPosition(
-                ally.transform.position, SafetyRadius);
-
-            if (enemiesNearAlly)
-            {
-                // Throw smoke at the ally's position for cover.
-                if (data.DataProvider.HasEquipmentAmmo(EquipmentType.SmokeGrenade))
-                {
-                    Vector3 dir = (ally.transform.position - eye).normalized + Vector3.up * 0.3f;
-                    dir.Normalize();
-                    data.DataProvider.UseEquipment(EquipmentType.SmokeGrenade, eye, dir);
-                    data.SmokeUsed = true;
-                }
-                else if (data.DataProvider.HasEquipmentAmmo(EquipmentType.SmokeLauncher))
-                {
-                    Vector3 dir = (ally.transform.position - eye).normalized;
-                    data.DataProvider.UseEquipment(EquipmentType.SmokeLauncher, eye, dir);
-                    data.SmokeUsed = true;
-                }
-            }
-
-            // Start the defibrillator channel.
-            data.DataProvider.UseEquipment(EquipmentType.Defibrillator, eye, ally.transform.position);
+            data.DefibStarted = false;
         }
 
         public override IActionRunState Perform(IMonoAgent agent, Data data, IActionContext context)
         {
+            var dp = data.DataProvider;
+            var ally = dp.GetNearestDownedAlly();
+            if (ally == null) return ActionRunState.Completed;
+
+            var self = agent.Transform;
+            Vector3 eye = self.position + Vector3.up * 0.8f;
+            float distToAlly = Vector3.Distance(self.position, ally.transform.position);
+
+            // Phase 1: while approaching (not yet at ally), throw smoke toward ally if
+            // enemies are near the ally and we haven't thrown smoke yet.
+            if (!data.DefibStarted)
+            {
+                if (!data.SmokeUsed && distToAlly <= SmokeThrowRange)
+                {
+                    bool enemiesNearAlly = dp.IsEnemyNearPosition(ally.transform.position, SafetyRadius);
+                    if (enemiesNearAlly)
+                    {
+                        Vector3 dir = (ally.transform.position - eye).normalized + Vector3.up * 0.3f;
+                        dir.Normalize();
+
+                        if (dp.HasEquipmentAmmo(EquipmentType.SmokeGrenade))
+                        {
+                            dp.UseEquipment(EquipmentType.SmokeGrenade, eye, dir);
+                            data.SmokeUsed = true;
+                        }
+                        else if (dp.HasEquipmentAmmo(EquipmentType.SmokeLauncher))
+                        {
+                            dp.UseEquipment(EquipmentType.SmokeLauncher, eye,
+                                (ally.transform.position - eye).normalized);
+                            data.SmokeUsed = true;
+                        }
+                    }
+                }
+
+                // Check if we've arrived at the ally (within stopping distance).
+                if (data.NavAgent != null && data.NavAgent.isOnNavMesh)
+                {
+                    if (data.NavAgent.pathPending)
+                        return ActionRunState.Continue;
+                    if (data.NavAgent.remainingDistance > data.NavAgent.stoppingDistance + 0.5f)
+                        return ActionRunState.Continue;
+                }
+                else if (distToAlly > 3f)
+                {
+                    return ActionRunState.Continue;
+                }
+
+                // Arrived: start the defibrillator channel.
+                dp.UseEquipment(EquipmentType.Defibrillator, eye, ally.transform.position);
+                data.DefibStarted = true;
+            }
+
+            // Phase 2: wait for the defibrillator channel to complete.
             data.Timer += context.DeltaTime;
-            // Defibrillator channel = 2s; wait a bit longer for safety.
             if (data.Timer < 2.5f)
                 return ActionRunState.Wait(0.5f, mayResolve: true);
             return ActionRunState.Completed;
@@ -161,8 +185,10 @@ namespace HagenDa.Networking.AI
         {
             public ITarget Target { get; set; }
             [GetComponent] public AIDataProvider DataProvider { get; set; }
+            [GetComponent] public UnityEngine.AI.NavMeshAgent NavAgent { get; set; }
             public float Timer;
             public bool SmokeUsed;
+            public bool DefibStarted;
         }
     }
 }

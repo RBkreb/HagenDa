@@ -1,5 +1,6 @@
 using Mirror;
 using UnityEngine;
+using HagenDa.Networking.AI;
 
 namespace HagenDa.Networking
 {
@@ -28,6 +29,12 @@ namespace HagenDa.Networking
         public override void OnStartServer()
         {
             DeployableUtil.IgnoreLivingCollision(gameObject);
+            CombatantRegistry.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            CombatantRegistry.Unregister(this);
         }
 
         /// <summary>Server: set the team that placed this sensor (from the thrower).</summary>

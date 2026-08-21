@@ -795,12 +795,16 @@ namespace HagenDa.Networking
             NetworkPlayerHealth best = null;
             float bestDist = 2f; // 2m radius
 
-            foreach (var h in Object.FindObjectsOfType<NetworkPlayerHealth>())
+            var combatants = HagenDa.Networking.AI.CombatantRegistry.AllCombatants;
+            for (int i = 0; i < combatants.Count; i++)
             {
+                var c = combatants[i];
+                if (c == null) continue;
+                var h = c.Health;
                 if (h == null || !h.IsDead) continue;
                 if (self != null && h == self) continue;   // 排除使用者自身
 
-                float d = Vector3.Distance(center, h.transform.position);
+                float d = Vector3.Distance(center, c.transform.position);
                 if (d < bestDist)
                 {
                     bestDist = d;

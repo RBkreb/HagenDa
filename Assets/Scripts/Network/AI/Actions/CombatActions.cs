@@ -78,11 +78,25 @@ namespace HagenDa.Networking.AI
                 UseTacticalEquipment(data, self, enemy, eye, dist);
             }
 
-            // === Movement: strafe or seek cover ===
-            if (data.DataProvider.IsUnderFire())
-                SeekCover(data, self, enemyPos, dt);
-            else
-                Strafe(data, self, enemyPos, dt);
+            // === Movement: strafe, seek cover, or hold in smoke ===
+            // In smoke: hold position — smoke is cover. Keep shooting at known
+            // enemies (the AI can aim at their last known position even without
+            // direct sight). Enemies can't see in to shoot back effectively.
+            if (data.DataProvider.IsInSmoke())
+            {
+                // Stop navmesh movement to hold inside smoke.
+                if (data.NavAgent != null && data.NavAgent.isOnNavMesh)
+                    data.NavAgent.ResetPath();
+                if (data.AI != null) data.AI.SetAIPosture(AIPosture.Crouch);
+            }
+            else if (data.DataProvider.IsEnemyInSight())
+            {
+                // Direct sight: strafe or seek cover.
+                if (data.DataProvider.IsUnderFire())
+                    SeekCover(data, self, enemyPos, dt);
+                else
+                    Strafe(data, self, enemyPos, dt);
+            }
 
             return ActionRunState.ContinueOrResolve;
         }

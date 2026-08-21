@@ -70,7 +70,13 @@ namespace HagenDa.Networking.AI
 
             shooting = new AIShootingProfile(gun != null ? gun.definition : null, gun != null ? gun.spreadMultiplier : 1f);
 
+            CombatantRegistry.Register(this);
             RefreshCache();
+        }
+
+        private void OnDisable()
+        {
+            CombatantRegistry.Unregister(this);
         }
 
         private void Update()
@@ -123,8 +129,8 @@ namespace HagenDa.Networking.AI
             int selfId = self.GetInstanceID();
             isSquadLeader = true;   // assume leader; disproved if a same-squad ally has a smaller ID
 
-            var combatants = Object.FindObjectsOfType<NetworkCombatant>();
-            for (int i = 0; i < combatants.Length; i++)
+            var combatants = CombatantRegistry.AllCombatants;
+            for (int i = 0; i < combatants.Count; i++)
             {
                 var c = combatants[i];
                 if (c == null || c == self) continue;
@@ -183,7 +189,7 @@ namespace HagenDa.Networking.AI
             }
 
             // Marked enemies are always "known" (even beyond direct vision).
-            for (int i = 0; i < combatants.Length; i++)
+            for (int i = 0; i < combatants.Count; i++)
             {
                 var c = combatants[i];
                 if (c == null || c == self || c.IsDead) continue;
@@ -192,16 +198,16 @@ namespace HagenDa.Networking.AI
             }
 
             // Scene targets.
-            var supplies = Object.FindObjectsOfType<LargeSupplyCrate>();
-            for (int i = 0; i < supplies.Length; i++)
+            var supplies = CombatantRegistry.AllSupplyCrates;
+            for (int i = 0; i < supplies.Count; i++)
             {
                 if (supplies[i] == null) continue;
                 if (nearestSupply == null || (supplies[i].transform.position - myPos).sqrMagnitude < (nearestSupply.transform.position - myPos).sqrMagnitude)
                     nearestSupply = supplies[i];
             }
 
-            var sensors = Object.FindObjectsOfType<SensorProbe>();
-            for (int i = 0; i < sensors.Length; i++)
+            var sensors = CombatantRegistry.AllSensors;
+            for (int i = 0; i < sensors.Count; i++)
             {
                 var s = sensors[i];
                 if (s == null) continue;
@@ -486,6 +492,12 @@ namespace HagenDa.Networking.AI
         public bool IsAtCapturePoint() => atCapturePoint;
         public bool IsInGarrison() => inGarrison;
         public bool IsSquadLeader() => isSquadLeader;
+
+        /// <summary>True when the AI is standing inside sufficiently dense smoke (acts as cover).</summary>
+        public bool IsInSmoke()
+        {
+            return ServerSmokeRegistry.IsInsideSmoke(transform.position);
+        }
 
         // ---- equipment ----
 

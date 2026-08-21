@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 using UnityEngine.AI;
+using HagenDa.Networking.AI;
 
 namespace HagenDa.Networking
 {
@@ -30,7 +31,7 @@ namespace HagenDa.Networking
 
         [Header("Score")]
         [Tooltip("先到该分的一方获胜（测试阶段 100）。")]
-        public int winScore = 100;
+        public int winScore = 400;
 
         [SyncVar] public int redScore;
         [SyncVar] public int blueScore;
@@ -85,7 +86,7 @@ namespace HagenDa.Networking
             pending.Clear();
 
             // Scene objects spawned at server start.
-            foreach (var c in FindObjectsOfType<NetworkCombatant>())
+            foreach (var c in CombatantRegistry.AllCombatants)
                 AddCombatant(c);
         }
 

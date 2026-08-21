@@ -1,3 +1,4 @@
+using CrashKonijn.Agent.Runtime;
 using CrashKonijn.Goap.Runtime;
 using Mirror;
 using UnityEngine;
@@ -21,6 +22,12 @@ namespace HagenDa.Networking.AI
 
         private GoapActionProvider provider;
         private NetworkEquipment equipment;
+
+        /// <summary>
+        /// Explicit loadout index (0=Assault, 1=Support, 2=Recon).
+        /// Set at spawn time by NetworkSetup; -1 = auto by instance ID.
+        /// </summary>
+        [HideInInspector] public int loadoutIndex = -1;
 
         // ---- Three fixed AI loadouts (indices into NetworkEquipment.equipmentList) ----
         //  Loadout A (Assault):  GrenadeLauncher, QuickDash, HealingSyringe, Grenade
@@ -54,6 +61,17 @@ namespace HagenDa.Networking.AI
             Invoke(nameof(Configure), 0.5f);
         }
 
+        private void OnDisable()
+        {
+            // Unregister from the batch updater.
+            var updater = Object.FindObjectOfType<AgentBatchUpdater>();
+            if (updater != null)
+            {
+                var ab = GetComponent<AgentBehaviour>();
+                if (ab != null) updater.Unregister(ab);
+            }
+        }
+
         private void Configure()
         {
             // GOAP runs server-side only — skip on clients.
@@ -71,6 +89,14 @@ namespace HagenDa.Networking.AI
                 if (def == null) continue;
                 EnableFor(def.type);
             }
+
+            // Register with the batch updater (sets RunInUnityUpdate=false internally).
+            var updater = Object.FindObjectOfType<AgentBatchUpdater>();
+            if (updater != null)
+            {
+                var ab = GetComponent<AgentBehaviour>();
+                if (ab != null) updater.Register(ab);
+            }
         }
 
         /// <summary>
@@ -79,8 +105,9 @@ namespace HagenDa.Networking.AI
         /// </summary>
         private void AssignLoadout()
         {
-            int id = GetInstanceID();
-            int index = Mathf.Abs(id) % Loadouts.Length;
+            int index = loadoutIndex >= 0
+                ? loadoutIndex
+                : Mathf.Abs(GetInstanceID()) % Loadouts.Length;
             var types = Loadouts[index];
 
             var loadout = new LoadoutDefinition

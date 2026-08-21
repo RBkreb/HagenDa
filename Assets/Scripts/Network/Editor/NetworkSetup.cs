@@ -6,7 +6,6 @@ using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem.UI;
 using Unity.AI.Navigation;
-using cowsins;
 using CrashKonijn.Agent.Runtime;
 using CrashKonijn.Goap.Runtime;
 using HagenDa.Networking.AI;
@@ -23,8 +22,6 @@ namespace HagenDa.Networking.EditorTools
     public static class NetworkSetup
     {
         private const string PrefabPath = "Assets/Scripts/Network/Prefabs/NetworkPlayer.prefab";
-        private const string FpsPrefabPath = "Assets/Scripts/Network/Prefabs/FpsEngineNetworkPlayer.prefab";
-        private const string FpsSourcePrefab = "Assets/Cowsins/Prefabs/PlayerControllers/CowsinsFPSController.prefab";
         private const string GrenadePrefabPath = "Assets/Scripts/Network/Prefabs/GrenadeThrowable.prefab";
         private const string SmokePrefabPath = "Assets/Scripts/Network/Prefabs/SmokeThrowable.prefab";
         private const string RescuePrefabPath = "Assets/Scripts/Network/Prefabs/RescueThrowable.prefab";
@@ -67,20 +64,6 @@ namespace HagenDa.Networking.EditorTools
             SaveActiveScene();
             AssetDatabase.SaveAssets();
             Debug.Log("[NetworkSetup] Done. Built player prefab and configured the active scene.");
-        }
-
-        [MenuItem("HagenDa/Setup FPS Engine Demo")]
-        public static void SetupFpsDemo()
-        {
-            EnsureFolder("Assets/Scripts/Network", "Prefabs");
-
-            GameObject playerPrefab = BuildFpsEnginePlayerPrefab();
-
-            SetupScene(playerPrefab, addTargets: true);
-
-            SaveActiveScene();
-            AssetDatabase.SaveAssets();
-            Debug.Log("[NetworkSetup] Done. Built FPS Engine player prefab and configured the active scene.");
         }
 
         [MenuItem("HagenDa/Create Physics Movement Scene")]
@@ -367,31 +350,151 @@ namespace HagenDa.Networking.EditorTools
             // --- NavMesh ---
             BuildNavMeshForFloor();
 
-            // --- Entities: red AI in the south (z<0), blue AI in the north (z>0). ---
-            CreateAIEntity(aiPrefab, new Vector3(-8f, 1f, -85f));
-            CreateAIEntity(aiPrefab, new Vector3(-4f, 1f, -85f));
-            CreateAIEntity(aiPrefab, new Vector3(0f, 1f, -85f));
-            CreateAIEntity(aiPrefab, new Vector3(4f, 1f, -85f));
-            CreateAIEntity(aiPrefab, new Vector3(8f, 1f, -85f));
-            CreateAIEntity(aiPrefab, new Vector3(-8f, 1f, -80f));
-            CreateAIEntity(aiPrefab, new Vector3(-4f, 1f, -80f));
-            CreateAIEntity(aiPrefab, new Vector3(4f, 1f, -80f));
-            CreateAIEntity(aiPrefab, new Vector3(8f, 1f, -80f));
+            // --- Cover objects (boxes, low walls, ramps) ---
+            CreateCoverObjects();
 
-            CreateAIEntity(aiPrefab, new Vector3(-8f, 1f, 80f));
-            CreateAIEntity(aiPrefab, new Vector3(-4f, 1f, 80f));
-            CreateAIEntity(aiPrefab, new Vector3(0f, 1f, 80f));
-            CreateAIEntity(aiPrefab, new Vector3(4f, 1f, 80f));
-            CreateAIEntity(aiPrefab, new Vector3(8f, 1f, 80f));
-            CreateAIEntity(aiPrefab, new Vector3(-8f, 1f, 85f));
-            CreateAIEntity(aiPrefab, new Vector3(-4f, 1f, 85f));
-            CreateAIEntity(aiPrefab, new Vector3(0f, 1f, 85f));
-            CreateAIEntity(aiPrefab, new Vector3(4f, 1f, 85f));
-            CreateAIEntity(aiPrefab, new Vector3(8f, 1f, 85f));
+            // --- Entities: 30 AI per side (10 Assault + 10 Support + 10 Recon).
+            // Red AI in the south (z<0), blue AI in the north (z>0).
+            // Player occupies one Assault slot on Red → Red has 9 Assault AI.
+            // 6 squads per team, 5 members each. ---
+            // Loadout indices: 0=Assault, 1=Support, 2=Recon
+
+            // Red team (south, z<0): 9 Assault + 10 Support + 10 Recon = 29 AI
+            // (player takes the 10th Assault slot)
+            SpawnTeamAI(aiPrefab, isRed: true);
+
+            // Blue team (north, z>0): 10 Assault + 10 Support + 10 Recon = 30 AI
+            SpawnTeamAI(aiPrefab, isRed: false);
+
+            // Set squadsPerTeam = 6 (6 squads × 5 members = 30 per team)
+            mm.squadsPerTeam = 6;
 
             UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, scenePath);
             AssetDatabase.SaveAssets();
-            Debug.Log($"[NetworkSetup] Done. Created {scenePath} with match system, HQ, garrisons, and teams.");
+            Debug.Log($"[NetworkSetup] Done. Created {scenePath} with match system, HQ, garrisons, 30 AI per side (10A/10S/10R), 6 squads.");
+        }
+
+        /// <summary>
+        /// Spawn 30 AI (or 29 for red — player takes 1 assault slot) in a 5×6 grid
+        /// with explicit loadout assignment: 10 Assault (0), 10 Support (1), 10 Recon (2).
+        /// Red is south (z<0), blue is north (z>0).
+        /// </summary>
+        private static void SpawnTeamAI(GameObject aiPrefab, bool isRed)
+        {
+            // Loadout pattern: A×10, S×10, R×10
+            // Red has only 9 Assault (player takes the 10th).
+            int assaultCount = isRed ? 9 : 10;
+            int supportCount = 10;
+            int reconCount = 10;
+            int total = assaultCount + supportCount + reconCount;
+
+            float zBase = isRed ? -85f : 80f;
+            float zDir = isRed ? 1f : 1f;   // rows spread toward 0
+            float rowSpacing = 5f;
+
+            // 5 columns (x: -8,-4,0,4,8), 6 rows
+            float[] xs = { -8f, -4f, 0f, 4f, 8f };
+
+            for (int i = 0; i < total; i++)
+            {
+                int col = i % 5;
+                int row = i / 5;
+
+                float x = xs[col];
+                float z = zBase + row * zDir * rowSpacing;
+
+                int loadout;
+                if (i < assaultCount)
+                    loadout = 0;   // Assault
+                else if (i < assaultCount + supportCount)
+                    loadout = 1;   // Support
+                else
+                    loadout = 2;   // Recon
+
+                CreateAIEntity(aiPrefab, new Vector3(x, 1f, z), loadout);
+            }
+        }
+
+        /// <summary>
+        /// Create cover objects in the central combat area: 8 boxes around the two HQ
+        /// points, 2 low walls across the corridor, and 4 angled ramps (2 per side).
+        /// All are marked NavigationStatic so they participate in NavMesh carving.
+        /// </summary>
+        private static void CreateCoverObjects()
+        {
+            // --- Central boxes (8) around the two HQ points ---
+            Vector3[] boxPositions = {
+                new Vector3(-15f, 0.5f, -5f),
+                new Vector3(-15f, 0.5f, 5f),
+                new Vector3(-12f, 0.75f, 0f),
+                new Vector3(-18f, 0.75f, 0f),
+                new Vector3(15f, 0.5f, -5f),
+                new Vector3(15f, 0.5f, 5f),
+                new Vector3(12f, 0.75f, 0f),
+                new Vector3(18f, 0.75f, 0f),
+            };
+
+            Vector3[] boxScales = {
+                new Vector3(2f, 1f, 2f),
+                new Vector3(2f, 1f, 2f),
+                new Vector3(1.5f, 1.5f, 1.5f),
+                new Vector3(1.5f, 1.5f, 1.5f),
+                new Vector3(2f, 1f, 2f),
+                new Vector3(2f, 1f, 2f),
+                new Vector3(1.5f, 1.5f, 1.5f),
+                new Vector3(1.5f, 1.5f, 1.5f),
+            };
+
+            for (int i = 0; i < boxPositions.Length; i++)
+            {
+                var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                go.name = $"CoverBox_{i}";
+                go.transform.position = boxPositions[i];
+                go.transform.localScale = boxScales[i];
+                GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.NavigationStatic);
+            }
+
+            // --- Low walls (2) across the central corridor ---
+            var wall1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            wall1.name = "LowWall_Center1";
+            wall1.transform.position = new Vector3(0f, 0.4f, -8f);
+            wall1.transform.localScale = new Vector3(6f, 0.8f, 0.5f);
+            GameObjectUtility.SetStaticEditorFlags(wall1, StaticEditorFlags.NavigationStatic);
+
+            var wall2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            wall2.name = "LowWall_Center2";
+            wall2.transform.position = new Vector3(0f, 0.4f, 8f);
+            wall2.transform.localScale = new Vector3(6f, 0.8f, 0.5f);
+            GameObjectUtility.SetStaticEditorFlags(wall2, StaticEditorFlags.NavigationStatic);
+
+            // --- Ramps (4) at 30° angle for cover on each side ---
+            var ramp1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            ramp1.name = "Ramp_RedLeft";
+            ramp1.transform.position = new Vector3(-10f, 0.75f, -15f);
+            ramp1.transform.rotation = Quaternion.Euler(-30f, 0f, 0f);
+            ramp1.transform.localScale = new Vector3(3f, 0.5f, 6f);
+            GameObjectUtility.SetStaticEditorFlags(ramp1, StaticEditorFlags.NavigationStatic);
+
+            var ramp2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            ramp2.name = "Ramp_RedRight";
+            ramp2.transform.position = new Vector3(10f, 0.75f, -15f);
+            ramp2.transform.rotation = Quaternion.Euler(-30f, 0f, 0f);
+            ramp2.transform.localScale = new Vector3(3f, 0.5f, 6f);
+            GameObjectUtility.SetStaticEditorFlags(ramp2, StaticEditorFlags.NavigationStatic);
+
+            var ramp3 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            ramp3.name = "Ramp_BlueLeft";
+            ramp3.transform.position = new Vector3(-10f, 0.75f, 15f);
+            ramp3.transform.rotation = Quaternion.Euler(30f, 0f, 0f);
+            ramp3.transform.localScale = new Vector3(3f, 0.5f, 6f);
+            GameObjectUtility.SetStaticEditorFlags(ramp3, StaticEditorFlags.NavigationStatic);
+
+            var ramp4 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            ramp4.name = "Ramp_BlueRight";
+            ramp4.transform.position = new Vector3(10f, 0.75f, 15f);
+            ramp4.transform.rotation = Quaternion.Euler(30f, 0f, 0f);
+            ramp4.transform.localScale = new Vector3(3f, 0.5f, 6f);
+            GameObjectUtility.SetStaticEditorFlags(ramp4, StaticEditorFlags.NavigationStatic);
         }
 
         private static GarrisonZone CreateGarrison(string name, Vector3 pos, int teamId, float radius)
@@ -629,59 +732,6 @@ namespace HagenDa.Networking.EditorTools
             // Save
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             Object.DestroyImmediate(root);
-            return prefab;
-        }
-
-        // ---------------------------------------------------------------
-        // FPS ENGINE NETWORKED PREFAB
-        // ---------------------------------------------------------------
-        private static GameObject BuildFpsEnginePlayerPrefab()
-        {
-            var source = AssetDatabase.LoadAssetAtPath<GameObject>(FpsSourcePrefab);
-            if (source == null)
-            {
-                Debug.LogError($"[NetworkSetup] FPS Engine controller prefab not found at {FpsSourcePrefab}");
-                return null;
-            }
-
-            GameObject contents = PrefabUtility.LoadPrefabContents(FpsSourcePrefab);
-
-            // Remove missing scripts (e.g. HDRP HDAdditionalCameraData whose GUID
-            // doesn't resolve in Tuanjie) so SaveAsPrefabAsset doesn't refuse to save.
-            RemoveMissingScripts(contents);
-
-            // Networking
-            contents.AddComponent<NetworkIdentity>();
-
-            var nt = contents.AddComponent<NetworkTransformReliable>();
-            nt.syncDirection = SyncDirection.ClientToServer; // client-authoritative movement
-            nt.syncPosition = true;
-            nt.syncRotation = false; // FPS Engine root never rotates (look lives on camera/orientation)
-            nt.interpolatePosition = true;
-            nt.interpolateRotation = false;
-
-            contents.AddComponent<NetworkPlayerHealth>();
-
-            var fps = contents.AddComponent<NetworkFpsPlayer>();
-
-            // Remote proxy body (visible capsule for other players).
-            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            body.name = "RemoteBody";
-            body.transform.SetParent(contents.transform, false);
-            body.transform.localPosition = new Vector3(0f, 1f, 0f);
-            Object.DestroyImmediate(body.GetComponent<CapsuleCollider>());
-            body.SetActive(false);
-            fps.remoteBody = body;
-
-            // Wire references.
-            fps.playerMovement = contents.GetComponentInChildren<PlayerMovement>(true);
-            fps.weaponController = contents.GetComponentInChildren<WeaponController>(true);
-            fps.playerStats = contents.GetComponentInChildren<PlayerStats>(true);
-            fps.inputManager = contents.GetComponentInChildren<InputManager>(true);
-
-            // Save.
-            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(contents, FpsPrefabPath);
-            PrefabUtility.UnloadPrefabContents(contents);
             return prefab;
         }
 
@@ -1765,11 +1815,19 @@ namespace HagenDa.Networking.EditorTools
             go.AddComponent<NetworkShootableTarget>();
         }
 
-        private static void CreateAIEntity(GameObject aiPrefab, Vector3 pos)
+        private static void CreateAIEntity(GameObject aiPrefab, Vector3 pos, int loadoutIndex = -1)
         {
             var go = (GameObject)PrefabUtility.InstantiatePrefab(aiPrefab);
             go.name = "AIEntity";
             go.transform.position = pos;
+
+            // Set explicit loadout (0=Assault, 1=Support, 2=Recon) if specified.
+            if (loadoutIndex >= 0)
+            {
+                var initializer = go.GetComponent<GoapAgentInitializer>();
+                if (initializer != null)
+                    initializer.loadoutIndex = loadoutIndex;
+            }
         }
 
         /// <summary>
@@ -1785,6 +1843,7 @@ namespace HagenDa.Networking.EditorTools
             var goapGo = new GameObject("Goap");
             var goap = goapGo.AddComponent<GoapBehaviour>();
             goapGo.AddComponent<ReactiveControllerBehaviour>();
+            goapGo.AddComponent<AgentBatchUpdater>();
 
             var factory = goapGo.AddComponent<CombatantAgentTypeFactory>();
             goap.agentTypeConfigFactories.Add(factory);

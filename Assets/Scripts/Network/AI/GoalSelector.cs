@@ -99,6 +99,14 @@ namespace HagenDa.Networking.AI
                 // Try self-heal first (syringe or supply crate, fire-and-forget).
                 data.TrySelfHeal();
 
+                // Already in smoke — treat it as cover, keep fighting.
+                if (data.IsInSmoke())
+                {
+                    provider.RequestGoal<EliminateEnemyGoal>();
+                    ApplyPosture(AIPosture.Crouch);
+                    return;
+                }
+
                 if (data.HasKnownEnemy())
                 {
                     // Fight-or-flight: 50/50 random decision.
@@ -150,7 +158,20 @@ namespace HagenDa.Networking.AI
                 return;
             }
 
-            // ---- Hard rule: engage known enemies ----
+            // ---- Hard rule: engage enemies in direct sight ----
+            // Only force attack when the AI can actually see an enemy. Intel-known
+            // enemies (marks / broadcasts) keep the AI cautious but don't lock it
+            // in place — this prevents the AI from getting stuck strafing inside
+            // smoke (where it can't see anyone but keeps receiving intel).
+            if (data.IsEnemyInSight())
+            {
+                provider.RequestGoal<EliminateEnemyGoal>();
+                ApplyPosture(AIPosture.Stand);
+                return;
+            }
+
+            // Intel-known enemy but no direct sight: move toward the nearest known
+            // enemy's position (push out of smoke / close distance) without strafing.
             if (data.HasKnownEnemy())
             {
                 provider.RequestGoal<EliminateEnemyGoal>();

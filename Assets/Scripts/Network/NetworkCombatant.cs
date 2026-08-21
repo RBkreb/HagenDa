@@ -1,5 +1,6 @@
 using Mirror;
 using UnityEngine;
+using HagenDa.Networking.AI;
 
 namespace HagenDa.Networking
 {
@@ -47,6 +48,12 @@ namespace HagenDa.Networking
         public override void OnStartServer()
         {
             NetworkMatchManager.RegisterCombatant(this);
+            CombatantRegistry.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            CombatantRegistry.Unregister(this);
         }
 
         /// <summary>Mark this entity until the given network time (server).

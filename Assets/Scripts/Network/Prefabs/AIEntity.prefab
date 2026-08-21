@@ -483,11 +483,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  surviveHealthThreshold: 25
+  surviveHealthThreshold: 35
   captureWeight: 50
   defendWeight: 30
-  eliminateWeight: 40
-  supportWeight: 25
   patrolWeight: 10
   evaluateInterval: 2
 --- !u!114 &292744208846018536
@@ -516,6 +514,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5b5f5e9b5980584ebbaec08b331a2f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  loadoutIndex: -1
 --- !u!1 &8416467697956502305
 GameObject:
   m_ObjectHideFlags: 0

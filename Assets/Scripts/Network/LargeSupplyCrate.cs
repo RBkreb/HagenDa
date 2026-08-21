@@ -1,5 +1,6 @@
 using Mirror;
 using UnityEngine;
+using HagenDa.Networking.AI;
 
 namespace HagenDa.Networking
 {
@@ -24,6 +25,12 @@ namespace HagenDa.Networking
         public override void OnStartServer()
         {
             DeployableUtil.IgnoreLivingCollision(gameObject);
+            CombatantRegistry.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            CombatantRegistry.Unregister(this);
         }
 
         private void OnCollisionEnter(Collision collision)
