@@ -23,6 +23,7 @@ namespace HagenDa.Networking.AI
 
         private AgentBehaviour agent;
         private NavMeshAgent navAgent;
+        private AIDataProvider data;
         private ITarget currentTarget;
         private bool shouldMove;
 
@@ -30,6 +31,7 @@ namespace HagenDa.Networking.AI
         {
             agent = GetComponent<AgentBehaviour>();
             navAgent = GetComponent<NavMeshAgent>();
+            data = GetComponent<AIDataProvider>();
         }
 
         private void OnEnable()
@@ -77,6 +79,14 @@ namespace HagenDa.Networking.AI
         {
             // The client disables the NavMeshAgent; only the server drives movement.
             if (navAgent == null || !navAgent.enabled) return;
+
+            // Death freezes movement (the corpse stays put).
+            if (data != null && data.Health != null && data.Health.IsDead)
+            {
+                StopMoving();
+                return;
+            }
+
             if (!shouldMove || currentTarget == null) return;
             if (!navAgent.isOnNavMesh) return;
 

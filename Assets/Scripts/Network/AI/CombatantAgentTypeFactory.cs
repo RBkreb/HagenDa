@@ -41,9 +41,8 @@ namespace HagenDa.Networking.AI
                 capability.AddGoal<EliminateEnemyGoal>()
                     .AddCondition<HasKnownEnemy>(Comparison.SmallerThanOrEqual, 0);
 
-                capability.AddGoal<SupportSquadGoal>();
-
-                capability.AddGoal<PatrolGoal>();
+                capability.AddGoal<PatrolGoal>()
+                    .AddCondition<IsPatrolling>(Comparison.GreaterThanOrEqual, 1);
 
                 // ============================================================
                 // ACTIONS — combat
@@ -225,14 +224,9 @@ namespace HagenDa.Networking.AI
                     .SetBaseCost(4f)
                     .SetStoppingDistance(3f);
 
-                capability.AddAction<FollowSquadAction>()
-                    .SetTarget<SquadLeaderPos>()
-                    .AddCondition<SquadLeaderAlive>(Comparison.GreaterThanOrEqual, 1)
-                    .SetBaseCost(7f)
-                    .SetStoppingDistance(5f);
-
                 capability.AddAction<WanderAction>()
                     .SetTarget<WanderPoint>()
+                    .AddEffect<IsPatrolling>(EffectType.Increase)
                     .SetBaseCost(10f)
                     .SetStoppingDistance(1f);
 
@@ -254,6 +248,7 @@ namespace HagenDa.Networking.AI
                 capability.AddWorldSensor<IsSafeSensor>().SetKey<IsSafe>();
                 capability.AddWorldSensor<SquadLeaderAliveSensor>().SetKey<SquadLeaderAlive>();
                 capability.AddWorldSensor<AllyDownedSensor>().SetKey<AllyDowned>();
+                capability.AddWorldSensor<IsPatrollingSensor>().SetKey<IsPatrolling>();
 
                 // ============================================================
                 // TARGET SENSORS (local)

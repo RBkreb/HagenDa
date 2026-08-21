@@ -31,6 +31,12 @@ namespace HagenDa.Networking.AI
     public class SquadLeaderAlive : WorldKeyBase { }
     public class AllyDowned : WorldKeyBase { }
 
+    // ---- Continuous-behaviour markers. The sensors always return 0, so the goal is
+    // only reachable through the action's effect; the agent keeps doing it forever
+    // (the action re-resolves after each Wait). ----
+    public class IsPatrolling : WorldKeyBase { }
+    public class IsWithSquad : WorldKeyBase { }
+
     // ---- Loadout / equipment (Has* = has ammo available) ----
     public class HasGrenade : WorldKeyBase { }
     public class HasSmokeGrenade : WorldKeyBase { }

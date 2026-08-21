@@ -48,6 +48,7 @@ namespace HagenDa.Networking.AI
         private bool enemyInSight;
         private bool atCapturePoint;
         private bool inGarrison;
+        private bool isSquadLeader;
 
         // ---- known enemies (direct vision + mark + intel broadcast) ----
         private readonly Dictionary<NetworkCombatant, float> knownEnemies = new Dictionary<NetworkCombatant, float>();
@@ -119,6 +120,8 @@ namespace HagenDa.Networking.AI
 
             // Squad leader = same-squad combatant with the smallest instance ID.
             int leaderId = int.MaxValue;
+            int selfId = self.GetInstanceID();
+            isSquadLeader = true;   // assume leader; disproved if a same-squad ally has a smaller ID
 
             var combatants = Object.FindObjectsOfType<NetworkCombatant>();
             for (int i = 0; i < combatants.Length; i++)
@@ -141,7 +144,7 @@ namespace HagenDa.Networking.AI
                         nearestMarkedEnemy = c;
 
                     // Direct vision → known enemy + broadcast to squad.
-                    if (VisionSystem.CanSee(transform, c.transform.position + Vector3.up * 0.8f))
+                    if (VisionSystem.CanSee(transform, c.transform))
                     {
                         enemyInSight = true;
                         knownEnemies[c] = Time.time;
@@ -160,6 +163,8 @@ namespace HagenDa.Networking.AI
                             leaderId = id;
                             squadLeader = c;
                         }
+                        if (id < selfId)
+                            isSquadLeader = false;
                     }
 
                     if (c.IsDead)
@@ -225,12 +230,15 @@ namespace HagenDa.Networking.AI
                             atCapturePoint = true;
 
                         bool mine = p.ownerTeam == myTeam;
-                        bool contested = p.ownerTeam < 0 && Mathf.Abs(p.contention) > 0.1f;
-                        if (!mine && !contested) continue;
+                        // Any point not owned by us (neutral OR enemy-held) is a valid
+                        // capture target, so both teams converge on the same contested
+                        // points and fight there.
+                        bool capturable = p.ownerTeam != myTeam;
+                        if (!mine && !capturable) continue;
 
                         if (mine && (nearestOwnedPoint == null || Closer(p.transform.position, nearestOwnedPoint.transform.position, myPos)))
                             nearestOwnedPoint = p;
-                        if (contested && (nearestUncapturedPoint == null || Closer(p.transform.position, nearestUncapturedPoint.transform.position, myPos)))
+                        if (capturable && (nearestUncapturedPoint == null || Closer(p.transform.position, nearestUncapturedPoint.transform.position, myPos)))
                             nearestUncapturedPoint = p;
                     }
                 }
@@ -366,6 +374,7 @@ namespace HagenDa.Networking.AI
         public bool IsEnemyInSight() => enemyInSight;
         public bool IsAtCapturePoint() => atCapturePoint;
         public bool IsInGarrison() => inGarrison;
+        public bool IsSquadLeader() => isSquadLeader;
 
         // ---- equipment ----
 

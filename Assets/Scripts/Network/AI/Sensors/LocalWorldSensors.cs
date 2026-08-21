@@ -173,4 +173,20 @@ namespace HagenDa.Networking.AI
             return data != null && data.GetNearestDownedAlly() != null;
         }
     }
+
+    // Continuous-behaviour sensors: always 0, so the goal is never "already met"
+    // and the resolver keeps the agent performing the corresponding action.
+    public class IsPatrollingSensor : LocalWorldSensorBase
+    {
+        public override void Created() { }
+        public override void Update() { }
+        public override SenseValue Sense(IActionReceiver agent, IComponentReference references) => 0;
+    }
+
+    public class IsWithSquadSensor : LocalWorldSensorBase
+    {
+        public override void Created() { }
+        public override void Update() { }
+        public override SenseValue Sense(IActionReceiver agent, IComponentReference references) => 0;
+    }
 }

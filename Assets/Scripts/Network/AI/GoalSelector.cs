@@ -7,8 +7,12 @@ namespace HagenDa.Networking.AI
     /// <summary>
     /// PHASE9 goal selector. GOAP resolves which action chain satisfies a requested
     /// goal, but does not decide *which* goal to pursue — this component does, using a
-    /// hybrid "hard rules + utility" algorithm every 2 seconds. It also applies the
-    /// posture (stand attack / crouch defend / prone under fire).
+    /// hybrid "hard rules + utility" algorithm every 2 seconds.
+    ///
+    /// All squad members share the same objective (no leader-following): with an enemy
+    /// in sight they attack, otherwise they push the nearest capturable point, then
+    /// defend an owned point, then patrol. Death freezes all behaviour (the corpse
+    /// stays prone) until the redeploy restores it.
     /// </summary>
     public class GoalSelector : NetworkBehaviour
     {
@@ -17,10 +21,10 @@ namespace HagenDa.Networking.AI
         public float surviveHealthThreshold = 25f;
 
         [Header("Utility")]
+        [Tooltip("有敌人时改用硬规则优先攻击（不再依赖此权重）。")]
+        public float eliminateWeight = 60f;
         public float captureWeight = 50f;
         public float defendWeight = 30f;
-        public float eliminateWeight = 40f;
-        public float supportWeight = 25f;
         public float patrolWeight = 10f;
 
         [Tooltip("Goal 评估间隔（秒）。")]
@@ -63,6 +67,14 @@ namespace HagenDa.Networking.AI
             }
             matchOverFrozen = false;
 
+            // Death freezes all behaviour: the corpse stays prone and never re-evaluates
+            // until the redeploy restores health.
+            if (data != null && data.Health != null && data.Health.IsDead)
+            {
+                if (move != null) move.StopMoving();
+                return;
+            }
+
             timer += Time.deltaTime;
             if (timer < evaluateInterval) return;
             timer = 0f;
@@ -90,6 +102,16 @@ namespace HagenDa.Networking.AI
                 return;
             }
 
+            // ---- Hard rule: engage known enemies (direct vision / mark / intel) ----
+            // A hard rule (not a utility weight) so it cannot be silently overridden
+            // by a stale serialized weight in the prefab.
+            if (data.HasKnownEnemy())
+            {
+                provider.RequestGoal<EliminateEnemyGoal>();
+                ApplyPosture(AIPosture.Stand);
+                return;
+            }
+
             // ---- Squad order override (future LLM commander) ----
             var sq = order != null ? order.CurrentOrder : SquadOrderType.None;
             switch (sq)
@@ -107,38 +129,27 @@ namespace HagenDa.Networking.AI
                     ApplyPosture(AIPosture.Stand);
                     return;
                 case SquadOrderType.Regroup:
-                    provider.RequestGoal<SupportSquadGoal>();
-                    ApplyPosture(AIPosture.Stand);
-                    return;
                 case SquadOrderType.Hold:
-                    provider.RequestGoal<PatrolGoal>();
-                    ApplyPosture(AIPosture.Crouch);
-                    return;
+                    // No follower goal; fall through to shared-objective selection.
+                    break;
             }
 
-            // ---- Utility scoring ----
+            // ---- Utility scoring (no known enemy; enemy handled by hard rule) ----
             int ammo = data.GetAmmoLevel();
             int health = data.GetHealthLevel();
-            bool contested = data.GetNearestUncapturedPoint() != null;
+            bool capturable = data.GetNearestUncapturedPoint() != null;
             bool owned = data.GetNearestOwnedPoint() != null;
-            bool hasEnemy = data.HasKnownEnemy();
-            bool leader = data.GetSquadLeader() != null;
 
             float resupply = (100 - ammo) * 0.4f + (100 - health) * 0.3f;
-            float capture = contested ? captureWeight : 0f;
+            float capture = capturable ? captureWeight : 0f;
             float defend = owned ? defendWeight : 0f;
-            float eliminate = hasEnemy ? eliminateWeight : 0f;
-            float support = leader ? supportWeight : 0f;
             float patrol = patrolWeight;
 
-            // Pick the highest-scoring goal.
             float best = resupply;
             GoalKind kind = GoalKind.Resupply;
 
             if (capture > best) { best = capture; kind = GoalKind.Capture; }
             if (defend > best) { best = defend; kind = GoalKind.Defend; }
-            if (eliminate > best) { best = eliminate; kind = GoalKind.Eliminate; }
-            if (support > best) { best = support; kind = GoalKind.Support; }
             if (patrol > best) { best = patrol; kind = GoalKind.Patrol; }
 
             switch (kind)
@@ -155,14 +166,6 @@ namespace HagenDa.Networking.AI
                     provider.RequestGoal<DefendObjectiveGoal>();
                     ApplyPosture(AIPosture.Crouch);
                     break;
-                case GoalKind.Eliminate:
-                    provider.RequestGoal<EliminateEnemyGoal>();
-                    ApplyPosture(AIPosture.Stand);
-                    break;
-                case GoalKind.Support:
-                    provider.RequestGoal<SupportSquadGoal>();
-                    ApplyPosture(AIPosture.Stand);
-                    break;
                 default:
                     provider.RequestGoal<PatrolGoal>();
                     ApplyPosture(AIPosture.Stand);
@@ -170,7 +173,7 @@ namespace HagenDa.Networking.AI
             }
         }
 
-        private enum GoalKind { Resupply, Capture, Defend, Eliminate, Support, Patrol }
+        private enum GoalKind { Resupply, Capture, Defend, Patrol }
 
         private void ApplyPosture(AIPosture posture)
         {

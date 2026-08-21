@@ -14,9 +14,20 @@ namespace HagenDa.Networking.AI
     /// soon as it knows a target (direct vision, mark, or intel broadcast). The
     /// per-weapon shooting profile decides hip/ADS and burst cadence; the AI ignores
     /// recoil (applyRecoil=false) but still accumulates spread.
+    ///
+    /// Aiming: the AI picks a visible aim point (foot / body / head) so it shoots the
+    /// exposed part when the target is behind cover, and its horizontal turn is
+    /// rate-limited (360°/s) so it cannot snap 180° instantly — it only fires once
+    /// it has mostly turned toward the target.
     /// </summary>
     public class AttackEnemyAction : GoapActionBase<AttackEnemyAction.Data>
     {
+        /// <summary>Max horizontal turn rate (degrees per second).</summary>
+        private const float MaxTurnDegPerSec = 360f;
+
+        /// <summary>Fire only once the horizontal aim error is below this (degrees).</summary>
+        private const float FireYawThreshold = 25f;
+
         public override IActionRunState Perform(IMonoAgent agent, Data data, IActionContext context)
         {
             var enemy = data.DataProvider.GetNearestKnownEnemy();
@@ -25,19 +36,45 @@ namespace HagenDa.Networking.AI
 
             var self = agent.Transform;
 
-            // Face the target (horizontal only).
-            Vector3 to = enemy.transform.position - self.position;
-            to.y = 0f;
-            if (to.sqrMagnitude > 0.0001f)
-                self.rotation = Quaternion.LookRotation(to);
+            // Horizontal turn target (rate-limited).
+            Vector3 toEnemy = enemy.transform.position - self.position;
+            toEnemy.y = 0f;
+            Quaternion targetRot = toEnemy.sqrMagnitude > 0.0001f
+                ? Quaternion.LookRotation(toEnemy)
+                : self.rotation;
 
-            float dist = to.magnitude;
-            var (aim, fire) = data.DataProvider.Shooting.DecideShooting(dist);
+            float maxStep = MaxTurnDegPerSec * context.DeltaTime;
+            self.rotation = Quaternion.RotateTowards(self.rotation, targetRot, maxStep);
 
+            float yawError = Quaternion.Angle(self.rotation, targetRot);
+            bool facingTarget = yawError <= FireYawThreshold;
+
+            // Pick a visible aim point (foot / body / head) and build the fire
+            // direction from the current horizontal facing + vertical elevation to
+            // that point. While turning, the horizontal part lags → shots miss.
+            Vector3 aimPoint = VisionSystem.GetVisibleAimPoint(self, enemy.transform);
             Vector3 eye = self.position + Vector3.up * 0.8f;
-            data.Gun.Tick(fire, aim, eye, self.forward, false);
 
-            return ActionRunState.Continue;
+            Vector3 forwardFlat = self.forward;
+            forwardFlat.y = 0f;
+            if (forwardFlat.sqrMagnitude < 0.0001f) forwardFlat = Vector3.forward;
+            forwardFlat.Normalize();
+
+            Vector3 toAim = aimPoint - eye;
+            float hDist = new Vector3(toAim.x, 0f, toAim.z).magnitude;
+            float pitch = Mathf.Atan2(toAim.y, Mathf.Max(0.01f, hDist)) * Mathf.Rad2Deg;
+            Vector3 right = Vector3.Cross(Vector3.up, forwardFlat).normalized;
+            Vector3 fireDir = Quaternion.AngleAxis(pitch, right) * forwardFlat;
+
+            float dist = hDist;
+            var (aim, fire) = data.DataProvider.Shooting.DecideShooting(dist);
+            fire = fire && facingTarget;
+
+            data.Gun.Tick(fire, aim, eye, fireDir, false);
+
+            // ContinueOrResolve (not Continue): let a higher-priority goal (e.g.
+            // Survive when health drops) interrupt mid-combat.
+            return ActionRunState.ContinueOrResolve;
         }
 
         public class Data : IActionData
@@ -63,7 +100,7 @@ namespace HagenDa.Networking.AI
             // Wait until the reload cycle completes (or no gun).
             if (data.Gun == null || !data.Gun.IsReloading)
                 return ActionRunState.Completed;
-            return ActionRunState.Continue;
+            return ActionRunState.ContinueOrResolve;
         }
 
         public class Data : IActionData

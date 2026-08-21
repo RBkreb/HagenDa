@@ -181,6 +181,12 @@ namespace HagenDa.Networking
         {
             dead = value;
 
+            // PHASE9: pause/resume the GOAP agent on death/rescue/redeploy. Pausing
+            // freezes action execution so the corpse neither moves nor re-plans.
+            var agentBehaviour = GetComponent<CrashKonijn.Agent.Runtime.AgentBehaviour>();
+            if (agentBehaviour != null)
+                agentBehaviour.IsPaused = value;
+
             if (agent == null)
                 agent = GetComponent<NavMeshAgent>();
             if (agent != null)
@@ -215,6 +221,16 @@ namespace HagenDa.Networking
             dead = false;
             state = AIState.Wander;
             currentObjective = null;
+
+            // PHASE9: 停止 GOAP 当前 action 并重新规划。否则 AgentBehaviour 的 State
+            // 会卡在死亡前的 PerformingAction，ActionRunner 因 `State == PerformingAction`
+            // 短路而不再驱动移动，AI 会停在 GR 不去占点。
+            var agentBehaviour = GetComponent<CrashKonijn.Agent.Runtime.AgentBehaviour>();
+            if (agentBehaviour != null)
+            {
+                agentBehaviour.IsPaused = false;
+                agentBehaviour.StopAction(resolveAction: true);
+            }
 
             if (agent == null)
                 agent = GetComponent<NavMeshAgent>();
