@@ -70,6 +70,14 @@ namespace HagenDa.Networking
         // PHASE8: 瞬发型装备（快速机动装置）冷却剩余秒数（客户端 HUD 显示）。
         [SyncVar] public float dashCooldownRemaining;
 
+        // PHASE8 干扰器：免疫标记剩余秒数 + 冷却剩余秒数。
+        [SyncVar] public float jammerImmuneRemaining;
+        [SyncVar] public float jammerCooldownRemaining;
+
+        // 干扰器免疫时长 / 冷却时长。
+        public const float JammerImmuneDuration = 30f;
+        public const float JammerCooldownDuration = 30f;
+
         public int Count => equipmentList != null ? equipmentList.Count : 0;
         public bool IsEmpDisabled => empExposure > 0f;
 
@@ -252,6 +260,10 @@ namespace HagenDa.Networking
             channelIndex = -1;
             channelDef = null;
             dashCooldownRemaining = 0f;
+            jammerImmuneRemaining = 0f;
+            jammerCooldownRemaining = 0f;
+            var combatant = GetComponent<NetworkCombatant>();
+            if (combatant != null) combatant.markImmune = false;
 
             SyncSelected();
             SyncSlotAmmo();
@@ -540,6 +552,29 @@ namespace HagenDa.Networking
         {
             if (!use || Time.time < nextUseTime[i]) return;
             if (IsEmpDisabled && def.empVulnerable) return;
+
+            // PHASE8 干扰器：清除当前标记 + 30s 免疫，免疫结束后 30s 冷却恢复 1 次。
+            if (def.type == EquipmentType.Jammer)
+            {
+                if (ammo[i] <= 0 || jammerImmuneRemaining > 0f || jammerCooldownRemaining > 0f)
+                    return;
+
+                ammo[i]--;
+                SyncSelected();
+                SyncSlotAmmo();
+
+                // 清除现有标记。
+                var combatant = GetComponent<NetworkCombatant>();
+                if (combatant != null)
+                    combatant.ClearMark();
+
+                // 免疫标记 30s（同步给 NetworkCombatant 供 SetMarked 拦截）。
+                jammerImmuneRemaining = JammerImmuneDuration;
+                if (combatant != null)
+                    combatant.markImmune = true;
+                return;
+            }
+
             // move is the local WASD vector (x strafe / y forward) — convert to a
             // world-space horizontal direction. No input defaults to forward.
             Vector3 worldDir = transform.forward * move.y + transform.right * move.x;
@@ -671,6 +706,35 @@ namespace HagenDa.Networking
             if (dashCooldownRemaining > 0f)
                 dashCooldownRemaining = Mathf.Max(0f, dashCooldownRemaining - dt);
 
+            // PHASE8 干扰器状态机：免疫 → 冷却 → 恢复 1 次使用。
+            var combatant = GetComponent<NetworkCombatant>();
+            if (jammerImmuneRemaining > 0f)
+            {
+                jammerImmuneRemaining = Mathf.Max(0f, jammerImmuneRemaining - dt);
+                if (jammerImmuneRemaining <= 0f)
+                {
+                    // 免疫结束 → 进入冷却。
+                    if (combatant != null)
+                        combatant.markImmune = false;
+                    jammerCooldownRemaining = JammerCooldownDuration;
+                }
+            }
+            else if (jammerCooldownRemaining > 0f)
+            {
+                jammerCooldownRemaining = Mathf.Max(0f, jammerCooldownRemaining - dt);
+                if (jammerCooldownRemaining <= 0f)
+                {
+                    // 冷却结束 → 恢复 1 次使用。
+                    int j = IndexOfType(EquipmentType.Jammer);
+                    if (j >= 0 && ammo != null && j < ammo.Length)
+                    {
+                        ammo[j] = Mathf.Min(1, ammo[j] + 1);
+                        SyncSelected();
+                        SyncSlotAmmo();
+                    }
+                }
+            }
+
             // Channeled-use completion.
             if (channeling)
             {
@@ -755,6 +819,15 @@ namespace HagenDa.Networking
         public void ApplyEmp(float duration)
         {
             empExposure = Mathf.Max(empExposure, duration);
+
+            // PHASE8 干扰器：EMP 干扰可提前终止免疫状态 → 进入冷却。
+            if (jammerImmuneRemaining > 0f)
+            {
+                jammerImmuneRemaining = 0f;
+                var combatant = GetComponent<NetworkCombatant>();
+                if (combatant != null) combatant.markImmune = false;
+                jammerCooldownRemaining = JammerCooldownDuration;
+            }
         }
     }
 }

@@ -15,6 +15,9 @@ namespace HagenDa.Networking
 
         protected override void OnImpact()
         {
+            // PHASE9: server-side smoke registry so AI vision can be blocked by smoke.
+            ServerSmokeRegistry.Register(transform.position, concentration, radius, decayTime);
+
             RpcSmokeVisual(transform.position, concentration, radius, decayTime);
         }
 

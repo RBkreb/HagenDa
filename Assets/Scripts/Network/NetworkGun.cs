@@ -24,6 +24,12 @@ namespace HagenDa.Networking
         public GameObject bulletPrefab;
         public int bulletPoolCapacity = 60;
 
+        [Header("AI shooting (PHASE9)")]
+        [Tooltip("AI 免后座力：false 时 recoil 不累积（仅散布影响）。")]
+        public bool applyRecoil = true;
+        [Tooltip("AI 散布难度乘数：<1 更准（精英），>1 更散（新兵）。")]
+        public float spreadMultiplier = 1f;
+
         [Header("First-person presentation (owner only)")]
         public Transform gunModel;                 // M4 viewmodel under the camera
         public Vector3 hipPosition = new Vector3(0.28f, -0.24f, 0.45f);
@@ -306,8 +312,9 @@ namespace HagenDa.Networking
             nextFireTime = Time.time + definition.FireInterval;
 
             // Spread grows per shot (clamped to the current max), recoil accumulates.
-            bloom = Mathf.Min(currentMaxSpread, bloom + definition.spreadPerShot);
-            recoil += definition.screenRecoilPerShot;
+            // PHASE9: AI 通过 spreadMultiplier 缩放散布，applyRecoil=false 免后座力。
+            bloom = Mathf.Min(currentMaxSpread, bloom + definition.spreadPerShot * spreadMultiplier);
+            if (applyRecoil) recoil += definition.screenRecoilPerShot;
 
             Vector3 dir = ComputeFireDirection(aimForward, recoil, bloom);
             SpawnBullet(aimOrigin, dir);

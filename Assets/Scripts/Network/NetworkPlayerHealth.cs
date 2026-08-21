@@ -36,6 +36,9 @@ namespace HagenDa.Networking
 
         public bool IsDead => health <= 0f;
 
+        /// <summary>PHASE9: 最近一次血量实际下降的时间（AI 判断 IsUnderFire）。</summary>
+        public float LastDamageTime => lastDamageTime;
+
         private bool deathHandled;   // server-side idempotency guard (health is already 0 when Die runs)
         private float lastDamageTime;
         private float regenAccumulator;

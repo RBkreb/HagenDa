@@ -4,6 +4,14 @@ using UnityEngine.AI;
 
 namespace HagenDa.Networking
 {
+    /// <summary>PHASE9 AI posture (goal-driven).</summary>
+    public enum AIPosture
+    {
+        Stand,
+        Crouch,
+        Prone
+    }
+
     /// <summary>
     /// Server-only AI entity: NavMeshAgent pathfinding with a simple
     /// Wander / Seek / Attack state machine. Reuses <see cref="NetworkCombat"/> for
@@ -36,7 +44,12 @@ namespace HagenDa.Networking
         [Header("Posture")]
         public GameObject visual;       // upright capsule mesh (Body)
         public float standHeight = 1.8f;
+        public float crouchHeight = 0.9f;
         public float proneHeight = 0.5f;
+
+        [Header("PHASE9 GOAP")]
+        [Tooltip("true = 由 GOAP 驱动行为（GoalSelector + Actions）；false = 旧 FSM。")]
+        public bool useGoap = false;
 
         private NavMeshAgent agent;
         private CapsuleCollider capsule;
@@ -70,7 +83,8 @@ namespace HagenDa.Networking
             if (equipment == null)
                 equipment = GetComponent<NetworkEquipment>();
 
-            RefreshTarget();
+            if (!useGoap)
+                RefreshTarget();
 
             // PHASE7: 阵营分配后染色（延迟一帧等 NetworkMatchManager 分配 teamId）。
             Invoke(nameof(ApplyTeamColor), 0.2f);
@@ -244,11 +258,13 @@ namespace HagenDa.Networking
                 {
                     // Lie flat (direction Z): vertical extent is the capsule diameter.
                     capsule.direction = 2;
+                    capsule.height = proneHeight;
                     capsule.center = new Vector3(0f, proneHeight * 0.5f, 0f);
                 }
                 else
                 {
                     capsule.direction = 1; // Y (upright)
+                    capsule.height = standHeight;
                     capsule.center = new Vector3(0f, standHeight * 0.5f, 0f);
                 }
             }
@@ -270,10 +286,47 @@ namespace HagenDa.Networking
             }
         }
 
+        /// <summary>
+        /// PHASE9 姿态控制：进攻站立 / 防守蹲下 / 被压制趴下。
+        /// </summary>
+        public void SetAIPosture(AIPosture posture)
+        {
+            if (capsule == null)
+                capsule = GetComponent<CapsuleCollider>();
+
+            switch (posture)
+            {
+                case AIPosture.Prone:
+                    SetProne(true);
+                    break;
+
+                case AIPosture.Crouch:
+                    if (capsule != null)
+                    {
+                        capsule.direction = 1;
+                        capsule.height = crouchHeight;
+                        capsule.center = new Vector3(0f, crouchHeight * 0.5f, 0f);
+                    }
+                    if (visual != null)
+                    {
+                        visual.transform.localRotation = Quaternion.identity;
+                        visual.transform.localPosition = new Vector3(0f, crouchHeight * 0.5f, 0f);
+                    }
+                    break;
+
+                default: // Stand
+                    SetProne(false);
+                    break;
+            }
+        }
+
         private void Update()
         {
             if (!isServer) return;
             if (dead) return;
+
+            // PHASE9: GOAP 接管行为决策时，旧 FSM 完全停用。
+            if (useGoap) return;
 
             // PHASE7: 对局结束后冻结一切 AI 行为。
             if (NetworkMatchManager.Instance != null && NetworkMatchManager.Instance.matchOver)

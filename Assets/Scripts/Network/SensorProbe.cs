@@ -36,6 +36,9 @@ namespace HagenDa.Networking
             ownerTeam = team;
         }
 
+        /// <summary>PHASE9: the team that placed this sensor (AI deployable detection).</summary>
+        public int OwnerTeam => ownerTeam;
+
         private void OnCollisionEnter(Collision collision)
         {
             // 接触地面后立刻静止，去除物理防止漂移。

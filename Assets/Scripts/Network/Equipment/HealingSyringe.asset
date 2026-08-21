@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbdbf6de009de6c438847ac18fa36f8d, type: 3}
   m_Name: HealingSyringe
   m_EditorClassIdentifier: 
-  type: 15
+  type: 16
   displayName: "\u6CBB\u7597\u9488"
   category: 1
   instantUse: 1

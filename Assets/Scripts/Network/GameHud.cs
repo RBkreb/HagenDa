@@ -451,8 +451,17 @@ namespace HagenDa.Networking
                     {
                         ammoText.text = def.displayName;
                         modeText.text = equipment.IsEmpDisabled ? "[EMP]" : "";
-                        // 瞬发型（快速机动装置）：显示冷却倒计时而非剩余次数。
-                        if (def.useStyle == EquipmentUseStyle.SelfInstant)
+                        // 瞬发型（快速机动装置/干扰器）：显示状态而非剩余次数。
+                        if (def.type == EquipmentType.Jammer)
+                        {
+                            if (equipment.jammerImmuneRemaining > 0f)
+                                equipmentText.text = $"免疫标记 {equipment.jammerImmuneRemaining:F0}s";
+                            else if (equipment.jammerCooldownRemaining > 0f)
+                                equipmentText.text = $"冷却 {equipment.jammerCooldownRemaining:F0}s";
+                            else
+                                equipmentText.text = "就绪";
+                        }
+                        else if (def.useStyle == EquipmentUseStyle.SelfInstant)
                         {
                             equipmentText.text = equipment.dashCooldownRemaining > 0f
                                 ? $"冷却 {equipment.dashCooldownRemaining:F0}s"
@@ -512,8 +521,19 @@ namespace HagenDa.Networking
                     var def = equipment.equipmentList[idx];
                     if (def != null)
                     {
-                        // 瞬发型显示冷却/就绪，其余显示剩余次数。
-                        if (def.useStyle == EquipmentUseStyle.SelfInstant)
+                        // 干扰器 / 瞬发型：显示状态（免疫/冷却/就绪），其余显示剩余次数。
+                        if (def.type == EquipmentType.Jammer)
+                        {
+                            string st;
+                            if (equipment.jammerImmuneRemaining > 0f)
+                                st = $"免疫{equipment.jammerImmuneRemaining:F0}s";
+                            else if (equipment.jammerCooldownRemaining > 0f)
+                                st = $"冷却{equipment.jammerCooldownRemaining:F0}s";
+                            else
+                                st = "就绪";
+                            sb.AppendLine($"{slotNames[slot]}: {def.displayName} {st}");
+                        }
+                        else if (def.useStyle == EquipmentUseStyle.SelfInstant)
                         {
                             string st = equipment.dashCooldownRemaining > 0f
                                 ? $"冷却{equipment.dashCooldownRemaining:F0}s"

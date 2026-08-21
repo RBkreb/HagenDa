@@ -27,6 +27,9 @@ namespace HagenDa.Networking
         [Tooltip("标记到期时间戳 (NetworkTime.time). -1 = 未标记.")]
         [SyncVar] public double markedUntil = -1.0;
 
+        [Tooltip("PHASE8 干扰器：免疫标记期间任何标记无效。")]
+        [SyncVar] public bool markImmune;
+
         public bool IsMarked => NetworkTime.time < markedUntil;
 
         private NetworkPlayerHealth health;
@@ -46,11 +49,20 @@ namespace HagenDa.Networking
             NetworkMatchManager.RegisterCombatant(this);
         }
 
-        /// <summary>Mark this entity until the given network time (server).</summary>
+        /// <summary>Mark this entity until the given network time (server).
+        /// 干扰器免疫期间忽略新标记。</summary>
         [Server]
         public void SetMarked(double until)
         {
+            if (markImmune) return;
             markedUntil = until;
+        }
+
+        /// <summary>立即清除当前标记。</summary>
+        [Server]
+        public void ClearMark()
+        {
+            markedUntil = -1.0;
         }
 
         private void Update()

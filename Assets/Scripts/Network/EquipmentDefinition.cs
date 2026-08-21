@@ -29,6 +29,7 @@ namespace HagenDa.Networking
         // 部署 / 自身 / 特有
         Interceptor,        // 拦截系统
         QuickDash,          // 快速机动装置
+        Jammer,             // 干扰器（瞬发，清除标记 + 30s 免疫标记）
         ArmorPlate,         // 护甲板
         BlastShield,        // 防爆盾
         HealingSyringe,     // 治疗针（特有）

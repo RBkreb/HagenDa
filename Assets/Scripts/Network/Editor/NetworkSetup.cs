@@ -7,6 +7,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem.UI;
 using Unity.AI.Navigation;
 using cowsins;
+using CrashKonijn.Agent.Runtime;
+using CrashKonijn.Goap.Runtime;
+using HagenDa.Networking.AI;
 
 namespace HagenDa.Networking.EditorTools
 {
@@ -274,10 +277,17 @@ namespace HagenDa.Networking.EditorTools
             BuildMatchScene("Assets/Scenes/Phase8.scene");
         }
 
+        [MenuItem("HagenDa/Create Phase9 Scene")]
+        public static void CreatePhase9Scene()
+        {
+            BuildMatchScene("Assets/Scenes/Phase9.scene");
+        }
+
         /// <summary>
-        /// Builds the PHASE7/8 100×200 match scene (GR + 2 HQ + teams + NavMesh) with
-        /// the current player/AI prefabs (which now include the PHASE8 MapIndicator,
-        /// GameHud and DeployScreen components).
+        /// Builds the PHASE7/8/9 100×200 match scene (GR + 2 HQ + teams + NavMesh) with
+        /// the current player/AI prefabs. PHASE9 adds the GOAP components (AgentBehaviour,
+        /// GoapActionProvider, AIDataProvider, GoalSelector, etc.) and the global Goap
+        /// controller to the AI entities.
         /// </summary>
         private static void BuildMatchScene(string scenePath)
         {
@@ -337,6 +347,9 @@ namespace HagenDa.Networking.EditorTools
             var mm = mmGo.AddComponent<NetworkMatchManager>();
             mm.garrisons = new System.Collections.Generic.List<GarrisonZone> { redGr, blueGr };
             mm.capturePoints = new System.Collections.Generic.List<CapturePoint> { hq1, hq2 };
+
+            // --- GOAP (PHASE9): global controller + code-configured agent type ---
+            EnsureGoapBehaviour();
 
             // --- Spawn points (player always spawns at red GR) ---
             CreateSpawnPoint("RedSpawn1", redGr.GetRandomDeployPoint() + Vector3.up * 1f);
@@ -1356,6 +1369,15 @@ namespace HagenDa.Networking.EditorTools
             qd.empVulnerable = true;
             list.Add(qd);
 
+            // 12b. 干扰器（瞬发型，清除标记 + 30s 免疫标记；EMP 可禁/可提前终止）
+            var jm = GetOrCreateEquipmentDef("Jammer");
+            jm.type = EquipmentType.Jammer;
+            jm.displayName = "干扰器";
+            jm.useStyle = EquipmentUseStyle.SelfInstant;
+            jm.maxCarry = 1; jm.supplyCost = 0;
+            jm.empVulnerable = true;
+            list.Add(jm);
+
             // 13. 护甲板
             var ap = GetOrCreateEquipmentDef("ArmorPlate");
             ap.type = EquipmentType.ArmorPlate;
@@ -1417,6 +1439,7 @@ namespace HagenDa.Networking.EditorTools
                     case EquipmentType.QuickDash:
                     case EquipmentType.HealingSyringe:
                     case EquipmentType.ArmorPlate:
+                    case EquipmentType.Jammer:         // 干扰器：瞬发型
                     case EquipmentType.Grenade:   // 手雷：瞬发型（z 键直接投掷）
                     case EquipmentType.SmokeGrenade:   // 烟雾手雷：瞬发型
                     case EquipmentType.EmpGrenade:     // 电磁手雷：瞬发型
@@ -1602,6 +1625,24 @@ namespace HagenDa.Networking.EditorTools
             equipment.equipmentList = equipmentList;
             ai.equipment = equipment;
 
+            // PHASE9 GOAP: data layer, goal selector, squad order receiver and the
+            // GOAP agent wiring (AgentBehaviour + GoapActionProvider + movement).
+            root.AddComponent<AIDataProvider>();
+            root.AddComponent<SquadOrderReceiver>();
+            root.AddComponent<GoalSelector>();
+
+            var agentBehaviour = root.AddComponent<AgentBehaviour>();
+            var goapProvider = root.AddComponent<GoapActionProvider>();
+            agentBehaviour.ActionProviderBase = goapProvider;
+            root.AddComponent<AgentNavMeshMove>();
+            root.AddComponent<GoapAgentInitializer>();
+
+            // AI 免后座力（射击规则系统）；散布难度乘数默认 1.0。
+            gun.applyRecoil = false;
+
+            // 启用 GOAP 驱动（旧 FSM 停用）。
+            ai.useGoap = true;
+
             // Visual body.
             // Red material for AI body (persistent, HDRP-aware — see CreatePersistentMaterial).
             var aiMat = CreatePersistentMaterial(
@@ -1725,6 +1766,24 @@ namespace HagenDa.Networking.EditorTools
             var go = (GameObject)PrefabUtility.InstantiatePrefab(aiPrefab);
             go.name = "AIEntity";
             go.transform.position = pos;
+        }
+
+        /// <summary>
+        /// PHASE9: create the global GOAP controller (if missing) with a reactive
+        /// controller and the code-configured Combatant agent type. The AIEntity
+        /// prefab's GoapAgentInitializer resolves "Combatant" from this at runtime.
+        /// </summary>
+        private static void EnsureGoapBehaviour()
+        {
+            var existing = Object.FindObjectOfType<GoapBehaviour>();
+            if (existing != null) return;
+
+            var goapGo = new GameObject("Goap");
+            var goap = goapGo.AddComponent<GoapBehaviour>();
+            goapGo.AddComponent<ReactiveControllerBehaviour>();
+
+            var factory = goapGo.AddComponent<CombatantAgentTypeFactory>();
+            goap.agentTypeConfigFactories.Add(factory);
         }
 
         private static void RegisterSpawnPrefabs(params GameObject[] prefabs)

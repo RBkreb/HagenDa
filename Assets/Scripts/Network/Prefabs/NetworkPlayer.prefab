@@ -20,10 +20,10 @@ GameObject:
   - component: {fileID: 2737380012179938336}
   - component: {fileID: 7025107502316937914}
   - component: {fileID: 5529676958996288014}
+  - component: {fileID: 1941879287338232598}
   - component: {fileID: 3271674328394960880}
   - component: {fileID: 6750311998941298034}
   - component: {fileID: 5789011040648113979}
-  - component: {fileID: 1941879287338232598}
   m_Layer: 0
   m_HasEditorInfo: 1
   m_Name: NetworkPlayer
@@ -283,6 +283,7 @@ MonoBehaviour:
   teamId: -1
   squadId: -1
   markedUntil: -1
+  markImmune: 0
 --- !u!114 &2737380012179938336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -330,6 +331,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   diameter: 4
   friendlyRevealRadius: 50
+--- !u!114 &1941879287338232598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634328753906994812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc2e0c3ced26c546abada6aacdd8427, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  diameter: 0.15
+  headOffset: 0.1
+  revealRadius: 50
 --- !u!114 &3271674328394960880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -375,6 +391,8 @@ MonoBehaviour:
   bulletPrefab: {fileID: 5926176164332243332, guid: dcb3f61632dbb1746985a4ecc29c1369,
     type: 3}
   bulletPoolCapacity: 60
+  applyRecoil: 1
+  spreadMultiplier: 1
   gunModel: {fileID: 902713417374327197}
   hipPosition: {x: 0.28, y: -0.24, z: 0.45}
   adsPosition: {x: 0, y: -0.18, z: 0.3}
@@ -418,12 +436,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 69bddee006a421a4b98a9f6276f94f04, type: 2}
   - {fileID: 11400000, guid: b9bf681d9c53d794fbea8ca10b4c9a33, type: 2}
   - {fileID: 11400000, guid: 406108a7bed5f7947b85907a256400f5, type: 2}
+  - {fileID: 11400000, guid: 84ce2a9bbc201ee44b8e58519b2b24d7, type: 2}
   - {fileID: 11400000, guid: e0ead184a3c43b5428750d4d856351ab, type: 2}
+  - {fileID: 11400000, guid: 1e756ec287a58554a86724f5c69e9313, type: 2}
   - {fileID: 11400000, guid: cad4a8be1cf43b84daa1ee06c3ba3157, type: 2}
   - {fileID: 11400000, guid: f6449bc34f7c8fc4ebc4387f723e440a, type: 2}
   - {fileID: 11400000, guid: 25d9ef986e04a6048ad67396d3323b84, type: 2}
   - {fileID: 11400000, guid: 9a734e141d3ed4b4191f0bd919b5f058, type: 2}
-  - {fileID: 11400000, guid: 84ce2a9bbc201ee44b8e58519b2b24d7, type: 2}
   controller: {fileID: 7971186896382879504}
   selection: -1
   selectedAmmo: 0
@@ -436,21 +455,8 @@ MonoBehaviour:
   specialIndex: -1
   throwableIndex: -1
   dashCooldownRemaining: 0
---- !u!114 &1941879287338232598
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1634328753906994812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6dc2e0c3ced26c546abada6aacdd8427, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  diameter: 0.15
-  headOffset: 0.1
-  revealRadius: 50
+  jammerImmuneRemaining: 0
+  jammerCooldownRemaining: 0
 --- !u!1 &5844093405414719529
 GameObject:
   m_ObjectHideFlags: 0

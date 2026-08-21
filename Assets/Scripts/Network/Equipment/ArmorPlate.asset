@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbdbf6de009de6c438847ac18fa36f8d, type: 3}
   m_Name: ArmorPlate
   m_EditorClassIdentifier: 
-  type: 13
+  type: 14
   displayName: "\u62A4\u7532\u677F"
   category: 0
   instantUse: 1

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbdbf6de009de6c438847ac18fa36f8d, type: 3}
+  m_Name: Jammer
+  m_EditorClassIdentifier: 
+  type: 13
+  displayName: "\u5E72\u6270\u5668"
+  category: 0
+  instantUse: 1
+  deployCap: 0
+  maxCarry: 1
+  supplyCost: 0
+  ammoRegenInterval: 0
+  empVulnerable: 1
+  useStyle: 4
+  boltTime: 1.5
+  channelTime: 1.5
+  throwablePrefab: {fileID: 0}
+  throwSpeed: 15
+  armorGrant: 25
+  dashCooldown: 15
+  shieldExplosionReduction: 0.6
+  empRadius: 6
+  empLifetime: 10
+  empInterfereDuration: 2
