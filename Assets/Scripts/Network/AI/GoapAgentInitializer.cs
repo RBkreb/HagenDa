@@ -11,7 +11,6 @@ namespace HagenDa.Networking.AI
     ///
     /// Server-side only (GOAP runs on the server).
     /// </summary>
-    [RequireComponent(typeof(GoapActionProvider))]
     public class GoapAgentInitializer : MonoBehaviour
     {
         public const string AgentTypeId = "Combatant";

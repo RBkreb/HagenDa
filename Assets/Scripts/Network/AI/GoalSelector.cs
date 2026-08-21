@@ -10,7 +10,6 @@ namespace HagenDa.Networking.AI
     /// hybrid "hard rules + utility" algorithm every 2 seconds. It also applies the
     /// posture (stand attack / crouch defend / prone under fire).
     /// </summary>
-    [RequireComponent(typeof(GoapActionProvider))]
     public class GoalSelector : NetworkBehaviour
     {
         [Header("Hard rules")]

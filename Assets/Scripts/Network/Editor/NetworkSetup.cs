@@ -1627,13 +1627,17 @@ namespace HagenDa.Networking.EditorTools
 
             // PHASE9 GOAP: data layer, goal selector, squad order receiver and the
             // GOAP agent wiring (AgentBehaviour + GoapActionProvider + movement).
+            // NOTE: GoapActionProvider must be added before GoalSelector /
+            // GoapAgentInitializer (they GetComponent<GoapActionProvider>() in Awake);
+            // no [RequireComponent] is used to avoid Unity auto-adding a duplicate.
             root.AddComponent<AIDataProvider>();
             root.AddComponent<SquadOrderReceiver>();
-            root.AddComponent<GoalSelector>();
 
             var agentBehaviour = root.AddComponent<AgentBehaviour>();
             var goapProvider = root.AddComponent<GoapActionProvider>();
             agentBehaviour.ActionProviderBase = goapProvider;
+
+            root.AddComponent<GoalSelector>();
             root.AddComponent<AgentNavMeshMove>();
             root.AddComponent<GoapAgentInitializer>();
 
