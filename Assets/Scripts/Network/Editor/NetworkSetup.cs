@@ -6,7 +6,6 @@ using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem.UI;
 using Unity.AI.Navigation;
-using cowsins;
 
 namespace HagenDa.Networking.EditorTools
 {
@@ -20,8 +19,6 @@ namespace HagenDa.Networking.EditorTools
     public static class NetworkSetup
     {
         private const string PrefabPath = "Assets/Scripts/Network/Prefabs/NetworkPlayer.prefab";
-        private const string FpsPrefabPath = "Assets/Scripts/Network/Prefabs/FpsEngineNetworkPlayer.prefab";
-        private const string FpsSourcePrefab = "Assets/Cowsins/Prefabs/PlayerControllers/CowsinsFPSController.prefab";
         private const string GrenadePrefabPath = "Assets/Scripts/Network/Prefabs/GrenadeThrowable.prefab";
         private const string SmokePrefabPath = "Assets/Scripts/Network/Prefabs/SmokeThrowable.prefab";
         private const string RescuePrefabPath = "Assets/Scripts/Network/Prefabs/RescueThrowable.prefab";
@@ -64,20 +61,6 @@ namespace HagenDa.Networking.EditorTools
             SaveActiveScene();
             AssetDatabase.SaveAssets();
             Debug.Log("[NetworkSetup] Done. Built player prefab and configured the active scene.");
-        }
-
-        [MenuItem("HagenDa/Setup FPS Engine Demo")]
-        public static void SetupFpsDemo()
-        {
-            EnsureFolder("Assets/Scripts/Network", "Prefabs");
-
-            GameObject playerPrefab = BuildFpsEnginePlayerPrefab();
-
-            SetupScene(playerPrefab, addTargets: true);
-
-            SaveActiveScene();
-            AssetDatabase.SaveAssets();
-            Debug.Log("[NetworkSetup] Done. Built FPS Engine player prefab and configured the active scene.");
         }
 
         [MenuItem("HagenDa/Create Physics Movement Scene")]
@@ -616,59 +599,6 @@ namespace HagenDa.Networking.EditorTools
             // Save
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             Object.DestroyImmediate(root);
-            return prefab;
-        }
-
-        // ---------------------------------------------------------------
-        // FPS ENGINE NETWORKED PREFAB
-        // ---------------------------------------------------------------
-        private static GameObject BuildFpsEnginePlayerPrefab()
-        {
-            var source = AssetDatabase.LoadAssetAtPath<GameObject>(FpsSourcePrefab);
-            if (source == null)
-            {
-                Debug.LogError($"[NetworkSetup] FPS Engine controller prefab not found at {FpsSourcePrefab}");
-                return null;
-            }
-
-            GameObject contents = PrefabUtility.LoadPrefabContents(FpsSourcePrefab);
-
-            // Remove missing scripts (e.g. HDRP HDAdditionalCameraData whose GUID
-            // doesn't resolve in Tuanjie) so SaveAsPrefabAsset doesn't refuse to save.
-            RemoveMissingScripts(contents);
-
-            // Networking
-            contents.AddComponent<NetworkIdentity>();
-
-            var nt = contents.AddComponent<NetworkTransformReliable>();
-            nt.syncDirection = SyncDirection.ClientToServer; // client-authoritative movement
-            nt.syncPosition = true;
-            nt.syncRotation = false; // FPS Engine root never rotates (look lives on camera/orientation)
-            nt.interpolatePosition = true;
-            nt.interpolateRotation = false;
-
-            contents.AddComponent<NetworkPlayerHealth>();
-
-            var fps = contents.AddComponent<NetworkFpsPlayer>();
-
-            // Remote proxy body (visible capsule for other players).
-            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            body.name = "RemoteBody";
-            body.transform.SetParent(contents.transform, false);
-            body.transform.localPosition = new Vector3(0f, 1f, 0f);
-            Object.DestroyImmediate(body.GetComponent<CapsuleCollider>());
-            body.SetActive(false);
-            fps.remoteBody = body;
-
-            // Wire references.
-            fps.playerMovement = contents.GetComponentInChildren<PlayerMovement>(true);
-            fps.weaponController = contents.GetComponentInChildren<WeaponController>(true);
-            fps.playerStats = contents.GetComponentInChildren<PlayerStats>(true);
-            fps.inputManager = contents.GetComponentInChildren<InputManager>(true);
-
-            // Save.
-            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(contents, FpsPrefabPath);
-            PrefabUtility.UnloadPrefabContents(contents);
             return prefab;
         }
 
