@@ -9,20 +9,18 @@ namespace HagenDa.Networking.AI
     /// goal, but does not decide *which* goal to pursue — this component does, using a
     /// hybrid "hard rules + utility" algorithm every 2 seconds.
     ///
-    /// All squad members share the same objective (no leader-following): with an enemy
-    /// in sight they attack, otherwise they push the nearest capturable point, then
-    /// defend an owned point, then patrol. Death freezes all behaviour (the corpse
-    /// stays prone) until the redeploy restores it.
+    /// Low-health behaviour: when health drops below threshold, the AI randomly picks
+    /// fight-or-flight if an enemy is nearby (50/50), or seeks cover / continues to
+    /// objective if no enemy. Healing is handled inline by AttackEnemyAction
+    /// (fire-and-forget syringe, usable while moving).
     /// </summary>
     public class GoalSelector : NetworkBehaviour
     {
         [Header("Hard rules")]
-        [Tooltip("残血阈值（< 此值强制 SurviveGoal）。")]
-        public float surviveHealthThreshold = 25f;
+        [Tooltip("残血阈值（< 此值触发自救/掩体/撤退）。")]
+        public float surviveHealthThreshold = 35f;
 
         [Header("Utility")]
-        [Tooltip("有敌人时改用硬规则优先攻击（不再依赖此权重）。")]
-        public float eliminateWeight = 60f;
         public float captureWeight = 50f;
         public float defendWeight = 30f;
         public float patrolWeight = 10f;
@@ -38,6 +36,7 @@ namespace HagenDa.Networking.AI
 
         private float timer;
         private bool matchOverFrozen;
+        private bool lowHealthFight;
 
         private void Awake()
         {
@@ -47,7 +46,6 @@ namespace HagenDa.Networking.AI
             ai = GetComponent<NetworkAIController>();
             move = GetComponent<AgentNavMeshMove>();
 
-            // PHASE9 分批：随机错开每个 AI 的评估相位，避免 60 AI 同帧 resolve 造成峰值。
             timer = Random.Range(0f, evaluateInterval);
         }
 
@@ -55,7 +53,6 @@ namespace HagenDa.Networking.AI
         {
             if (!isServer) return;
 
-            // Freeze everything once the match ends.
             if (NetworkMatchManager.Instance != null && NetworkMatchManager.Instance.matchOver)
             {
                 if (!matchOverFrozen)
@@ -67,8 +64,6 @@ namespace HagenDa.Networking.AI
             }
             matchOverFrozen = false;
 
-            // Death freezes all behaviour: the corpse stays prone and never re-evaluates
-            // until the redeploy restores health.
             if (data != null && data.Health != null && data.Health.IsDead)
             {
                 if (move != null) move.StopMoving();
@@ -86,25 +81,76 @@ namespace HagenDa.Networking.AI
         {
             if (data == null || provider == null) return;
 
-            // ---- Hard rules (absolute priority) ----
-            if (data.GetHealthLevel() < surviveHealthThreshold)
+            int health = data.GetHealthLevel();
+
+            // ---- Hard rule: rescue downed ally (if carrying defibrillator) ----
+            if (data.HasEquipmentAmmo(EquipmentType.Defibrillator) &&
+                data.GetNearestRescueRequest() != null)
             {
-                provider.RequestGoal<SurviveGoal>();
-                ApplyPosture(AIPosture.Crouch);
+                provider.RequestGoal<RescueAllyGoal>();
+                ApplyPosture(AIPosture.Stand);
+                if (move != null) move.SetRun(true);
                 return;
+            }
+
+            // ---- Hard rules: low health ----
+            if (health < surviveHealthThreshold)
+            {
+                // Try self-heal first (syringe or supply crate, fire-and-forget).
+                data.TrySelfHeal();
+
+                if (data.HasKnownEnemy())
+                {
+                    // Fight-or-flight: 50/50 random decision.
+                    lowHealthFight = Random.value < 0.5f;
+
+                    if (lowHealthFight)
+                    {
+                        provider.RequestGoal<EliminateEnemyGoal>();
+                        ApplyPosture(AIPosture.Stand);
+                        return;
+                    }
+                    else
+                    {
+                        provider.RequestGoal<TakeCoverGoal>();
+                        ApplyPosture(AIPosture.Prone);
+                        if (move != null) move.SetRun(true);
+                        return;
+                    }
+                }
+                else
+                {
+                    // No enemy: seek cover to heal, or keep moving to objective.
+                    // Don't retreat to GR — stay in the fight.
+                    if (data.HasEquipmentAmmo(EquipmentType.LargeSupplyCrate) && !data.IsUnderFire())
+                    {
+                        provider.RequestGoal<TakeCoverGoal>();
+                        ApplyPosture(AIPosture.Crouch);
+                        return;
+                    }
+
+                    if (data.GetNearestSupply() != null)
+                    {
+                        provider.RequestGoal<ResupplyGoal>();
+                        ApplyPosture(AIPosture.Stand);
+                        if (move != null) move.SetRun(true);
+                        return;
+                    }
+
+                    // No supply available: keep pushing objective while self-healing.
+                    // Fall through to objective selection.
+                }
             }
 
             // Self-marked + jammer available → clear the mark.
             if (data.IsSelfMarked() && data.HasEquipmentAmmo(EquipmentType.Jammer))
             {
-                provider.RequestGoal<SurviveGoal>();
+                provider.RequestGoal<EliminateEnemyGoal>();
                 ApplyPosture(AIPosture.Crouch);
                 return;
             }
 
-            // ---- Hard rule: engage known enemies (direct vision / mark / intel) ----
-            // A hard rule (not a utility weight) so it cannot be silently overridden
-            // by a stale serialized weight in the prefab.
+            // ---- Hard rule: engage known enemies ----
             if (data.HasKnownEnemy())
             {
                 provider.RequestGoal<EliminateEnemyGoal>();
@@ -130,13 +176,11 @@ namespace HagenDa.Networking.AI
                     return;
                 case SquadOrderType.Regroup:
                 case SquadOrderType.Hold:
-                    // No follower goal; fall through to shared-objective selection.
                     break;
             }
 
-            // ---- Utility scoring (no known enemy; enemy handled by hard rule) ----
+            // ---- Utility scoring (no known enemy) ----
             int ammo = data.GetAmmoLevel();
-            int health = data.GetHealthLevel();
             bool capturable = data.GetNearestUncapturedPoint() != null;
             bool owned = data.GetNearestOwnedPoint() != null;
 

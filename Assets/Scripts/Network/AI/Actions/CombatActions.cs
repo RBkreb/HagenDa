@@ -2,6 +2,7 @@ using CrashKonijn.Agent.Core;
 using CrashKonijn.Agent.Runtime;
 using CrashKonijn.Goap.Runtime;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace HagenDa.Networking.AI
 {
@@ -10,23 +11,20 @@ namespace HagenDa.Networking.AI
     // ============================================================
 
     /// <summary>
-    /// Attack the nearest known enemy. Attack range is unlimited — the AI engages as
-    /// soon as it knows a target (direct vision, mark, or intel broadcast). The
-    /// per-weapon shooting profile decides hip/ADS and burst cadence; the AI ignores
-    /// recoil (applyRecoil=false) but still accumulates spread.
-    ///
-    /// Aiming: the AI picks a visible aim point (foot / body / head) so it shoots the
-    /// exposed part when the target is behind cover, and its horizontal turn is
-    /// rate-limited (360°/s) so it cannot snap 180° instantly — it only fires once
-    /// it has mostly turned toward the target.
+    /// Attack the nearest known enemy. The AI maintains small lateral movements
+    /// (strafing) to avoid being a static target, seeks cover when under fire, and
+    /// uses tactical equipment based on the situation.
     /// </summary>
     public class AttackEnemyAction : GoapActionBase<AttackEnemyAction.Data>
     {
-        /// <summary>Max horizontal turn rate (degrees per second).</summary>
         private const float MaxTurnDegPerSec = 360f;
-
-        /// <summary>Fire only once the horizontal aim error is below this (degrees).</summary>
         private const float FireYawThreshold = 25f;
+
+        private const float StrafeInterval = 1.5f;
+        private const float StrafeDistance = 3f;
+        private const float EquipmentCheckInterval = 2f;
+        private const float CoverCheckInterval = 3f;
+        private const float CoverSearchDist = 12f;
 
         public override IActionRunState Perform(IMonoAgent agent, Data data, IActionContext context)
         {
@@ -35,23 +33,21 @@ namespace HagenDa.Networking.AI
                 return ActionRunState.Completed;
 
             var self = agent.Transform;
+            float dt = context.DeltaTime;
+            Vector3 enemyPos = enemy.transform.position;
 
-            // Horizontal turn target (rate-limited).
-            Vector3 toEnemy = enemy.transform.position - self.position;
+            // === Turn toward enemy (rate-limited) ===
+            Vector3 toEnemy = enemyPos - self.position;
             toEnemy.y = 0f;
             Quaternion targetRot = toEnemy.sqrMagnitude > 0.0001f
                 ? Quaternion.LookRotation(toEnemy)
                 : self.rotation;
-
-            float maxStep = MaxTurnDegPerSec * context.DeltaTime;
+            float maxStep = MaxTurnDegPerSec * dt;
             self.rotation = Quaternion.RotateTowards(self.rotation, targetRot, maxStep);
-
             float yawError = Quaternion.Angle(self.rotation, targetRot);
             bool facingTarget = yawError <= FireYawThreshold;
 
-            // Pick a visible aim point (foot / body / head) and build the fire
-            // direction from the current horizontal facing + vertical elevation to
-            // that point. While turning, the horizontal part lags → shots miss.
+            // === Aim and shoot ===
             Vector3 aimPoint = VisionSystem.GetVisibleAimPoint(self, enemy.transform);
             Vector3 eye = self.position + Vector3.up * 0.8f;
 
@@ -69,12 +65,187 @@ namespace HagenDa.Networking.AI
             float dist = hDist;
             var (aim, fire) = data.DataProvider.Shooting.DecideShooting(dist);
             fire = fire && facingTarget;
-
             data.Gun.Tick(fire, aim, eye, fireDir, false);
 
-            // ContinueOrResolve (not Continue): let a higher-priority goal (e.g.
-            // Survive when health drops) interrupt mid-combat.
+            // === Self-heal (fire-and-forget, can move while channeling) ===
+            data.DataProvider.TrySelfHeal();
+
+            // === Tactical equipment usage ===
+            data.EquipTimer -= dt;
+            if (data.EquipTimer <= 0f)
+            {
+                data.EquipTimer = EquipmentCheckInterval;
+                UseTacticalEquipment(data, self, enemy, eye, dist);
+            }
+
+            // === Movement: strafe or seek cover ===
+            if (data.DataProvider.IsUnderFire())
+                SeekCover(data, self, enemyPos, dt);
+            else
+                Strafe(data, self, enemyPos, dt);
+
             return ActionRunState.ContinueOrResolve;
+        }
+
+        private void Strafe(Data data, Transform self, Vector3 enemyPos, float dt)
+        {
+            data.StrafeTimer -= dt;
+            if (data.StrafeTimer > 0f) return;
+            data.StrafeTimer = StrafeInterval;
+
+            if (data.NavAgent == null || !data.NavAgent.isOnNavMesh) return;
+
+            Vector3 toEnemy = enemyPos - self.position;
+            toEnemy.y = 0f;
+            if (toEnemy.sqrMagnitude < 0.01f) return;
+
+            Vector3 perp = Vector3.Cross(Vector3.up, toEnemy.normalized).normalized;
+            if (Random.value < 0.5f) perp = -perp;
+
+            Vector3 strafePos = self.position + perp * StrafeDistance;
+            if (NavMesh.SamplePosition(strafePos, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+                data.NavAgent.SetDestination(hit.position);
+        }
+
+        private void SeekCover(Data data, Transform self, Vector3 enemyPos, float dt)
+        {
+            data.CoverTimer -= dt;
+            if (data.CoverTimer > 0f) return;
+            data.CoverTimer = CoverCheckInterval;
+
+            if (data.NavAgent == null || !data.NavAgent.isOnNavMesh) return;
+
+            var cover = CoverSystem.FindCover(self.position, enemyPos, CoverSearchDist);
+            if (cover.hasCover)
+            {
+                data.NavAgent.SetDestination(cover.coverPosition);
+                if (data.AI != null) data.AI.SetAIPosture(AIPosture.Crouch);
+            }
+            else
+            {
+                Strafe(data, self, enemyPos, dt);
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Tactical equipment: smart situational usage.
+        // ---------------------------------------------------------------
+        private void UseTacticalEquipment(Data data, Transform self,
+            NetworkCombatant enemy, Vector3 eye, float dist)
+        {
+            var dp = data.DataProvider;
+
+            // 1. Jammer — clear mark if self is marked.
+            if (dp.IsSelfMarked() && dp.HasEquipmentAmmo(EquipmentType.Jammer))
+            {
+                dp.UseEquipment(EquipmentType.Jammer, eye, self.forward);
+                return;
+            }
+
+            // 2. Smoke — when under fire: throw at feet (retreat cover).
+            if (dp.IsUnderFire())
+            {
+                if (dp.HasEquipmentAmmo(EquipmentType.SmokeGrenade))
+                {
+                    // Throw at feet: straight down.
+                    dp.UseEquipment(EquipmentType.SmokeGrenade, eye, Vector3.down);
+                    return;
+                }
+                if (dp.HasEquipmentAmmo(EquipmentType.SmokeLauncher))
+                {
+                    // Fire at feet: straight down.
+                    dp.UseEquipment(EquipmentType.SmokeLauncher, eye, Vector3.down);
+                    return;
+                }
+            }
+
+            // 3. Grenade launcher — fire when enemy is retreating OR enemies clustered (5m).
+            if (dp.HasEquipmentAmmo(EquipmentType.GrenadeLauncher) &&
+                (dp.IsEnemyRetreating() || dp.IsEnemyClustered()))
+            {
+                Vector3 dir = (enemy.transform.position - eye).normalized;
+                dp.UseEquipment(EquipmentType.GrenadeLauncher, eye, dir);
+                return;
+            }
+
+            // 4. Frag grenade — throw at medium-range enemies (15-35m).
+            if (dist > 15f && dist < 35f && dp.HasEquipmentAmmo(EquipmentType.Grenade))
+            {
+                Vector3 dir = (enemy.transform.position - eye).normalized + Vector3.up * 0.4f;
+                dir.Normalize();
+                dp.UseEquipment(EquipmentType.Grenade, eye, dir);
+                return;
+            }
+
+            // 5. EMP grenade — destroy enemy deployables (sensors).
+            var sensor = dp.GetNearestEnemySensor();
+            if (sensor != null && dp.HasEquipmentAmmo(EquipmentType.EmpGrenade))
+            {
+                float sensorDist = Vector3.Distance(self.position, sensor.transform.position);
+                if (sensorDist < 30f)
+                {
+                    Vector3 dir = (sensor.transform.position - eye).normalized + Vector3.up * 0.3f;
+                    dir.Normalize();
+                    dp.UseEquipment(EquipmentType.EmpGrenade, eye, dir);
+                    return;
+                }
+            }
+
+            // 6. Quick dash — evade when under fire (perpendicular to enemy).
+            if (dp.IsUnderFire() && dp.HasEquipmentAmmo(EquipmentType.QuickDash))
+            {
+                int slot = dp.GetEquipmentSlot(EquipmentType.QuickDash);
+                if (slot >= 0 && data.Equipment != null)
+                {
+                    int index = data.Equipment.GetSlotIndex(slot);
+                    Vector3 dashDir = Vector3.Cross(Vector3.up,
+                        (enemy.transform.position - self.position).normalized).normalized;
+                    if (Random.value < 0.5f) dashDir = -dashDir;
+                    data.Equipment.Use(index, false, eye, dashDir, Vector3.up, true);
+                    return;
+                }
+            }
+
+            // 7. Deploy supply crate when low health/ammo and safe (not under fire).
+            if ((dp.GetAmmoLevel() < 20 || dp.GetHealthLevel() < 35) &&
+                !dp.IsUnderFire() &&
+                dp.HasEquipmentAmmo(EquipmentType.LargeSupplyCrate))
+            {
+                dp.UseEquipment(EquipmentType.LargeSupplyCrate, eye, self.forward);
+                return;
+            }
+
+            // 8. Deploy sensor: at capture point with no friendly sensor OR enemy within 20m.
+            if (dp.HasEquipmentAmmo(EquipmentType.Sensor) &&
+                (dp.ShouldDeploySensorAtCapturePoint() || dp.IsEnemyWithinRange(20f)))
+            {
+                dp.UseEquipment(EquipmentType.Sensor, eye, self.forward);
+                return;
+            }
+
+            // 9. Throw supply pack to low-ammo ally.
+            var ally = dp.GetNearestLowAmmoAlly();
+            if (ally != null && dp.HasEquipmentAmmo(EquipmentType.SmallSupplyPack))
+            {
+                Vector3 dir = (ally.transform.position - eye).normalized + Vector3.up * 0.3f;
+                dir.Normalize();
+                dp.UseEquipment(EquipmentType.SmallSupplyPack, eye, dir);
+                return;
+            }
+
+            // 10. Smoke for ally rescue: throw at rescue target if ally is downed nearby.
+            var rescueTarget = dp.GetNearestRescueRequest();
+            if (rescueTarget != null && dp.HasEquipmentAmmo(EquipmentType.SmokeGrenade))
+            {
+                float rescueDist = Vector3.Distance(self.position, rescueTarget.transform.position);
+                if (rescueDist < 25f)
+                {
+                    Vector3 dir = (rescueTarget.transform.position - eye).normalized + Vector3.up * 0.3f;
+                    dir.Normalize();
+                    dp.UseEquipment(EquipmentType.SmokeGrenade, eye, dir);
+                    return;
+                }
+            }
         }
 
         public class Data : IActionData
@@ -83,6 +254,13 @@ namespace HagenDa.Networking.AI
 
             [GetComponent] public NetworkGun Gun { get; set; }
             [GetComponent] public AIDataProvider DataProvider { get; set; }
+            [GetComponent] public NetworkEquipment Equipment { get; set; }
+            [GetComponent] public NavMeshAgent NavAgent { get; set; }
+            [GetComponent] public NetworkAIController AI { get; set; }
+
+            public float StrafeTimer;
+            public float EquipTimer;
+            public float CoverTimer;
         }
     }
 
@@ -97,7 +275,6 @@ namespace HagenDa.Networking.AI
 
         public override IActionRunState Perform(IMonoAgent agent, Data data, IActionContext context)
         {
-            // Wait until the reload cycle completes (or no gun).
             if (data.Gun == null || !data.Gun.IsReloading)
                 return ActionRunState.Completed;
             return ActionRunState.ContinueOrResolve;
@@ -177,7 +354,7 @@ namespace HagenDa.Networking.AI
         }
     }
 
-    /// <summary>Throw an EMP grenade at the nearest enemy deployable (sensor/crate/interceptor).</summary>
+    /// <summary>Throw an EMP grenade at the nearest enemy deployable.</summary>
     public class ThrowEmpGrenadeAction : GoapActionBase<ThrowEmpGrenadeAction.Data>
     {
         public override IActionRunState Perform(IMonoAgent agent, Data data, IActionContext context)

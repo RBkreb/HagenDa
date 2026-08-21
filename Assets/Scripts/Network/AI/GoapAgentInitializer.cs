@@ -1,4 +1,5 @@
 using CrashKonijn.Goap.Runtime;
+using Mirror;
 using UnityEngine;
 
 namespace HagenDa.Networking.AI
@@ -9,6 +10,9 @@ namespace HagenDa.Networking.AI
     /// carries (all other equipment actions are disabled to shrink the planner's
     /// search space — the conditions still enforce ammo availability).
     ///
+    /// Also assigns one of three fixed loadouts per AI entity (round-robin by
+    /// instance ID) so the AI team has a balanced mix of assault / support / recon.
+    ///
     /// Server-side only (GOAP runs on the server).
     /// </summary>
     public class GoapAgentInitializer : MonoBehaviour
@@ -17,6 +21,17 @@ namespace HagenDa.Networking.AI
 
         private GoapActionProvider provider;
         private NetworkEquipment equipment;
+
+        // ---- Three fixed AI loadouts (indices into NetworkEquipment.equipmentList) ----
+        //  Loadout A (Assault):  GrenadeLauncher, QuickDash, HealingSyringe, Grenade
+        //  Loadout B (Support):  LargeSupplyCrate, SmokeLauncher, Defibrillator, SmokeGrenade
+        //  Loadout C (Recon):     Jammer, SmallSupplyPack, Sensor, EmpGrenade
+        private static readonly EquipmentType[][] Loadouts =
+        {
+            new[] { EquipmentType.GrenadeLauncher, EquipmentType.QuickDash, EquipmentType.HealingSyringe, EquipmentType.Grenade },
+            new[] { EquipmentType.LargeSupplyCrate, EquipmentType.SmokeLauncher, EquipmentType.Defibrillator, EquipmentType.SmokeGrenade },
+            new[] { EquipmentType.Jammer, EquipmentType.SmallSupplyPack, EquipmentType.Sensor, EquipmentType.EmpGrenade },
+        };
 
         private void Awake()
         {
@@ -36,12 +51,18 @@ namespace HagenDa.Networking.AI
         private void Start()
         {
             // Defer until the loadout slots are assigned (server spawn).
-            Invoke(nameof(ConfigureActions), 0.5f);
+            Invoke(nameof(Configure), 0.5f);
         }
 
-        private void ConfigureActions()
+        private void Configure()
         {
+            // GOAP runs server-side only — skip on clients.
+            var netId = GetComponent<NetworkIdentity>();
+            if (netId != null && !netId.isServer) return;
+
             if (provider == null || equipment == null) return;
+
+            AssignLoadout();
 
             // Enable only the actions for equipment the AI carries.
             for (int slot = 0; slot < 4; slot++)
@@ -50,6 +71,38 @@ namespace HagenDa.Networking.AI
                 if (def == null) continue;
                 EnableFor(def.type);
             }
+        }
+
+        /// <summary>
+        /// Assign one of three fixed loadouts (round-robin by instance ID).
+        /// Ensures a balanced mix of assault / support / recon across the team.
+        /// </summary>
+        private void AssignLoadout()
+        {
+            int id = GetInstanceID();
+            int index = Mathf.Abs(id) % Loadouts.Length;
+            var types = Loadouts[index];
+
+            var loadout = new LoadoutDefinition
+            {
+                optional1 = IndexOf(types[0]),
+                optional2 = IndexOf(types[1]),
+                special   = IndexOf(types[2]),
+                throwable = IndexOf(types[3]),
+            };
+
+            equipment.ApplyLoadout(loadout);
+        }
+
+        private int IndexOf(EquipmentType type)
+        {
+            if (equipment == null || equipment.equipmentList == null) return -1;
+            for (int i = 0; i < equipment.equipmentList.Count; i++)
+            {
+                if (equipment.equipmentList[i] != null && equipment.equipmentList[i].type == type)
+                    return i;
+            }
+            return -1;
         }
 
         private void EnableFor(EquipmentType type)

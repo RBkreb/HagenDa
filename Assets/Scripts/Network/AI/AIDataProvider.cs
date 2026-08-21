@@ -340,6 +340,117 @@ namespace HagenDa.Networking.AI
 
         public bool HasFriendlySensor() => nearestFriendlySensor != null;
 
+        /// <summary>Nearest same-team downed ally with an active rescue request.</summary>
+        public NetworkCombatant GetNearestRescueRequest()
+        {
+            if (self == null) return null;
+            return IntelBroadcast.GetNearestRescueRequest(transform.position, self.teamId);
+        }
+
+        /// <summary>True if any known enemy is within 20m of the AI (mark/vision/intel).</summary>
+        public bool IsEnemyWithinRange(float range)
+        {
+            float sq = range * range;
+            foreach (var kv in knownEnemies)
+            {
+                if (kv.Key == null || kv.Key.IsDead) continue;
+                if ((kv.Key.transform.position - transform.position).sqrMagnitude <= sq)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>True if 2+ known enemies are clustered within 5m of the nearest known enemy.</summary>
+        public bool IsEnemyClustered()
+        {
+            var nearest = GetNearestKnownEnemy();
+            if (nearest == null) return false;
+            Vector3 pos = nearest.transform.position;
+            float sq = 5f * 5f;
+            int count = 0;
+            foreach (var kv in knownEnemies)
+            {
+                if (kv.Key == null || kv.Key.IsDead) continue;
+                if ((kv.Key.transform.position - pos).sqrMagnitude <= sq)
+                    count++;
+            }
+            return count >= 2;
+        }
+
+        /// <summary>True if the nearest known enemy is moving away from the AI.</summary>
+        private readonly Dictionary<NetworkCombatant, float> prevEnemyDist = new Dictionary<NetworkCombatant, float>();
+        public bool IsEnemyRetreating()
+        {
+            var enemy = GetNearestKnownEnemy();
+            if (enemy == null) return false;
+            float curDist = (enemy.transform.position - transform.position).sqrMagnitude;
+            if (prevEnemyDist.TryGetValue(enemy, out float prev))
+            {
+                prevEnemyDist[enemy] = curDist;
+                return curDist > prev + 1f;   // moved >1m further since last check
+            }
+            prevEnemyDist[enemy] = curDist;
+            return false;
+        }
+
+        /// <summary>True if any known enemy is within range of the given position.</summary>
+        public bool IsEnemyNearPosition(Vector3 pos, float range)
+        {
+            float sq = range * range;
+            foreach (var kv in knownEnemies)
+            {
+                if (kv.Key == null || kv.Key.IsDead) continue;
+                if ((kv.Key.transform.position - pos).sqrMagnitude <= sq)
+                    return true;
+            }
+            return false;
+        }
+
+        // ---- self-heal helper (fire-and-forget, can move while channeling) ----
+        private float lastHealAttempt;
+        private const float HealCooldown = 4f;
+
+        /// <summary>
+        /// Try to use a healing item if health is low. Fire-and-forget: the syringe
+        /// channels in the background (NetworkEquipment.Update handles it), so the
+        /// AI can keep moving and shooting. Also deploys a supply crate when safe.
+        /// </summary>
+        public bool TrySelfHeal()
+        {
+            if (Time.time - lastHealAttempt < HealCooldown) return false;
+            if (GetHealthLevel() >= 50) return false;
+
+            Vector3 eye = transform.position + Vector3.up * 0.8f;
+            Vector3 fwd = transform.forward;
+
+            // Priority 1: healing syringe (instant trigger, channels in background).
+            if (HasEquipmentAmmo(EquipmentType.HealingSyringe))
+            {
+                lastHealAttempt = Time.time;
+                UseEquipment(EquipmentType.HealingSyringe, eye, fwd);
+                return true;
+            }
+
+            // Priority 2: deploy supply crate when safe (not under fire).
+            if (GetHealthLevel() < 35 && HasEquipmentAmmo(EquipmentType.LargeSupplyCrate) && !IsUnderFire())
+            {
+                lastHealAttempt = Time.time;
+                UseEquipment(EquipmentType.LargeSupplyCrate, eye, fwd);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>True if the AI is at a capture point and there's no friendly sensor there.</summary>
+        public bool ShouldDeploySensorAtCapturePoint()
+        {
+            if (!atCapturePoint) return false;
+            // If a friendly sensor exists anywhere, assume it covers this point too
+            // (simplified: one sensor per team is enough for now).
+            return nearestFriendlySensor == null;
+        }
+
         // ---- status ----
 
         public int GetHealthLevel()

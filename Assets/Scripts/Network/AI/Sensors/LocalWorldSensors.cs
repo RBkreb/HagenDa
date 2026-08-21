@@ -189,4 +189,23 @@ namespace HagenDa.Networking.AI
         public override void Update() { }
         public override SenseValue Sense(IActionReceiver agent, IComponentReference references) => 0;
     }
+
+    // Continuous-behaviour marker: always 0 so TakeCoverGoal is only reachable via
+    // MoveToCoverAction's effect. The agent keeps seeking cover until a higher-
+    // priority goal interrupts.
+    public class IsInCoverSensor : LocalWorldSensorBase
+    {
+        public override void Created() { }
+        public override void Update() { }
+        public override SenseValue Sense(IActionReceiver agent, IComponentReference references) => 0;
+    }
+
+    // Continuous-behaviour marker: always 0 so RescueAllyGoal is only reachable via
+    // UseDefibrillatorAction's effect.
+    public class AllyRescuedSensor : LocalWorldSensorBase
+    {
+        public override void Created() { }
+        public override void Update() { }
+        public override SenseValue Sense(IActionReceiver agent, IComponentReference references) => 0;
+    }
 }

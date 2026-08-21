@@ -28,6 +28,12 @@ namespace HagenDa.Networking.AI
                 capability.AddGoal<SurviveGoal>()
                     .AddCondition<IsSafe>(Comparison.GreaterThanOrEqual, 1);
 
+                capability.AddGoal<TakeCoverGoal>()
+                    .AddCondition<IsInCover>(Comparison.GreaterThanOrEqual, 1);
+
+                capability.AddGoal<RescueAllyGoal>()
+                    .AddCondition<AllyRescued>(Comparison.GreaterThanOrEqual, 1);
+
                 capability.AddGoal<ResupplyGoal>()
                     .AddCondition<AmmoLevel>(Comparison.GreaterThanOrEqual, 50)
                     .AddCondition<HealthLevel>(Comparison.GreaterThanOrEqual, 50);
@@ -125,7 +131,6 @@ namespace HagenDa.Networking.AI
                 // ============================================================
                 capability.AddAction<DeploySupplyCrateAction>()
                     .AddCondition<HasSupplyCrate>(Comparison.GreaterThanOrEqual, 1)
-                    .AddCondition<AmmoLevel>(Comparison.SmallerThan, 30)
                     .AddEffect<HasSupplyCrate>(EffectType.Decrease)
                     .AddEffect<AmmoLevel>(EffectType.Increase)
                     .AddEffect<HealthLevel>(EffectType.Increase)
@@ -179,9 +184,10 @@ namespace HagenDa.Networking.AI
 
                 capability.AddAction<UseHealingSyringeAction>()
                     .AddCondition<HasHealingSyringe>(Comparison.GreaterThanOrEqual, 1)
-                    .AddCondition<HealthLevel>(Comparison.SmallerThan, 40)
+                    .AddCondition<HealthLevel>(Comparison.SmallerThan, 50)
                     .AddEffect<HasHealingSyringe>(EffectType.Decrease)
-                    .SetBaseCost(5f)
+                    .AddEffect<HealthLevel>(EffectType.Increase)
+                    .SetBaseCost(2f)
                     .SetRequiresTarget(false)
                     .SetStoppingDistance(0f);
 
@@ -189,10 +195,11 @@ namespace HagenDa.Networking.AI
                     .SetTarget<NearestDownedAlly>()
                     .AddCondition<HasDefibrillator>(Comparison.GreaterThanOrEqual, 1)
                     .AddCondition<AllyDowned>(Comparison.GreaterThanOrEqual, 1)
-                    .AddCondition<EnemyInSight>(Comparison.SmallerThanOrEqual, 0)
                     .AddEffect<HasDefibrillator>(EffectType.Decrease)
+                    .AddEffect<AllyRescued>(EffectType.Increase)
                     .SetBaseCost(3f)
-                    .SetStoppingDistance(2f);
+                    .SetStoppingDistance(2f)
+                    .SetMoveMode(ActionMoveMode.PerformWhileMoving);
 
                 // ============================================================
                 // ACTIONS — movement
@@ -211,10 +218,18 @@ namespace HagenDa.Networking.AI
 
                 capability.AddAction<RetreatToGarrisonAction>()
                     .SetTarget<NearestGarrison>()
-                    .AddCondition<HealthLevel>(Comparison.SmallerThan, 25)
+                    .AddCondition<HealthLevel>(Comparison.SmallerThan, 35)
                     .AddEffect<IsSafe>(EffectType.Increase)
                     .SetBaseCost(1f)
                     .SetStoppingDistance(3f);
+
+                capability.AddAction<MoveToCoverAction>()
+                    .SetTarget<CoverPosition>()
+                    .AddCondition<HealthLevel>(Comparison.SmallerThan, 35)
+                    .AddEffect<IsInCover>(EffectType.Increase)
+                    .SetBaseCost(1f)
+                    .SetStoppingDistance(1f)
+                    .SetMoveMode(ActionMoveMode.PerformWhileMoving);
 
                 capability.AddAction<MoveToSupplyAction>()
                     .SetTarget<NearestSupply>()
@@ -249,6 +264,8 @@ namespace HagenDa.Networking.AI
                 capability.AddWorldSensor<SquadLeaderAliveSensor>().SetKey<SquadLeaderAlive>();
                 capability.AddWorldSensor<AllyDownedSensor>().SetKey<AllyDowned>();
                 capability.AddWorldSensor<IsPatrollingSensor>().SetKey<IsPatrolling>();
+                capability.AddWorldSensor<IsInCoverSensor>().SetKey<IsInCover>();
+                capability.AddWorldSensor<AllyRescuedSensor>().SetKey<AllyRescued>();
 
                 // ============================================================
                 // TARGET SENSORS (local)
@@ -264,6 +281,7 @@ namespace HagenDa.Networking.AI
                 capability.AddTargetSensor<NearestEnemyDeployableSensor>().SetTarget<NearestEnemyDeployable>();
                 capability.AddTargetSensor<SquadLeaderPosSensor>().SetTarget<SquadLeaderPos>();
                 capability.AddTargetSensor<WanderPointSensor>().SetTarget<WanderPoint>();
+                capability.AddTargetSensor<CoverPositionSensor>().SetTarget<CoverPosition>();
 
                 // ============================================================
                 // MULTI SENSOR (equipment Has* keys)

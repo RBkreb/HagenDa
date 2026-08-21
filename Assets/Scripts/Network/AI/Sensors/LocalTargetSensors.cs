@@ -211,4 +211,33 @@ namespace HagenDa.Networking.AI
             return center;
         }
     }
+
+    /// <summary>
+    /// Finds cover away from the nearest known enemy using CoverSystem.
+    /// Returns a PositionTarget at the cover position, or null when no cover
+    /// or no enemy is available.
+    /// </summary>
+    public class CoverPositionSensor : LocalTargetSensorBase
+    {
+        public override void Created() { }
+        public override void Update() { }
+
+        public override ITarget Sense(IActionReceiver agent, IComponentReference references, ITarget existingTarget)
+        {
+            var data = references.GetCachedComponent<AIDataProvider>();
+            if (data == null) return null;
+
+            var enemy = data.GetNearestKnownEnemy();
+            if (enemy == null) return null;
+
+            var cover = CoverSystem.FindCover(
+                agent.Transform.position, enemy.transform.position, 15f);
+
+            if (!cover.hasCover) return null;
+
+            if (existingTarget is PositionTarget pt)
+                return pt.SetPosition(cover.coverPosition);
+            return new PositionTarget(cover.coverPosition);
+        }
+    }
 }

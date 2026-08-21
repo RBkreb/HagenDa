@@ -19,4 +19,5 @@ namespace HagenDa.Networking.AI
     public class NearestEnemyDeployable : TargetKeyBase { }
     public class SquadLeaderPos : TargetKeyBase { }
     public class WanderPoint : TargetKeyBase { }
+    public class CoverPosition : TargetKeyBase { }
 }

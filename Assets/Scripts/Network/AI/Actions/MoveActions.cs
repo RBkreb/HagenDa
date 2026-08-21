@@ -1,5 +1,8 @@
 using CrashKonijn.Agent.Core;
+using CrashKonijn.Agent.Runtime;
 using CrashKonijn.Goap.Runtime;
+using UnityEngine;
+using UnityEngine.AI;
 
 namespace HagenDa.Networking.AI
 {
@@ -65,6 +68,45 @@ namespace HagenDa.Networking.AI
         public class Data : IActionData
         {
             public ITarget Target { get; set; }
+        }
+    }
+
+    /// <summary>
+    /// Sprint to cover away from the nearest enemy. On arrival, crouch and hold
+    /// for a short window (mayResolve=true) so a higher-priority goal can interrupt.
+    /// </summary>
+    public class MoveToCoverAction : GoapActionBase<MoveToCoverAction.Data>
+    {
+        public override void Start(IMonoAgent agent, Data data)
+        {
+            // Sprint to cover in crouch posture.
+            if (data.Move != null) data.Move.SetRun(true);
+            if (data.AI != null) data.AI.SetAIPosture(AIPosture.Crouch);
+        }
+
+        public override IActionRunState Perform(IMonoAgent agent, Data data, IActionContext context)
+        {
+            // Check if the agent has arrived at the cover position.
+            if (data.NavAgent != null && data.NavAgent.isOnNavMesh)
+            {
+                if (data.NavAgent.pathPending) return ActionRunState.Continue;
+                if (data.NavAgent.remainingDistance > data.NavAgent.stoppingDistance + 0.5f)
+                    return ActionRunState.Continue;
+            }
+
+            // Arrived at cover — go prone and hold position briefly.
+            if (data.AI != null) data.AI.SetAIPosture(AIPosture.Prone);
+
+            // mayResolve=true: allow re-planning if health recovers or a new threat appears.
+            return ActionRunState.Wait(1.5f, mayResolve: true);
+        }
+
+        public class Data : IActionData
+        {
+            public ITarget Target { get; set; }
+            [GetComponent] public AgentNavMeshMove Move { get; set; }
+            [GetComponent] public NetworkAIController AI { get; set; }
+            [GetComponent] public NavMeshAgent NavAgent { get; set; }
         }
     }
 

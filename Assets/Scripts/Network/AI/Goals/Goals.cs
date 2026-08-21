@@ -28,4 +28,10 @@ namespace HagenDa.Networking.AI
 
     /// <summary>Default fallback patrol.</summary>
     public class PatrolGoal : GoalBase { }
+
+    /// <summary>Sprint to cover and crouch/prone (low health + enemy nearby).</summary>
+    public class TakeCoverGoal : GoalBase { }
+
+    /// <summary>Rescue a downed ally with the defibrillator.</summary>
+    public class RescueAllyGoal : GoalBase { }
 }

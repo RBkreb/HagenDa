@@ -36,6 +36,8 @@ namespace HagenDa.Networking.AI
     // (the action re-resolves after each Wait). ----
     public class IsPatrolling : WorldKeyBase { }
     public class IsWithSquad : WorldKeyBase { }
+    public class IsInCover : WorldKeyBase { }
+    public class AllyRescued : WorldKeyBase { }
 
     // ---- Loadout / equipment (Has* = has ammo available) ----
     public class HasGrenade : WorldKeyBase { }

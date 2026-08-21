@@ -272,6 +272,10 @@ namespace HagenDa.Networking
             // 死亡 10s 后可重新部署。
             var mm = NetworkMatchManager.Instance;
             redeployDeadline = Time.time + (mm != null ? mm.redeployDelay : 10f);
+
+            // PHASE9: broadcast rescue request so allies with defibrillator can respond.
+            if (self != null && !unrevivable)
+                IntelBroadcast.BroadcastRescueRequest(self);
         }
 
         [Server]
@@ -286,6 +290,10 @@ namespace HagenDa.Networking
             lastAttacker = null;
             SetDeadState(false);
             RpcRescue();
+
+            // PHASE9: clear rescue request (ally has been revived).
+            var self = GetComponent<NetworkCombatant>();
+            if (self != null) IntelBroadcast.ClearRescueRequest(self);
         }
 
         // ---------------------------------------------------------------
@@ -407,6 +415,10 @@ namespace HagenDa.Networking
             lastAttacker = null;
             health = maxHealth;
             armor = 0f;
+
+            // PHASE9: clear rescue request (redeployed — no longer needs rescue).
+            var self = GetComponent<NetworkCombatant>();
+            if (self != null) IntelBroadcast.ClearRescueRequest(self);
 
             // 传送：先清动量再设位置。
             if (rb != null)
