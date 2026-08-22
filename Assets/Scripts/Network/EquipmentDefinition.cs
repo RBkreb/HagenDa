@@ -33,7 +33,8 @@ namespace HagenDa.Networking
         BlastShield,        // 防爆盾
         HealingSyringe,     // 治疗针（特有）
         Defibrillator,      // 除颤仪（特有）
-        Sensor              // 感应器（特有，固定地面标记敌方）
+        Sensor,             // 感应器（特有，固定地面标记敌方）
+        DeployBeacon        // 部署信标（可选，同小队重部署点）
     }
 
     /// <summary>
@@ -90,6 +91,9 @@ namespace HagenDa.Networking
         [Header("Deploy cap (PHASE8 互斥)")]
         [Tooltip("同一实体可同时在世界中部署的数量上限（0 = 不限）。超出时摧毁最早部署的。")]
         public int deployCap = 0;
+
+        [Tooltip("重新部署时保留该配备在世界中的部署物（如部署信标：阵亡后小队仍需在其上重生）。")]
+        public bool persistOnRedeploy = false;
 
         [Header("Carry / Supply")]
         [Tooltip("携带上限（弹药/次数）。")]

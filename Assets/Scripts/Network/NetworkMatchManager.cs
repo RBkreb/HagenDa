@@ -29,8 +29,8 @@ namespace HagenDa.Networking
         public static NetworkMatchManager Instance { get; private set; }
 
         [Header("Score")]
-        [Tooltip("先到该分的一方获胜（测试阶段 100）。")]
-        public int winScore = 100;
+        [Tooltip("先到该分的一方获胜（调试阶段 1000，防止对局过早结束）。")]
+        public int winScore = 1000;
 
         [SyncVar] public int redScore;
         [SyncVar] public int blueScore;
@@ -235,6 +235,27 @@ namespace HagenDa.Networking
                     return p;
             }
             return member.transform.position;
+        }
+
+        /// <summary>
+        /// 部署信标（PHASE8 可选配备）：同小队的重部署点。找到匹配信标后消耗 1 次
+        /// 使用次数（用尽时信标自毁）。无匹配信标返回 null（回退 GR）。
+        /// </summary>
+        [Server]
+        public Vector3? GetBeaconDeployPoint(int team, int squad, NetworkCombatant self)
+        {
+            DeployBeacon best = null;
+            float bestDist = float.MaxValue;
+
+            foreach (var b in Object.FindObjectsOfType<DeployBeacon>())
+            {
+                if (b == null || !b.MatchesSquad(team, squad)) continue;
+                float d = (b.transform.position - self.transform.position).sqrMagnitude;
+                if (d < bestDist) { bestDist = d; best = b; }
+            }
+
+            if (best == null) return null;
+            return best.ConsumeDeployPoint();
         }
     }
 }

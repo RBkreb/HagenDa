@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dbdbf6de009de6c438847ac18fa36f8d, type: 3}
-  m_Name: SignalCharge
+  m_Name: DeployBeacon
   m_EditorClassIdentifier: 
-  type: 6
-  displayName: "\u4FE1\u53F7\u70B8\u836F"
+  type: 18
+  displayName: "\u90E8\u7F72\u4FE1\u6807"
   category: 0
-  instantUse: 0
-  deployCap: 3
-  persistOnRedeploy: 0
-  maxCarry: 3
-  supplyCost: 120
+  instantUse: 1
+  deployCap: 1
+  persistOnRedeploy: 1
+  maxCarry: 1
+  supplyCost: 150
   ammoRegenInterval: 0
   empVulnerable: 1
-  useStyle: 2
+  useStyle: 3
   boltTime: 1.5
   channelTime: 1.5
-  throwablePrefab: {fileID: 3056728582641926965, guid: 364002a47172c704695892a626f28e2f,
+  throwablePrefab: {fileID: 5425216317184490878, guid: 304aa6fb0a53e1d4d8faec99fe41ae36,
     type: 3}
-  throwSpeed: 3
+  throwSpeed: 15
   armorGrant: 25
   dashCooldown: 15
   shieldExplosionReduction: 0.6

@@ -327,7 +327,7 @@ namespace HagenDa.Networking
             return mm.GetGarrisonDeployPoint(MyTeam());
         }
 
-        /// <summary>统一部署点解析（1=GR / 2=HQ / 3=squad，fallback GR）。</summary>
+        /// <summary>统一部署点解析（1=GR / 2=HQ / 3=squad / 4=beacon，fallback GR）。</summary>
         [Server]
         private Vector3? ResolveDeployPoint(int choice)
         {
@@ -347,6 +347,11 @@ namespace HagenDa.Networking
                 case 3:
                     var sq = mm.GetSquadDeployPoint(team, squad, self);
                     if (sq.HasValue) return sq;
+                    break;
+                case 4:
+                    // 部署信标（同小队）。无匹配信标回退 GR。
+                    var bc = mm.GetBeaconDeployPoint(team, squad, self);
+                    if (bc.HasValue) return bc;
                     break;
             }
             return mm.GetGarrisonDeployPoint((MatchTeam)team);

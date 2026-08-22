@@ -229,10 +229,17 @@ namespace HagenDa.Networking
             }
 
             // 清除该实体已部署的配备（大型补给箱/拦截/感应器等）。
+            // 部署信标除外：阵亡重部署期间小队仍需在其上重生。
             for (int k = placedDeployables.Count - 1; k >= 0; k--)
             {
                 var d = placedDeployables[k];
-                if (d != null && d.gameObject != null)
+                if (d == null)
+                {
+                    placedDeployables.RemoveAt(k);
+                    continue;
+                }
+                if (d.persistOnRedeploy) continue;
+                if (d.gameObject != null)
                     NetworkServer.Destroy(d.gameObject);
                 placedDeployables.RemoveAt(k);
             }
@@ -307,6 +314,7 @@ namespace HagenDa.Networking
             var slot = go.GetComponent<DeployableSlot>();
             if (slot == null) slot = go.AddComponent<DeployableSlot>();
             slot.Init(GetComponent<NetworkIdentity>(), def.type);
+            slot.persistOnRedeploy = def.persistOnRedeploy;
 
             PrunePlacedDeployables();
 
@@ -518,7 +526,10 @@ namespace HagenDa.Networking
             pos.y = Mathf.Max(pos.y, 0.15f);
 
             var go = Instantiate(def.throwablePrefab, pos, Quaternion.identity);
-            NetworkServer.Spawn(go);
+
+            // 归属必须在 Spawn 之前设置：Host 模式下 spawn 消息（快照初始 SyncVar）
+            // 延迟到下一帧才派发给主机客户端并反序列化覆写字段，Spawn 之后再赋值
+            // 会被初始值(-1)覆盖（Mirror LocalConnectionToClient 消息队列机制）。
 
             // 感应器：传入部署者队伍（放置物无 NetworkCombatant）。
             var sensor = go.GetComponent<SensorProbe>();
@@ -527,6 +538,16 @@ namespace HagenDa.Networking
                 var my = GetComponent<NetworkCombatant>();
                 if (my != null) sensor.SetOwnerTeam(my.teamId);
             }
+
+            // 部署信标：传入部署者队伍 + 小队（同小队重部署点）。
+            var beacon = go.GetComponent<DeployBeacon>();
+            if (beacon != null)
+            {
+                var my = GetComponent<NetworkCombatant>();
+                if (my != null) beacon.SetOwner(my.teamId, my.squadId);
+            }
+
+            NetworkServer.Spawn(go);
 
             // 大型补给箱/拦截装置/感应器：计入部署上限互斥。
             if (def.deployCap > 0)

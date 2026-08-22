@@ -86,6 +86,13 @@ namespace HagenDa.Networking
                 if ((s.transform.position - pos).sqrMagnitude <= r2)
                     s.ApplyEmp(interfereDuration);
             }
+
+            // PHASE8 部署信标：EMP 直接摧毁。
+            foreach (var b in Object.FindObjectsOfType<DeployBeacon>())
+            {
+                if ((b.transform.position - pos).sqrMagnitude <= r2)
+                    b.ApplyEmp(interfereDuration);
+            }
         }
 
         [ClientRpc]

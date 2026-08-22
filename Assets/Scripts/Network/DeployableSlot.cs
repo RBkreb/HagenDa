@@ -20,6 +20,9 @@ namespace HagenDa.Networking
         [Tooltip("部署时间戳（服务器），用于\"最先部署的被摧毁\"。")]
         public double deployTime;
 
+        [Tooltip("部署者重新部署时是否保留该部署物（部署信标）。")]
+        public bool persistOnRedeploy;
+
         [Server]
         public void Init(NetworkIdentity owner, EquipmentType type)
         {

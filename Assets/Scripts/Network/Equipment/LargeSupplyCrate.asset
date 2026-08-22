@@ -17,6 +17,7 @@ MonoBehaviour:
   category: 0
   instantUse: 1
   deployCap: 1
+  persistOnRedeploy: 0
   maxCarry: 1
   supplyCost: 100
   ammoRegenInterval: 10

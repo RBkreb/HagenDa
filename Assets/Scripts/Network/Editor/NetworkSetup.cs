@@ -43,6 +43,7 @@ namespace HagenDa.Networking.EditorTools
         private const string LargeSupplyCratePrefabPath = "Assets/Scripts/Network/Prefabs/LargeSupplyCrate.prefab";
         private const string InterceptorPrefabPath = "Assets/Scripts/Network/Prefabs/Interceptor.prefab";
         private const string SensorProbePrefabPath = "Assets/Scripts/Network/Prefabs/SensorProbe.prefab";
+        private const string DeployBeaconPrefabPath = "Assets/Scripts/Network/Prefabs/DeployBeacon.prefab";
 
         private const string RgdModelPath = "Assets/Low Poly Weapons VOL.1/Prefabs/RGD-5.prefab";
         private const string SmokeModelPath = "Assets/Low Poly Weapons VOL.1/Prefabs/Smoke.prefab";
@@ -1066,6 +1067,62 @@ namespace HagenDa.Networking.EditorTools
             return prefab;
         }
 
+        // ---------------------------------------------------------------
+        // PHASE8 部署信标（黄色倒圆锥，同小队重部署点）
+        // ---------------------------------------------------------------
+
+        private static GameObject BuildDeployBeaconPrefab()
+        {
+            var root = new GameObject("DeployBeacon");
+            root.AddComponent<NetworkIdentity>();
+
+            // 倒圆锥 mesh（底面朝上、尖端朝下）：单独资产，内存 mesh 无法序列化进 prefab。
+            EnsureFolder("Assets/Scripts/Network", "Materials");
+            const string meshPath = "Assets/Scripts/Network/Materials/DeployBeaconConeMesh.asset";
+            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
+            if (mesh == null)
+            {
+                mesh = CreateConeMesh(0.35f, 0.8f, 16);
+                mesh.name = "DeployBeaconConeMesh";
+                AssetDatabase.CreateAsset(mesh, meshPath);
+                AssetDatabase.SaveAssets();
+            }
+            mesh = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
+
+            // 圆锥放在子节点并旋转 180°（根节点保持无旋转，地图标记文字不受影响）。
+            var cone = new GameObject("Cone");
+            cone.transform.SetParent(root.transform, false);
+            cone.transform.localRotation = Quaternion.Euler(180f, 0f, 0f);
+
+            var mf = cone.AddComponent<MeshFilter>();
+            mf.sharedMesh = mesh;
+
+            var mr = cone.AddComponent<MeshRenderer>();
+            var mat = CreatePersistentMaterial(
+                "Assets/Scripts/Network/Materials/BeaconYellow.mat",
+                new Color(0.95f, 0.8f, 0.1f),
+                new Color(0.55f, 0.45f, 0.05f));
+            if (mat != null) mr.sharedMaterial = mat;
+
+            // 圆锥与地面碰撞（放置后冻结），对活体无碰撞。
+            var mc = cone.AddComponent<MeshCollider>();
+            mc.sharedMesh = mesh;
+            mc.convex = true;
+
+            var rb = root.AddComponent<Rigidbody>();
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            rb.useGravity = true;
+            rb.mass = 1f;
+
+            var beacon = root.AddComponent<DeployBeacon>();
+            beacon.maxUses = 5;
+
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, DeployBeaconPrefabPath);
+            Object.DestroyImmediate(root);
+            return prefab;
+        }
+
         /// <summary>程序化生成圆锥 mesh（顶点朝上，底部圆盘）。</summary>
         private static Mesh CreateConeMesh(float radius, float height, int segments)
         {
@@ -1277,6 +1334,18 @@ namespace HagenDa.Networking.EditorTools
             sn.throwablePrefab = BuildSensorProbePrefab();
             list.Add(sn);
 
+            // 11c. 部署信标（可选，Deploy，瞬发型，部署上限 1，同小队重部署点，
+            //      5 次用尽自毁，EMP 可摧毁，重部署时保留）
+            var bn = GetOrCreateEquipmentDef("DeployBeacon");
+            bn.type = EquipmentType.DeployBeacon;
+            bn.displayName = "部署信标";
+            bn.useStyle = EquipmentUseStyle.Deploy;
+            bn.maxCarry = 1; bn.supplyCost = 150;
+            bn.empVulnerable = true;
+            bn.persistOnRedeploy = true;
+            bn.throwablePrefab = BuildDeployBeaconPrefab();
+            list.Add(bn);
+
             // 12. 快速机动装置（EMP 可禁）
             var qd = GetOrCreateEquipmentDef("QuickDash");
             qd.type = EquipmentType.QuickDash;
@@ -1351,6 +1420,7 @@ namespace HagenDa.Networking.EditorTools
                     case EquipmentType.SmokeGrenade:   // 烟雾手雷：瞬发型
                     case EquipmentType.EmpGrenade:     // 电磁手雷：瞬发型
                     case EquipmentType.Sensor:         // 感应器：瞬发型特有（g 键直接部署）
+                    case EquipmentType.DeployBeacon:   // 部署信标：瞬发型（放置即部署）
                         d.instantUse = true;
                         break;
                     default:
@@ -1370,6 +1440,9 @@ namespace HagenDa.Networking.EditorTools
                         d.deployCap = 3;
                         break;
                     case EquipmentType.Sensor:
+                        d.deployCap = 1;
+                        break;
+                    case EquipmentType.DeployBeacon:   // 部署信标：单人同时仅 1 个
                         d.deployCap = 1;
                         break;
                     default:

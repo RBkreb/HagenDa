@@ -327,12 +327,14 @@ namespace HagenDa.Networking
 
             hintText.text = deployChoice == 1 ? "部署点：驻地 (GR)"
                 : deployChoice == 2 ? "部署点：据点 (HQ)"
-                : "部署点：小队成员";
+                : deployChoice == 3 ? "部署点：小队成员"
+                : "部署点：小队信标";
         }
 
         /// <summary>
         /// 解析所选部署点的实际对象：
-        ///   3=最近存活同小队成员（移动时跟随）、2=己方 HQ、1=己方 GR。
+        ///   4=最近同小队部署信标、3=最近存活同小队成员（移动时跟随）、
+        ///   2=己方 HQ、1=己方 GR。
         /// </summary>
         private Transform ResolveSelectedTarget(int choice, Vector3 world)
         {
@@ -342,6 +344,12 @@ namespace HagenDa.Networking
             int team = combatant != null ? combatant.teamId : (int)MatchTeam.Red;
             int squad = combatant != null ? combatant.squadId : -1;
             var self = combatant;
+
+            if (choice == 4)
+            {
+                var b = FindNearestBeacon(team, squad, world);
+                return b != null ? b.transform : null;
+            }
 
             if (choice == 3 && NetworkClient.localPlayer != null)
             {
@@ -423,6 +431,14 @@ namespace HagenDa.Networking
             int team = combatant != null ? combatant.teamId : (int)MatchTeam.Red;
             int squad = combatant != null ? combatant.squadId : -1;
 
+            // Own-squad deploy beacon within 5m → beacon deploy (checked first: the
+            // beacon is a fixed, deliberate placement and its marker is the click
+            // target).
+            var beacon = FindNearestBeacon(team, squad, world);
+            if (beacon != null &&
+                Vector3.Distance(world, beacon.transform.position) <= 5f)
+                return 4;
+
             // Squad member (alive) within 6m → squad deploy. Bigger radius so the
             // small entity dots on the map are easy to click.
             var local = NetworkClient.localPlayer;
@@ -462,6 +478,20 @@ namespace HagenDa.Networking
             }
 
             return 1;   // default GR
+        }
+
+        /// <summary>最近的同小队部署信标（仅同小队可重生）。</summary>
+        private DeployBeacon FindNearestBeacon(int team, int squad, Vector3 world)
+        {
+            DeployBeacon best = null;
+            float bestDist = float.MaxValue;
+            foreach (var b in Object.FindObjectsOfType<DeployBeacon>())
+            {
+                if (b == null || !b.MatchesSquad(team, squad)) continue;
+                float d = Vector3.Distance(world, b.transform.position);
+                if (d < bestDist) { bestDist = d; best = b; }
+            }
+            return best;
         }
 
         private void OnSlotClick(int slot)
