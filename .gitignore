@@ -25,3 +25,6 @@ desktop.ini
 
 # Screenshots (codely debug)
 screenshots/
+
+#python env
+venv/

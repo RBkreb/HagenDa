@@ -7,6 +7,8 @@
     "com.unity.animation.rigging": "1.2.1",
     "com.unity.feature.development": "1.0.1",
     "com.unity.inputsystem": "1.14.4-t3",
+    "com.unity.ml-agents": "file:D:/HagenTa/ml-agents-release_20/com.unity.ml-agents",
+    "com.unity.ml-agents.extensions": "file:D:/HagenTa/ml-agents-release_20/com.unity.ml-agents.extensions",
     "com.unity.nuget.newtonsoft-json": "3.2.1",
     "com.unity.render-pipelines.high-definition": "14.2.0-t1",
     "com.unity.textmeshpro": "3.0.10",
