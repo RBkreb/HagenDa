@@ -13,15 +13,16 @@ GameObject:
   - component: {fileID: 3643610658518500391}
   - component: {fileID: 6867261242698045442}
   - component: {fileID: 8165061629808964091}
-  - component: {fileID: 674333920905833729}
+  - component: {fileID: 3323619008789848411}
   - component: {fileID: 2861076355436660845}
   - component: {fileID: 5783371912108599561}
   - component: {fileID: 3829205206201556184}
   - component: {fileID: 1238050597131074024}
   - component: {fileID: 1078101726408592051}
+  - component: {fileID: 3308931702653194175}
+  - component: {fileID: 3115867161679082356}
   - component: {fileID: 6098297461493983970}
   - component: {fileID: 7057705317322719540}
-  - component: {fileID: 3308931702653194175}
   m_Layer: 0
   m_HasEditorInfo: 1
   m_Name: AIEntity
@@ -148,28 +149,29 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
---- !u!195 &674333920905833729
-NavMeshAgent:
+--- !u!136 &3323619008789848411
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 543077640700298910}
-  m_Enabled: 1
-  m_AgentTypeID: 0
+  m_Material: {fileID: 13400000, guid: e09fb4eb95239ed40ac781754d239041, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 2
   m_Radius: 0.25
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 1.8
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_Height: 0.9
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.45, z: 0}
 --- !u!114 &2861076355436660845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,12 +189,9 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   throwPoint: {fileID: 0}
-  grenadeThrowablePrefab: {fileID: 3792378269598571763, guid: f8492bd32540f38419c8d1854790070d,
-    type: 3}
-  smokeThrowablePrefab: {fileID: 8750669352066971556, guid: a71b5efb948a6994cb201844257bac2c,
-    type: 3}
-  rescueThrowablePrefab: {fileID: 6601452253533115365, guid: 477445035a5cabe41a1df9782413153f,
-    type: 3}
+  grenadeThrowablePrefab: {fileID: 0}
+  smokeThrowablePrefab: {fileID: 0}
+  rescueThrowablePrefab: {fileID: 0}
   throwSpeed: 10
   throwCooldown: 1
 --- !u!114 &5783371912108599561
@@ -212,15 +211,14 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   definition: {fileID: 11400000, guid: fb977b69eb03c1c4cb36be57e91644cc, type: 2}
-  bulletPrefab: {fileID: 5926176164332243332, guid: dcb3f61632dbb1746985a4ecc29c1369,
-    type: 3}
+  bulletPrefab: {fileID: 0}
   bulletPoolCapacity: 60
   gunModel: {fileID: 0}
   hipPosition: {x: 0.28, y: -0.24, z: 0.45}
   adsPosition: {x: 0, y: -0.18, z: 0.3}
   hipEuler: {x: 0, y: 0, z: 0}
   adsEuler: {x: 0, y: 0, z: 0}
-  controller: {fileID: 0}
+  controller: {fileID: 3115867161679082356}
   magAmmo: 0
   reserveAmmo: 0
   fireModeIndex: 0
@@ -289,6 +287,84 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   diameter: 4
   friendlyRevealRadius: 50
+--- !u!114 &3308931702653194175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543077640700298910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc2e0c3ced26c546abada6aacdd8427, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  diameter: 0.15
+  headOffset: 0.1
+  revealRadius: 50
+--- !u!114 &3115867161679082356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543077640700298910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44cf39f0befad1740a61b19b6f1755b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMethod: 0
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  moveAcceleration: 15
+  friction: 1.5
+  stoppingFriction: 8
+  slideFriction: 1.5
+  gravity: 15
+  standWalkSpeed: 3.5
+  standSprintSpeed: 7.5
+  crouchWalkSpeed: 2
+  crouchSprintSpeed: 4.5
+  proneSpeed: 0.5
+  standHeight: 1.8
+  crouchHeight: 0.9
+  proneHeight: 0.5
+  clearanceRayOffset: 0.02
+  standCrouchDelay: 0.1
+  standProneDelay: 0.25
+  crouchProneDelay: 0.15
+  jumpHeight: 1
+  slideSpeed: 12
+  slideTriggerSpeed: 5
+  slideEndSpeed: 4
+  slideCooldown: 2
+  dashForce: 200
+  dashDuration: 0.2
+  diveSpeed: 15
+  diveTriggerSpeed: 4
+  lookSensitivity: 0.05793
+  minPitch: -89
+  maxPitch: 89
+  eyeOffsetFromTop: 0.15
+  jumpShakeIntensity: 0.2
+  jumpShakeDuration: 0.15
+  slideShakeIntensity: 0.2
+  slideShakeDuration: 0.5
+  diveShakeIntensity: 0.4
+  diveShakeDuration: 0.3
+  combat: {fileID: 2861076355436660845}
+  gun: {fileID: 5783371912108599561}
+  equipment: {fileID: 7057705317322719540}
+  playerCamera: {fileID: 0}
+  standCollider: {fileID: 8165061629808964091}
+  crouchCollider: {fileID: 3323619008789848411}
+  visual: {fileID: 3619932077785825544}
+  pitch: 0
+  posture: 0
+  sliding: 0
+  activeSlot: -1
 --- !u!114 &6098297461493983970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,19 +381,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  walkSpeed: 3.5
-  runSpeed: 7.5
-  wanderRadius: 5
-  wanderWaitTime: 2
-  detectRange: 50
-  attackRange: 40
-  throwInterval: 5
-  combat: {fileID: 2861076355436660845}
-  gun: {fileID: 5783371912108599561}
-  equipment: {fileID: 7057705317322719540}
+  controller: {fileID: 3115867161679082356}
   visual: {fileID: 3619932077785825544}
-  standHeight: 1.8
-  proneHeight: 0.5
 --- !u!114 &7057705317322719540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -347,13 +412,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 69bddee006a421a4b98a9f6276f94f04, type: 2}
   - {fileID: 11400000, guid: b9bf681d9c53d794fbea8ca10b4c9a33, type: 2}
   - {fileID: 11400000, guid: 406108a7bed5f7947b85907a256400f5, type: 2}
+  - {fileID: 11400000, guid: 84ce2a9bbc201ee44b8e58519b2b24d7, type: 2}
+  - {fileID: 11400000, guid: 5eb9fbd22872ce647bb81196b7fdd1a8, type: 2}
   - {fileID: 11400000, guid: e0ead184a3c43b5428750d4d856351ab, type: 2}
   - {fileID: 11400000, guid: cad4a8be1cf43b84daa1ee06c3ba3157, type: 2}
   - {fileID: 11400000, guid: f6449bc34f7c8fc4ebc4387f723e440a, type: 2}
   - {fileID: 11400000, guid: 25d9ef986e04a6048ad67396d3323b84, type: 2}
   - {fileID: 11400000, guid: 9a734e141d3ed4b4191f0bd919b5f058, type: 2}
-  - {fileID: 11400000, guid: 84ce2a9bbc201ee44b8e58519b2b24d7, type: 2}
-  controller: {fileID: 0}
+  controller: {fileID: 3115867161679082356}
   selection: -1
   selectedAmmo: 0
   selectedSupply: 0
@@ -365,21 +431,6 @@ MonoBehaviour:
   specialIndex: -1
   throwableIndex: -1
   dashCooldownRemaining: 0
---- !u!114 &3308931702653194175
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 543077640700298910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6dc2e0c3ced26c546abada6aacdd8427, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  diameter: 0.15
-  headOffset: 0.1
-  revealRadius: 50
 --- !u!1 &3619932077785825544
 GameObject:
   m_ObjectHideFlags: 0

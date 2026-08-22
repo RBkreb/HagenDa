@@ -1567,11 +1567,13 @@ namespace HagenDa.Networking.EditorTools
             capsule.center = new Vector3(0f, 0.9f, 0f);
             capsule.sharedMaterial = noFriction;
 
-            // NavMeshAgent for pathfinding (server-driven).
-            var agent = root.AddComponent<NavMeshAgent>();
-            agent.height = 1.8f;
-            agent.radius = 0.25f;
-            agent.baseOffset = 0f;
+            // Crouch collider (same as the player): 0.9m, disabled by default.
+            var aiCrouchCapsule = root.AddComponent<CapsuleCollider>();
+            aiCrouchCapsule.height = 0.9f;
+            aiCrouchCapsule.radius = 0.25f;
+            aiCrouchCapsule.center = new Vector3(0f, 0.45f, 0f);
+            aiCrouchCapsule.enabled = false;
+            aiCrouchCapsule.sharedMaterial = noFriction;
 
             // Shared combat (same as player).
             var combat = root.AddComponent<NetworkCombat>();
@@ -1593,17 +1595,29 @@ namespace HagenDa.Networking.EditorTools
             root.AddComponent<MapIndicator>();
             root.AddComponent<HeadMarker>();
 
-            // AI controller.
+            // 3C movement (ML-branch): the SAME force-driven controller as the
+            // player. The AI controller only injects input server-side; all
+            // movement / posture / combat runs through the identical code path.
+            var aiController = root.AddComponent<NetworkPlayerController>();
+            aiController.standCollider = capsule;
+            aiController.crouchCollider = aiCrouchCapsule;
+            aiController.combat = combat;
+            aiController.gun = gun;
+
+            // AI controller (input provider, no built-in behavior).
             var ai = root.AddComponent<NetworkAIController>();
-            ai.combat = combat;
-            ai.gun = gun;
 
             // Equipment (PHASE6): same shared runtime as the player.
             if (equipmentList == null)
                 equipmentList = BuildEquipmentAssets();
             var equipment = root.AddComponent<NetworkEquipment>();
             equipment.equipmentList = equipmentList;
-            ai.equipment = equipment;
+            equipment.controller = aiController;
+            aiController.equipment = equipment;
+
+            // Cross-wire the gun's camera-shake / equipment dash hooks.
+            gun.controller = aiController;
+            ai.controller = aiController;
 
             // Visual body.
             // Red material for AI body (persistent, HDRP-aware — see CreatePersistentMaterial).
@@ -1622,8 +1636,10 @@ namespace HagenDa.Networking.EditorTools
             if (rend != null)
                 rend.sharedMaterial = aiMat;
 
-            // Wire the visual so SetDead can rotate it into the prone posture.
+            // Wire the visual: the controller toggles it for remote viewing, the
+            // AI controller colours it per team.
             ai.visual = body;
+            aiController.visual = body;
 
             EnsureFolder("Assets/Scripts/Network", "Prefabs");
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, AIPrefabPath);

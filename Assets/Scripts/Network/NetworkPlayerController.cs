@@ -508,6 +508,16 @@ namespace HagenDa.Networking
             serverInput = s;
         }
 
+        /// <summary>
+        /// Server-side input injection (AI / ML policy). Identical semantics to
+        /// CmdInput: the struct is stored and consumed by the next SimulateServer.
+        /// </summary>
+        [Server]
+        public void SetServerInput(NetworkInputState s)
+        {
+            serverInput = s;
+        }
+
         // ---------------------------------------------------------------
         // SERVER SIMULATION (authoritative)
         // ---------------------------------------------------------------

@@ -207,5 +207,6 @@ Plus standard `com.unity.modules.*` engine modules.
 
 ### Project
 - [2026-08-18 15:24:15] PHASE5 通用枪械模板已完成并通过测试（2026-08-18），下一阶段为 PHASE6 道具设计。核心实现：WeaponDefinition（数据模板 ScriptableObject）+ NetworkGun（服务端权威枪械状态机，玩家/AI 共用），枪械模型 Assets/Low Poly Weapons VOL.1/Models/M4_8.fbx，资产 Assets/Scripts/Network/Weapons/M4Definition.asset。关键决策：射速 900rpm（偏离规格默认 600，解决散布回复 7°/s 与满速射击散布持续增大的矛盾）；保留子弹穿透（与 PHASE4 一致）；第一人称枪械表现用基础版（挂 M4 模型 + 视觉后座 + 瞄准归中，无枪口火光/换弹动画）。注意：WeaponDefinition 数值改代码字段初始值不会回写已存在的 .asset（序列化值覆盖代码默认），改数值应直接编辑 M4Definition.asset 或删除该资产重建。
+- [2026-08-22] 优先使用 codegraph 辅助代码读取与分析。项目已初始化索引（`.codegraph/`，663 文件 / 13,334 节点 / 27,582 边，DB 已被 `.codegraph/.gitignore` 忽略）。**Why:** 用户明确指示（2026-08-22），符号查询 + 调用链分析比通篇 read_file/grep 更快更准。**How to apply:** 本项目中需要定位符号、读代码、分析调用关系或改动影响面时，先走 codegraph CLI（`codegraph query/node/explore/callers/callees/impact`），再按需 read_file 具体片段；代码改动后可用 `codegraph sync` 同步索引。
 ### Reference
 
