@@ -551,6 +551,10 @@
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.IO.Abstractions">
+      <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\System.IO.Abstractions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
       <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
@@ -571,12 +575,28 @@
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Interactive.Async">
+      <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\ProtoBuffer\System.Interactive.Async.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Google.Protobuf">
+      <HintPath>Library\PackageCache\com.unity.barracuda@3.0.0\Barracuda\Runtime\Plugins\ProtoBuffer\Google.Protobuf.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Codely.Newtonsoft.Json">
       <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.75\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Grpc.Core">
+      <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\ProtoBuffer\Grpc.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.2.1\Runtime\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.IO.Abstractions.TestingHelpers">
+      <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\System.IO.Abstractions.TestingHelpers.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
@@ -1175,12 +1195,24 @@
       <HintPath>Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Barracuda.ONNX">
+      <HintPath>Library\ScriptAssemblies\Unity.Barracuda.ONNX.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Barracuda.MacBLAS">
+      <HintPath>Library\ScriptAssemblies\Unity.Barracuda.MacBLAS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ShaderGraph.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Barracuda.iOSBLAS">
+      <HintPath>Library\ScriptAssemblies\Unity.Barracuda.iOSBLAS.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
@@ -1191,8 +1223,16 @@
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Barracuda">
+      <HintPath>Library\ScriptAssemblies\Unity.Barracuda.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Barracuda.BurstBLAS">
+      <HintPath>Library\ScriptAssemblies\Unity.Barracuda.BurstBLAS.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CrashKonijn.Goap.Resolver">
@@ -1247,6 +1287,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Barracuda.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Barracuda.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.AI.Navigation.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1264,17 +1308,24 @@
     <ProjectReference Include="Mirror.Editor.csproj" />
     <ProjectReference Include="tjgenerators.Editor.csproj" />
     <ProjectReference Include="UnityTcp.CustomTool.csproj" />
+    <ProjectReference Include="Unity.ML-Agents.Editor.csproj" />
     <ProjectReference Include="Telepathy.csproj" />
     <ProjectReference Include="Mirror.Examples.csproj" />
     <ProjectReference Include="Edgegap.csproj" />
     <ProjectReference Include="kcp2k.csproj" />
     <ProjectReference Include="EncryptionTransportEditor.csproj" />
+    <ProjectReference Include="Unity.ML-Agents.Extensions.Editor.csproj" />
+    <ProjectReference Include="Unity.ML-Agents.Extensions.csproj" />
     <ProjectReference Include="Mirror.csproj" />
     <ProjectReference Include="Mirror.Transports.csproj" />
+    <ProjectReference Include="Unity.ML-Agents.Extensions.Editor.Input.csproj" />
     <ProjectReference Include="Mirror.Components.csproj" />
     <ProjectReference Include="SimpleWebTransport.csproj" />
     <ProjectReference Include="Mirror.CompilerSymbols.csproj" />
     <ProjectReference Include="Mirror.Authenticators.csproj" />
+    <ProjectReference Include="Unity.ML-Agents.csproj" />
+    <ProjectReference Include="Unity.ML-Agents.CommunicatorObjects.csproj" />
+    <ProjectReference Include="Unity.ML-Agents.Extensions.Input.csproj" />
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>

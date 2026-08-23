@@ -480,6 +480,10 @@
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.IO.Abstractions">
+      <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\System.IO.Abstractions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
       <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
@@ -500,32 +504,28 @@
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Codely.Newtonsoft.Json">
-      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.75\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.2.1\Runtime\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="System.Interactive.Async">
+      <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\ProtoBuffer\System.Interactive.Async.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Google.Protobuf">
       <HintPath>Library\PackageCache\com.unity.barracuda@3.0.0\Barracuda\Runtime\Plugins\ProtoBuffer\Google.Protobuf.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Interactive.Async">
-      <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\ProtoBuffer\System.Interactive.Async.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.IO.Abstractions.TestingHelpers">
-      <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\System.IO.Abstractions.TestingHelpers.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.IO.Abstractions">
-      <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\System.IO.Abstractions.dll</HintPath>
+    <Reference Include="Codely.Newtonsoft.Json">
+      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.75\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Grpc.Core">
       <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\ProtoBuffer\Grpc.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.2.1\Runtime\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.IO.Abstractions.TestingHelpers">
+      <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\System.IO.Abstractions.TestingHelpers.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
