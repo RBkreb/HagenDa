@@ -44,9 +44,38 @@ namespace HagenDa.Networking
         {
             if (!isServer || controller == null) return;
 
+            // 脚本陪练共存时让行：ScriptedAIController 自己驱动身体。
+            if (GetComponent<ScriptedAIController>() != null) return;
+
             // Dead: forward zero input so stale edge-triggered flags cannot fire
             // on respawn (auto-redeploy is handled by NetworkPlayerHealth).
-            controller.SetServerInput(dead ? default : intent);
+            if (dead)
+            {
+                controller.SetServerInput(default);
+                return;
+            }
+
+            // Push the current intent ONCE, then auto-clear edge-triggered flags
+            // (jump / toggles / reload / mark / slot keys / deploy choice). The
+            // driver (ML policy) sets edges at its decision rate (6 Hz) and holds
+            // continuous fields (move/look/fire/aim/sprint) between decisions —
+            // identical contract to the human client path, where edges fire once
+            // per press.
+            var s = intent;
+            controller.SetServerInput(s);
+
+            intent.jump = false;
+            intent.crouchToggle = false;
+            intent.proneToggle = false;
+            intent.reload = false;
+            intent.switchFireMode = false;
+            intent.mark = false;
+            intent.slotPrimary = false;
+            intent.slotOpt1 = false;
+            intent.slotOpt2 = false;
+            intent.slotSpecial = false;
+            intent.slotThrowable = false;
+            intent.deployChoice = 0;
         }
 
         /// <summary>

@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbd5a5e4f4da3a243a02cd9c10827b25, type: 3}
+  m_Name: TrainingMap_S1Compact
+  m_EditorClassIdentifier: 
+  shape: 0
+  size: 30
+  depth: 30
+  waveAmplitude: 12
+  waveLength: 30
+  coverCount: 4
+  layoutSeed: 42
+  homeOffset: 12
+  zoneRadius: 5
+  covers:
+  - kind: 1
+    position: {x: 3.6983416, y: 0, z: -8.618225}
+    rotationY: 45.186584
+    scale: {x: 2, y: 1, z: 0.8}
+  - kind: 1
+    position: {x: -7.2944474, y: 0, z: -5.697776}
+    rotationY: 260.78702
+    scale: {x: 2, y: 1, z: 0.8}
+  - kind: 0
+    position: {x: -7.179674, y: 0, z: 6.2700133}
+    rotationY: 84.45184
+    scale: {x: 2, y: 2.2, z: 0.6}
+  - kind: 0
+    position: {x: 6.9110227, y: 0, z: 1.8527241}
+    rotationY: 143.08939
+    scale: {x: 2, y: 2.2, z: 0.6}
+  redHome: {x: 0, y: 0, z: -12}
+  blueHome: {x: 0, y: 0, z: 12}
+  zoneCenter: {x: 0, y: 0, z: 0}

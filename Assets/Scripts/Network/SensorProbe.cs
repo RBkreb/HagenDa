@@ -66,7 +66,7 @@ namespace HagenDa.Networking
                 if (c.teamId == ownerTeam) continue;   // 只标记敌方
 
                 if ((c.transform.position - pos).sqrMagnitude <= r2)
-                    c.SetMarked(NetworkTime.time + markDuration);
+                    c.SetMarked(NetworkTime.time + markDuration, ownerTeam, null);
             }
         }
 

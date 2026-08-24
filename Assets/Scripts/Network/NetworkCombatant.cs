@@ -27,6 +27,15 @@ namespace HagenDa.Networking
         [Tooltip("标记到期时间戳 (NetworkTime.time). -1 = 未标记.")]
         [SyncVar] public double markedUntil = -1.0;
 
+        [Tooltip("ML 训练：标记方队伍（标记引导击杀归属）。-1 = 未知。")]
+        [SyncVar] public int markedByTeam = -1;
+
+        /// <summary>ML 训练：最近一次标记者（服务器端引用，奖励归属）。</summary>
+        [System.NonSerialized] public NetworkCombatant lastMarker;
+
+        [Tooltip("PHASE8 干扰器：免疫标记期间任何标记无效。")]
+        [SyncVar] public bool markImmune;
+
         public bool IsMarked => NetworkTime.time < markedUntil;
 
         private NetworkPlayerHealth health;
@@ -46,11 +55,29 @@ namespace HagenDa.Networking
             NetworkMatchManager.RegisterCombatant(this);
         }
 
-        /// <summary>Mark this entity until the given network time (server).</summary>
+        /// <summary>Mark this entity until the given network time (server).
+        /// 干扰器免疫期间忽略新标记。</summary>
         [Server]
         public void SetMarked(double until)
         {
+            SetMarked(until, -1, null);
+        }
+
+        /// <summary>带归属的标记（ML 训练：标记引导击杀奖励）。</summary>
+        [Server]
+        public void SetMarked(double until, int byTeam, NetworkCombatant marker)
+        {
+            if (markImmune) return;
             markedUntil = until;
+            markedByTeam = byTeam;
+            lastMarker = marker;
+        }
+
+        /// <summary>立即清除当前标记（干扰器）。</summary>
+        [Server]
+        public void ClearMark()
+        {
+            markedUntil = -1.0;
         }
 
         private void Update()

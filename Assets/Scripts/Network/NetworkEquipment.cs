@@ -70,6 +70,14 @@ namespace HagenDa.Networking
         // PHASE8: 瞬发型装备（快速机动装置）冷却剩余秒数（客户端 HUD 显示）。
         [SyncVar] public float dashCooldownRemaining;
 
+        // PHASE8 干扰器：免疫标记剩余秒数 + 冷却剩余秒数。
+        [SyncVar] public float jammerImmuneRemaining;
+        [SyncVar] public float jammerCooldownRemaining;
+
+        // 干扰器免疫时长 / 冷却时长。
+        public const float JammerImmuneDuration = 30f;
+        public const float JammerCooldownDuration = 30f;
+
         public int Count => equipmentList != null ? equipmentList.Count : 0;
         public bool IsEmpDisabled => empExposure > 0f;
 
@@ -259,6 +267,12 @@ namespace HagenDa.Networking
             channelIndex = -1;
             channelDef = null;
             dashCooldownRemaining = 0f;
+
+            // 干扰器：清免疫与冷却。
+            jammerImmuneRemaining = 0f;
+            jammerCooldownRemaining = 0f;
+            var combatant = GetComponent<NetworkCombatant>();
+            if (combatant != null) combatant.markImmune = false;
 
             SyncSelected();
             SyncSlotAmmo();
@@ -539,13 +553,31 @@ namespace HagenDa.Networking
                 if (my != null) sensor.SetOwnerTeam(my.teamId);
             }
 
+            // 部署者引用（ML 训练：效用奖励归属）。
+            var myCombatant = GetComponent<NetworkCombatant>();
+
             // 部署信标：传入部署者队伍 + 小队（同小队重部署点）。
             var beacon = go.GetComponent<DeployBeacon>();
             if (beacon != null)
             {
-                var my = GetComponent<NetworkCombatant>();
-                if (my != null) beacon.SetOwner(my.teamId, my.squadId);
+                if (myCombatant != null)
+                {
+                    beacon.SetOwner(myCombatant.teamId, myCombatant.squadId);
+                    beacon.ownerCombatant = myCombatant;
+
+                    // 团队广播：信标已部署（ML 训练共识 §3）。
+                    if (NetworkServer.active)
+                        TeamIntel.Broadcast(myCombatant.teamId, IntelEvent.BeaconDeployed,
+                            go.transform.position, myCombatant.squadId, GetInstanceID());
+                }
             }
+
+            // 大型补给箱 / 拦截装置：记录部署者（效用奖励 + 阵营过滤）。
+            var crate = go.GetComponent<LargeSupplyCrate>();
+            if (crate != null) crate.ownerCombatant = myCombatant;
+
+            var interceptor = go.GetComponent<NetworkInterceptor>();
+            if (interceptor != null) interceptor.ownerCombatant = myCombatant;
 
             NetworkServer.Spawn(go);
 
@@ -561,6 +593,29 @@ namespace HagenDa.Networking
         {
             if (!use || Time.time < nextUseTime[i]) return;
             if (IsEmpDisabled && def.empVulnerable) return;
+
+            // PHASE8 干扰器：清除当前标记 + 30s 免疫，免疫结束后 30s 冷却恢复 1 次。
+            if (def.type == EquipmentType.Jammer)
+            {
+                if (ammo[i] <= 0 || jammerImmuneRemaining > 0f || jammerCooldownRemaining > 0f)
+                    return;
+
+                ammo[i]--;
+                SyncSelected();
+                SyncSlotAmmo();
+
+                // 清除现有标记。
+                var combatant = GetComponent<NetworkCombatant>();
+                if (combatant != null)
+                    combatant.ClearMark();
+
+                // 免疫标记 30s（同步给 NetworkCombatant 供 SetMarked 拦截）。
+                jammerImmuneRemaining = JammerImmuneDuration;
+                if (combatant != null)
+                    combatant.markImmune = true;
+                return;
+            }
+
             // move is the local WASD vector (x strafe / y forward) — convert to a
             // world-space horizontal direction. No input defaults to forward.
             Vector3 worldDir = transform.forward * move.y + transform.right * move.x;
@@ -692,6 +747,35 @@ namespace HagenDa.Networking
             if (dashCooldownRemaining > 0f)
                 dashCooldownRemaining = Mathf.Max(0f, dashCooldownRemaining - dt);
 
+            // PHASE8 干扰器状态机：免疫 → 冷却 → 恢复 1 次使用。
+            var combatant = GetComponent<NetworkCombatant>();
+            if (jammerImmuneRemaining > 0f)
+            {
+                jammerImmuneRemaining = Mathf.Max(0f, jammerImmuneRemaining - dt);
+                if (jammerImmuneRemaining <= 0f)
+                {
+                    // 免疫结束 → 进入冷却。
+                    if (combatant != null)
+                        combatant.markImmune = false;
+                    jammerCooldownRemaining = JammerCooldownDuration;
+                }
+            }
+            else if (jammerCooldownRemaining > 0f)
+            {
+                jammerCooldownRemaining = Mathf.Max(0f, jammerCooldownRemaining - dt);
+                if (jammerCooldownRemaining <= 0f)
+                {
+                    // 冷却结束 → 恢复 1 次使用。
+                    int j = IndexOfType(EquipmentType.Jammer);
+                    if (j >= 0 && ammo != null && j < ammo.Length)
+                    {
+                        ammo[j] = Mathf.Min(1, ammo[j] + 1);
+                        SyncSelected();
+                        SyncSlotAmmo();
+                    }
+                }
+            }
+
             // Channeled-use completion.
             if (channeling)
             {
@@ -733,11 +817,19 @@ namespace HagenDa.Networking
                     break;
 
                 case EquipmentType.HealingSyringe:
-                    if (health != null) health.StartBuffRegen(20f);
+                    if (health != null)
+                    {
+                        health.StartBuffRegen(20f);
+                        // ML 训练：治疗有效使用。
+                        RewardBus.SupportUtility(GetComponent<NetworkCombatant>(),
+                                                 RewardBus.SupportKind.Heal);
+                    }
                     break;
 
                 case EquipmentType.Defibrillator:
-                    ReviveNearestFriendly(transform.position);
+                    if (ReviveNearestFriendly(transform.position))
+                        RewardBus.SupportUtility(GetComponent<NetworkCombatant>(),
+                                                 RewardBus.SupportKind.Rescue);
                     break;
             }
 
@@ -745,9 +837,10 @@ namespace HagenDa.Networking
             channelDef = null;
         }
 
-        private void ReviveNearestFriendly(Vector3 center)
+        private bool ReviveNearestFriendly(Vector3 center)
         {
-            // 测试阶段：没有友方概念，除颤仪对所有死亡实体（除使用者自身）生效。
+            // 只复活同阵营死亡实体（2m 内），返回是否有实际救援。
+            var selfCombatant = GetComponent<NetworkCombatant>();
             var self = GetComponent<NetworkPlayerHealth>();
             NetworkPlayerHealth best = null;
             float bestDist = 2f; // 2m radius
@@ -756,6 +849,13 @@ namespace HagenDa.Networking
             {
                 if (h == null || !h.IsDead) continue;
                 if (self != null && h == self) continue;   // 排除使用者自身
+
+                // 阵营过滤：只救友军（此前对敌我同时生效）。
+                if (selfCombatant != null)
+                {
+                    var other = h.GetComponent<NetworkCombatant>();
+                    if (other == null || other.teamId != selfCombatant.teamId) continue;
+                }
 
                 float d = Vector3.Distance(center, h.transform.position);
                 if (d < bestDist)
@@ -766,7 +866,11 @@ namespace HagenDa.Networking
             }
 
             if (best != null)
+            {
                 best.Rescue();
+                return true;
+            }
+            return false;
         }
 
         // ---------------------------------------------------------------

@@ -96,9 +96,314 @@ namespace HagenDa.Networking.EditorTools
             // Re-serialize the prefab from the current script defaults WITHOUT
             // touching the active scene.
             BuildPlayerPrefab();
-
             AssetDatabase.SaveAssets();
             Debug.Log("[NetworkSetup] Done. Rebuilt " + PrefabPath);
+        }
+
+        // ---------------------------------------------------------------
+        // M1: TRAINING SCENE (ML-TRAINING.md 附录 C)
+        // ---------------------------------------------------------------
+
+        private const string TrainingScenePath = "Assets/Scenes/TrainingArena.scene";
+        private const string TrainingMapsFolder = "Assets/Scripts/Network/TrainingMaps";
+
+        [MenuItem("HagenDa/Create ML Training Scene")]
+        public static void CreateTrainingScene()
+        {
+            CreateTrainingSceneInternal(5, 5, false, TrainingScenePath, "5v5");
+        }
+
+        [MenuItem("HagenDa/Create S1 Training Scene (1v1 vs target)")]
+        public static void CreateS1TrainingScene()
+        {
+            CreateS1MultiAreaScene(100, 120f, 3);
+        }
+
+        private const string S1TrainingScenePath = "Assets/Scenes/S1Training.scene";
+
+        /// <summary>
+        /// S1 多区域训练场景（加速采样：20 个并行 1v1 场地，x 轴排列，间距 200m
+        /// 保证射线/索敌不跨区）。所有区域共享一个 TrainingSessionManager——
+        /// 全灭判定基于全部实体（S1 靶不反击，几乎不会全灭）。
+        /// </summary>
+        private static void CreateS1MultiAreaScene(int areaCount, float spacing, int targetsPerArea)
+        {
+            EnsureFolder("Assets", "Scenes");
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            EnsureFolder("Assets/Scripts/Network", "TrainingMaps");
+
+            // Prefabs (idempotent).
+            GameObject grenadePrefab = BuildGrenadePrefab();
+            GameObject smokePrefab = BuildSmokePrefab();
+            GameObject rescuePrefab = BuildRescuePrefab();
+            GameObject bulletPrefab = BuildBulletPrefab();
+            GameObject playerPrefab = BuildPlayerPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab);
+            GameObject aiPrefab = BuildAIEntityPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab);
+            GameObject scriptedPrefab = BuildScriptedAIPrefab(aiPrefab);
+
+            // 紧凑 S1 专用地图：30×30m，少量掩体。
+            var s1Map = GetOrCreateTrainingMap("TrainingMap_S1Compact", TrainingMap.MapShape.Square, 42);
+            s1Map.size = 30f;
+            s1Map.depth = 30f;
+            s1Map.coverCount = 4;
+            s1Map.homeOffset = 12f;
+            s1Map.zoneRadius = 5f;
+            EditorUtility.SetDirty(s1Map);
+
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(
+                UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Single);
+
+            EnsureLighting();
+
+            // NetworkManager + MatchManager（全场景一份）。
+            var nmGo = new GameObject("NetworkManager");
+            var nm = nmGo.AddComponent<NetworkManager>();
+            nm.playerPrefab = playerPrefab;
+            nm.autoCreatePlayer = false;
+            var kcp = nmGo.AddComponent<kcp2k.KcpTransport>();
+            nm.transport = kcp;
+            nmGo.AddComponent<TrainingAutoHost>();   // Play 后自动 StartHost
+            RegisterSpawnPrefabs(grenadePrefab, smokePrefab, rescuePrefab, aiPrefab, scriptedPrefab);
+
+            var mmGo = new GameObject("NetworkMatchManager");
+            var mm = mmGo.AddComponent<NetworkMatchManager>();
+            mm.winScore = 999999;
+            mm.squadsPerTeam = 1;
+            mm.redeployDelay = 10f;
+            mm.garrisons = new List<GarrisonZone>();
+
+            // Session Manager（全场景一份）。
+            var sessionGo = new GameObject("TrainingSessionManager");
+            sessionGo.AddComponent<NetworkIdentity>();
+            var session = sessionGo.AddComponent<TrainingSessionManager>();
+            session.maps = new List<TrainingMap> { s1Map };
+            session.roundDuration = 60f;   // 紧凑场地用短回合
+
+            // Zone Registry（观测用）。
+            var registryGo = new GameObject("StrategicZoneRegistry");
+            registryGo.AddComponent<StrategicZoneRegistry>();
+
+            // 100 区域：x = i * 120（紧凑场地间距缩小），红 z=-12 / 蓝 z=+12。
+            for (int i = 0; i < areaCount; i++)
+            {
+                float cx = i * spacing;
+
+                var areaGo = new GameObject($"Area_{i}");
+                areaGo.transform.position = new Vector3(cx, 0f, 0f);
+
+                var arena = areaGo.AddComponent<TrainingArena>();
+                s1Map.BuildLayout();
+                arena.ApplyLayout(s1Map);
+
+                var grRed = CreateTrainingGarrison($"GR_Red_{i}", (int)MatchTeam.Red,
+                    new Vector3(cx, 0f, -12f));
+                mm.garrisons.Add(grRed);
+
+                // 1 ML agent。
+                var red = (GameObject)PrefabUtility.InstantiatePrefab(aiPrefab);
+                red.name = $"ML_Red_{i}";
+                red.transform.position = new Vector3(cx, 1.5f, -12f);
+
+                // N 个靶：z=+8..+14，x 分散（保证互相间距 ≥4m，且离 ML ≥ 10m）。
+                for (int t = 0; t < targetsPerArea; t++)
+                {
+                    float tx = cx + (t - (targetsPerArea - 1) * 0.5f) * 6f;
+                    float tz = 8f + (t % 3) * 3f;   // 8, 11, 14
+
+                    var blue = (GameObject)PrefabUtility.InstantiatePrefab(scriptedPrefab);
+                    blue.name = $"Target_Blue_{i}_{t}";
+                    blue.transform.position = new Vector3(tx, 1.5f, tz);
+                    var scripted = blue.GetComponent<ScriptedAIController>();
+                    if (scripted != null) scripted.targetMode = true;
+                }
+
+                // NavMesh（区域级）。
+                BuildNavMeshOnFloor("Floor");
+            }
+
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, S1TrainingScenePath);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[NetworkSetup] Done. Created {S1TrainingScenePath} " +
+                      $"({areaCount} areas x {targetsPerArea} targets, spacing {spacing}m).");
+        }
+
+        private static void CreateTrainingSceneInternal(int mlCount, int scriptedCount,
+            bool s1TargetMode, string scenePath, string label)
+        {
+            EnsureFolder("Assets", "Scenes");
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            EnsureFolder("Assets/Scripts/Network", "TrainingMaps");
+
+            // Prefabs (idempotent).
+            GameObject grenadePrefab = BuildGrenadePrefab();
+            GameObject smokePrefab = BuildSmokePrefab();
+            GameObject rescuePrefab = BuildRescuePrefab();
+            GameObject bulletPrefab = BuildBulletPrefab();
+            GameObject playerPrefab = BuildPlayerPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab);
+            GameObject aiPrefab = BuildAIEntityPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab);
+            GameObject scriptedPrefab = BuildScriptedAIPrefab(aiPrefab);
+
+            // Map assets: Square + Wave（附录 C 两类，种子可复现）。
+            var squareMap = GetOrCreateTrainingMap("TrainingMap_Square", TrainingMap.MapShape.Square, 12345);
+            var waveMap = GetOrCreateTrainingMap("TrainingMap_Wave", TrainingMap.MapShape.Wave, 67890);
+
+            // Fresh empty scene.
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(
+                UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Single);
+
+            EnsureLighting();
+
+            // NetworkManager（无 HUD——训练全自动；禁自动生成真人玩家）。
+            var nmGo = new GameObject("NetworkManager");
+            var nm = nmGo.AddComponent<NetworkManager>();
+            nm.playerPrefab = playerPrefab;
+            nm.autoCreatePlayer = false;
+            var kcp = nmGo.AddComponent<kcp2k.KcpTransport>();
+            nm.transport = kcp;
+            RegisterSpawnPrefabs(grenadePrefab, smokePrefab, rescuePrefab, aiPrefab, scriptedPrefab);
+
+            // MatchManager：注册表/击杀计分/重部署查询（训练场景无据点无胜利分）。
+            var mmGo = new GameObject("NetworkMatchManager");
+            var mm = mmGo.AddComponent<NetworkMatchManager>();
+            mm.winScore = 999999;          // 训练回合由 TrainingSessionManager 驱动
+            mm.squadsPerTeam = 1;           // Q9-B：单小队
+            mm.redeployDelay = 10f;
+
+            // 双方 GR（home 重生点，供死亡自动重部署）。
+            var grRed = CreateTrainingGarrison("GR_Red", (int)MatchTeam.Red, new Vector3(0f, 0f, -24f));
+            var grBlue = CreateTrainingGarrison("GR_Blue", (int)MatchTeam.Blue, new Vector3(0f, 0f, 24f));
+            mm.garrisons = new List<GarrisonZone> { grRed, grBlue };
+
+            // Arena + Session Manager + Zone Registry。
+            var arenaGo = new GameObject("TrainingArena");
+            arenaGo.AddComponent<TrainingArena>();
+
+            var sessionGo = new GameObject("TrainingSessionManager");
+            sessionGo.AddComponent<NetworkIdentity>();
+            var session = sessionGo.AddComponent<TrainingSessionManager>();
+            session.arena = arenaGo.GetComponent<TrainingArena>();
+            session.maps = new List<TrainingMap> { squareMap, waveMap };
+            session.roundDuration = s1TargetMode ? 90f : 120f;
+
+            var registryGo = new GameObject("StrategicZoneRegistry");
+            registryGo.AddComponent<StrategicZoneRegistry>();
+
+            // Central abstract zone（纯要地 marker：无争夺机制，中央位置）。
+            var zoneGo = new GameObject("CentralZone");
+            zoneGo.transform.position = Vector3.zero;
+            zoneGo.AddComponent<StrategicZone>();
+
+            // Teams：红 ML + 蓝 Scripted。出生按 z 分队（红 z<0 / 蓝 z>0）。
+            for (int i = 0; i < mlCount; i++)
+            {
+                var red = (GameObject)PrefabUtility.InstantiatePrefab(aiPrefab);
+                red.name = "ML_Red_" + i;
+                red.transform.position = new Vector3((i - (mlCount - 1) * 0.5f) * 1.5f, 1.5f, -24f);
+            }
+            for (int i = 0; i < scriptedCount; i++)
+            {
+                var blue = (GameObject)PrefabUtility.InstantiatePrefab(scriptedPrefab);
+                blue.name = s1TargetMode ? "Target_Blue_" + i : "Scripted_Blue_" + i;
+                blue.transform.position = new Vector3((i - (scriptedCount - 1) * 0.5f) * 1.5f, 1.5f, 24f);
+
+                if (s1TargetMode)
+                {
+                    var scripted = blue.GetComponent<ScriptedAIController>();
+                    if (scripted != null) scripted.targetMode = true;
+                }
+            }
+
+            // 初始几何（编辑期预览；运行时每回合 ApplyLayout 重建）。
+            squareMap.BuildLayout();
+            arenaGo.GetComponent<TrainingArena>().ApplyLayout(squareMap);
+
+            // NavMesh（脚本陪练用；ML AI 不依赖）。
+            BuildNavMeshOnFloor("Floor");
+
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, scenePath);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[NetworkSetup] Done. Created {scenePath} ({label}).");
+        }
+
+        private static GarrisonZone CreateTrainingGarrison(string name, int team, Vector3 pos)
+        {
+            var go = new GameObject(name);
+            go.transform.position = pos;
+            var gz = go.AddComponent<GarrisonZone>();
+            gz.teamId = team;
+            gz.radius = 6f;
+
+            // 4 个部署点（home 周围散开）。
+            for (int i = 0; i < 4; i++)
+            {
+                var dp = new GameObject("DeployPoint_" + i);
+                dp.transform.SetParent(go.transform, false);
+                float ang = i * Mathf.PI * 0.5f;
+                dp.transform.localPosition = new Vector3(Mathf.Cos(ang) * 3f, 0f, Mathf.Sin(ang) * 3f);
+                gz.deployPoints.Add(dp.transform);
+            }
+            return gz;
+        }
+
+        private static TrainingMap GetOrCreateTrainingMap(string name, TrainingMap.MapShape shape, int seed)
+        {
+            var path = $"{TrainingMapsFolder}/{name}.asset";
+            var map = AssetDatabase.LoadAssetAtPath<TrainingMap>(path);
+            if (map == null)
+            {
+                map = ScriptableObject.CreateInstance<TrainingMap>();
+                AssetDatabase.CreateAsset(map, path);
+            }
+            map.shape = shape;
+            map.layoutSeed = seed;
+            EditorUtility.SetDirty(map);
+            return map;
+        }
+
+        /// <summary>脚本陪练 prefab：ML AI prefab 克隆 + ScriptedAIController 替换桥。</summary>
+        private static GameObject BuildScriptedAIPrefab(GameObject aiPrefab)
+        {
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            const string path = "Assets/Scripts/Network/Prefabs/ScriptedAIEntity.prefab";
+
+            var existing = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            var root = existing != null
+                ? (GameObject)PrefabUtility.InstantiatePrefab(existing)
+                : (GameObject)PrefabUtility.InstantiatePrefab(aiPrefab);
+            root.name = "ScriptedAIEntity";
+
+            // 脚本陪练：无 ML 桥（不采样），加 NavMesh 驱动状态机。
+            var bridge = root.GetComponent<MLAgentBridge>();
+            if (bridge != null) Object.DestroyImmediate(bridge);
+            var sensor = root.GetComponent<AgentRaySensor>();
+            if (sensor != null) Object.DestroyImmediate(sensor);
+
+            if (root.GetComponent<ScriptedAIController>() == null)
+                root.AddComponent<ScriptedAIController>();
+
+            var prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
+            Object.DestroyImmediate(root);
+            return prefab;
+        }
+
+        /// <summary>在指定名字的地板上烘 NavMesh（训练场脚本陪练用）。</summary>
+        private static void BuildNavMeshOnFloor(string floorName)
+        {
+            var floor = GameObject.Find(floorName);
+            if (floor == null)
+            {
+                Debug.LogWarning("[NetworkSetup] No Floor found; skipping NavMesh build.");
+                return;
+            }
+            var surface = floor.GetComponent<NavMeshSurface>();
+            if (surface == null)
+                surface = floor.AddComponent<NavMeshSurface>();
+            surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+            surface.collectObjects = CollectObjects.Children;
+            surface.BuildNavMesh();
+            Debug.Log("[NetworkSetup] NavMesh built on " + floorName + ".");
         }
 
         [MenuItem("HagenDa/Create Phase3 Scene")]
@@ -1387,6 +1692,16 @@ namespace HagenDa.Networking.EditorTools
             bs.maxCarry = 1; bs.supplyCost = 0; bs.shieldExplosionReduction = 0.6f;
             list.Add(bs);
 
+            // 17. 干扰器（可选，瞬发清除自身标记 + 30s 免疫标记，免疫结束后
+            //     30s 冷却恢复 1 次，EMP 可禁）
+            var jm = GetOrCreateEquipmentDef("Jammer");
+            jm.type = EquipmentType.Jammer;
+            jm.displayName = "干扰器";
+            jm.useStyle = EquipmentUseStyle.SelfInstant;
+            jm.maxCarry = 1; jm.supplyCost = 0;
+            jm.empVulnerable = true;
+            list.Add(jm);
+
             // PHASE8: 按类型统一赋值 category + instantUse + deployCap。
             foreach (var d in list)
             {
@@ -1421,6 +1736,7 @@ namespace HagenDa.Networking.EditorTools
                     case EquipmentType.EmpGrenade:     // 电磁手雷：瞬发型
                     case EquipmentType.Sensor:         // 感应器：瞬发型特有（g 键直接部署）
                     case EquipmentType.DeployBeacon:   // 部署信标：瞬发型（放置即部署）
+                    case EquipmentType.Jammer:         // 干扰器：瞬发型（slot 键直接使用）
                         d.instantUse = true;
                         break;
                     default:
@@ -1606,6 +1922,11 @@ namespace HagenDa.Networking.EditorTools
 
             // AI controller (input provider, no built-in behavior).
             var ai = root.AddComponent<NetworkAIController>();
+
+            // ML bridge (M1): observation collection + action mapping + ray sensor.
+            root.AddComponent<AgentRaySensor>();
+            var bridge = root.AddComponent<MLAgentBridge>();
+            bridge.ai = ai;
 
             // Equipment (PHASE6): same shared runtime as the player.
             if (equipmentList == null)

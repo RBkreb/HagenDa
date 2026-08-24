@@ -283,6 +283,8 @@ MonoBehaviour:
   teamId: -1
   squadId: -1
   markedUntil: -1
+  markedByTeam: -1
+  markImmune: 0
 --- !u!114 &2737380012179938336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -440,6 +442,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f6449bc34f7c8fc4ebc4387f723e440a, type: 2}
   - {fileID: 11400000, guid: 25d9ef986e04a6048ad67396d3323b84, type: 2}
   - {fileID: 11400000, guid: 9a734e141d3ed4b4191f0bd919b5f058, type: 2}
+  - {fileID: 11400000, guid: 1e756ec287a58554a86724f5c69e9313, type: 2}
   controller: {fileID: 7971186896382879504}
   selection: -1
   selectedAmmo: 0
@@ -452,6 +455,8 @@ MonoBehaviour:
   specialIndex: -1
   throwableIndex: -1
   dashCooldownRemaining: 0
+  jammerImmuneRemaining: 0
+  jammerCooldownRemaining: 0
 --- !u!1 &5844093405414719529
 GameObject:
   m_ObjectHideFlags: 0

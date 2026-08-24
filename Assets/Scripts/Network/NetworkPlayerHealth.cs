@@ -143,6 +143,7 @@ namespace HagenDa.Networking
 
             if (remaining > 0f)
             {
+                float healthBefore = health;
                 health = Mathf.Max(0f, health - remaining);
                 // Regen is gated on health *actually decreasing*, not on taking
                 // damage: armor-only damage must not reset the regen timer.
@@ -150,6 +151,18 @@ namespace HagenDa.Networking
 
                 // 回复中被伤害则去除回复 buff（治疗针 / 补给包）。
                 buffRegenPerSecond = 0f;
+
+                // 团队广播：受击（位置 = 攻击者 → 读取方得到受击方向）（ML 训练共识 §3）。
+                if (lastAttacker != null)
+                {
+                    var c0 = GetComponent<NetworkCombatant>();
+                    if (c0 != null)
+                        TeamIntel.Broadcast(c0.teamId, IntelEvent.Damaged,
+                            lastAttacker.transform.position, c0.squadId, GetInstanceID());
+                }
+
+                // ML 训练奖励：按实际损失 HP 计（过量伤害不重复计分）。
+                RewardBus.Damage(this, lastAttacker, healthBefore - health);
             }
 
             // PHASE8: 受击反馈（相机震动 + FOV 脉冲）。
@@ -265,6 +278,14 @@ namespace HagenDa.Networking
             // 击杀归属计分（仅敌方击杀）。
             var self = GetComponent<NetworkCombatant>();
             NetworkMatchManager.Instance?.ReportKill(lastAttacker, self);
+
+            // ML 训练奖励：击杀 + 阵亡 + 助攻 + 团队共享 + 标记引导。
+            RewardBus.Kill(this, lastAttacker);
+
+            // 团队广播：阵亡求救（ML 训练共识 §3）。
+            if (self != null)
+                TeamIntel.Broadcast(self.teamId, IntelEvent.DeathSOS,
+                    transform.position, self.squadId, GetInstanceID());
 
             // 死亡 10s 后可重新部署。
             var mm = NetworkMatchManager.Instance;
@@ -457,6 +478,10 @@ namespace HagenDa.Networking
 
             var ai = GetComponent<NetworkAIController>();
             if (ai != null) ai.SetDead(dead);
+
+            // 脚本陪练（与 ML AI 共存于同一身体）：冻结状态机。
+            var scripted = GetComponent<ScriptedAIController>();
+            if (scripted != null) scripted.SetDead(dead);
         }
 
         /// <summary>The enabled capsule collider (stand/crouch/prone), used by bullets
@@ -478,6 +503,30 @@ namespace HagenDa.Networking
 
         [ClientRpc]
         private void RpcRescue() { }
+
+        /// <summary>
+        /// ML 训练回合重置（TrainingSessionManager）：满血满甲、清死亡状态、
+        /// 重置装备与弹药——绕过 redeploy 等待流程。
+        /// </summary>
+        [Server]
+        public void ServerFullResetForRound()
+        {
+            deathHandled = false;
+            unrevivable = false;
+            awaitingRedeploy = false;
+            awaitingInitialDeploy = false;
+            lastAttacker = null;
+            health = maxHealth;
+            armor = 0f;
+            buffRegenPerSecond = 0f;
+
+            SetDeadState(false);
+
+            var eq = GetComponent<NetworkEquipment>();
+            if (eq != null) eq.ResetForRedeploy();
+            var gun = GetComponent<NetworkGun>();
+            if (gun != null) gun.ResetForRedeploy();
+        }
 
         private void OnHealthChanged(float oldValue, float newValue) { }
         private void OnArmorChanged(float oldValue, float newValue) { }

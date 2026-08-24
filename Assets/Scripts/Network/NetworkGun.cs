@@ -312,6 +312,13 @@ namespace HagenDa.Networking
             Vector3 dir = ComputeFireDirection(aimForward, recoil, bloom);
             SpawnBullet(aimOrigin, dir);
 
+            // S1 评估统计（服务器端，评估场景中才有）。
+            if (NetworkServer.active)
+            {
+                var eval = Object.FindObjectOfType<S1EvaluationStats>();
+                if (eval != null) eval.RecordShot();
+            }
+
             // Visual recoil only makes sense for an owned player (AI has no owner
             // connection and no first-person camera).
             if (connectionToClient != null)

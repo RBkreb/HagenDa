@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbd5a5e4f4da3a243a02cd9c10827b25, type: 3}
+  m_Name: TrainingMap_Square
+  m_EditorClassIdentifier: 
+  shape: 0
+  size: 60
+  depth: 60
+  waveAmplitude: 12
+  waveLength: 30
+  coverCount: 14
+  layoutSeed: 12345
+  homeOffset: 24
+  zoneRadius: 8
+  covers:
+  - kind: 1
+    position: {x: -22.52916, y: 0, z: -23.211386}
+    rotationY: 278.91544
+    scale: {x: 2, y: 1, z: 0.8}
+  - kind: 2
+    position: {x: 15.469508, y: 0, z: 17.674648}
+    rotationY: 59.745167
+    scale: {x: 3, y: 1.4, z: 3}
+  - kind: 1
+    position: {x: -12.46875, y: 0, z: 0.32426298}
+    rotationY: 82.898544
+    scale: {x: 2, y: 1, z: 0.8}
+  - kind: 2
+    position: {x: -14.769008, y: 0, z: -25.876213}
+    rotationY: 48.540096
+    scale: {x: 3, y: 1.4, z: 3}
+  - kind: 1
+    position: {x: -15.855265, y: 0, z: 20.900135}
+    rotationY: 309.99622
+    scale: {x: 2, y: 1, z: 0.8}
+  - kind: 2
+    position: {x: -20.607483, y: 0, z: 1.597484}
+    rotationY: 129.15181
+    scale: {x: 3, y: 1.4, z: 3}
+  - kind: 0
+    position: {x: 12.089825, y: 0, z: 13.385667}
+    rotationY: 142.65038
+    scale: {x: 2, y: 2.2, z: 0.6}
+  - kind: 1
+    position: {x: 9.689945, y: 0, z: -15.630506}
+    rotationY: 186.31354
+    scale: {x: 2, y: 1, z: 0.8}
+  - kind: 1
+    position: {x: -12.854117, y: 0, z: 14.622057}
+    rotationY: 0.92841816
+    scale: {x: 2, y: 1, z: 0.8}
+  - kind: 0
+    position: {x: 11.002026, y: 0, z: -2.632623}
+    rotationY: 97.182846
+    scale: {x: 2, y: 2.2, z: 0.6}
+  - kind: 2
+    position: {x: 7.0325522, y: 0, z: -11.081953}
+    rotationY: 133.03209
+    scale: {x: 3, y: 1.4, z: 3}
+  - kind: 0
+    position: {x: 10.993034, y: 0, z: -23.36798}
+    rotationY: 335.03918
+    scale: {x: 2, y: 2.2, z: 0.6}
+  - kind: 0
+    position: {x: -21.069794, y: 0, z: -4.4238925}
+    rotationY: 122.35664
+    scale: {x: 2, y: 2.2, z: 0.6}
+  - kind: 2
+    position: {x: 16.622309, y: 0, z: -25.934713}
+    rotationY: 313.05704
+    scale: {x: 3, y: 1.4, z: 3}
+  redHome: {x: 0, y: 0, z: -24}
+  blueHome: {x: 0, y: 0, z: 24}
+  zoneCenter: {x: 0, y: 0, z: 0}

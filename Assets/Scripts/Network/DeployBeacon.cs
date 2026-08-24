@@ -41,6 +41,9 @@ namespace HagenDa.Networking
             ownerSquad = squad;
         }
 
+        /// <summary>ML 训练：记录部署者引用（信标重生效用奖励归属）。</summary>
+        [System.NonSerialized] public NetworkCombatant ownerCombatant;
+
         private void OnCollisionEnter(Collision collision)
         {
             // 接触地面后立刻静止并去除物理，固定在落点（倒圆锥立在尖端）。
@@ -89,6 +92,7 @@ namespace HagenDa.Networking
                                          QueryTriggerInteraction.Ignore))
                 {
                     usesRemaining--;
+                    RewardBus.BeaconRespawn(ownerCombatant);
                     if (usesRemaining <= 0)
                         NetworkServer.Destroy(gameObject);
                     return p;
@@ -98,6 +102,7 @@ namespace HagenDa.Networking
             // No clear spot found: spawn at the beacon itself (collisions with
             // living bodies are ignored anyway).
             usesRemaining--;
+            RewardBus.BeaconRespawn(ownerCombatant);
             if (usesRemaining <= 0)
                 NetworkServer.Destroy(gameObject);
             return transform.position;

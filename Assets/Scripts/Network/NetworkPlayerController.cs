@@ -162,6 +162,15 @@ namespace HagenDa.Networking
         private PhysicMaterial aliveStandMat;   // cached no-friction material (stand)
         private PhysicMaterial aliveCrouchMat;   // cached no-friction material (crouch)
 
+        /// <summary>ML 训练观测：当前是否接地（服务端）。</summary>
+        public bool Grounded => grounded;
+
+        /// <summary>ML 训练观测：粘性冲刺是否激活。</summary>
+        public bool Sprinting => sprintActive;
+
+        /// <summary>ML 训练观测：飞扑进行中（空中）。</summary>
+        public bool Diving => diving;
+
         // Client-side input cache (sampled every rendered frame).
         private Vector2 clientMove;
         private bool clientFire;
@@ -917,7 +926,8 @@ namespace HagenDa.Networking
                     // 敌方：标记；友军/自身：穿过继续。
                     if (c.teamId >= 0 && (self == null || c.teamId != self.teamId))
                     {
-                        c.SetMarked(NetworkTime.time + 10.0);
+                        c.SetMarked(NetworkTime.time + 10.0,
+                                    self != null ? self.teamId : -1, self);
                         return;
                     }
                     continue;

@@ -22,6 +22,9 @@ GameObject:
   - component: {fileID: 3308931702653194175}
   - component: {fileID: 3115867161679082356}
   - component: {fileID: 6098297461493983970}
+  - component: {fileID: 5468884711748042741}
+  - component: {fileID: 3778607301254952988}
+  - component: {fileID: 8104064327175373757}
   - component: {fileID: 7057705317322719540}
   m_Layer: 0
   m_HasEditorInfo: 1
@@ -189,9 +192,12 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   throwPoint: {fileID: 0}
-  grenadeThrowablePrefab: {fileID: 0}
-  smokeThrowablePrefab: {fileID: 0}
-  rescueThrowablePrefab: {fileID: 0}
+  grenadeThrowablePrefab: {fileID: 3792378269598571763, guid: f8492bd32540f38419c8d1854790070d,
+    type: 3}
+  smokeThrowablePrefab: {fileID: 8750669352066971556, guid: a71b5efb948a6994cb201844257bac2c,
+    type: 3}
+  rescueThrowablePrefab: {fileID: 6601452253533115365, guid: 477445035a5cabe41a1df9782413153f,
+    type: 3}
   throwSpeed: 10
   throwCooldown: 1
 --- !u!114 &5783371912108599561
@@ -211,7 +217,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   definition: {fileID: 11400000, guid: fb977b69eb03c1c4cb36be57e91644cc, type: 2}
-  bulletPrefab: {fileID: 0}
+  bulletPrefab: {fileID: 5926176164332243332, guid: dcb3f61632dbb1746985a4ecc29c1369,
+    type: 3}
   bulletPoolCapacity: 60
   gunModel: {fileID: 0}
   hipPosition: {x: 0.28, y: -0.24, z: 0.45}
@@ -273,6 +280,8 @@ MonoBehaviour:
   teamId: -1
   squadId: -1
   markedUntil: -1
+  markedByTeam: -1
+  markImmune: 0
 --- !u!114 &1078101726408592051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -383,6 +392,67 @@ MonoBehaviour:
   syncInterval: 0
   controller: {fileID: 3115867161679082356}
   visual: {fileID: 3619932077785825544}
+--- !u!114 &5468884711748042741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543077640700298910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 465973e839f8dcc4f8721bd189923942, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3778607301254952988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543077640700298910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    VectorObservationSize: 1
+    NumStackedVectorObservations: 1
+    m_ActionSpec:
+      m_NumContinuousActions: 0
+      BranchSizes: 01000000
+    VectorActionSize: 01000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 0
+    hasUpgradedBrainParametersWithActionSpec: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_BehaviorType: 0
+  m_BehaviorName: My Behavior
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_DeterministicInference: 0
+  m_ObservableAttributeHandling: 0
+--- !u!114 &8104064327175373757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543077640700298910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5200ccb42985c2444b2011c11fc504b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
+  classId: 0
+  ai: {fileID: 6098297461493983970}
 --- !u!114 &7057705317322719540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -419,6 +489,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f6449bc34f7c8fc4ebc4387f723e440a, type: 2}
   - {fileID: 11400000, guid: 25d9ef986e04a6048ad67396d3323b84, type: 2}
   - {fileID: 11400000, guid: 9a734e141d3ed4b4191f0bd919b5f058, type: 2}
+  - {fileID: 11400000, guid: 1e756ec287a58554a86724f5c69e9313, type: 2}
   controller: {fileID: 3115867161679082356}
   selection: -1
   selectedAmmo: 0
@@ -431,6 +502,8 @@ MonoBehaviour:
   specialIndex: -1
   throwableIndex: -1
   dashCooldownRemaining: 0
+  jammerImmuneRemaining: 0
+  jammerCooldownRemaining: 0
 --- !u!1 &3619932077785825544
 GameObject:
   m_ObjectHideFlags: 0

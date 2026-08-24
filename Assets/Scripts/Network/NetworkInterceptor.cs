@@ -16,6 +16,9 @@ namespace HagenDa.Networking
         public float radius = 3f;
         public int maxIntercepts = 3;
 
+        /// <summary>ML 训练：部署者（拦截效用奖励归属）。服务器端引用。</summary>
+        [System.NonSerialized] public NetworkCombatant ownerCombatant;
+
         private int intercepts;
 
         public override void OnStartServer()
@@ -61,6 +64,9 @@ namespace HagenDa.Networking
             if (target == null) return;
             NetworkServer.Destroy(target);
             intercepts++;
+
+            // ML 训练：拦截挡弹效用奖励。
+            RewardBus.InterceptorBlock(ownerCombatant);
 
             if (intercepts >= maxIntercepts)
                 NetworkServer.Destroy(gameObject);

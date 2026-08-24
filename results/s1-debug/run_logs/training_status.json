@@ -1,0 +1,47 @@
+{
+    "HagenDaSquad": {
+        "checkpoints": [
+            {
+                "steps": 49992,
+                "file_path": "results\\s1-debug\\HagenDaSquad\\HagenDaSquad-49992.onnx",
+                "reward": null,
+                "creation_time": 1787576627.3595886,
+                "auxillary_file_paths": [
+                    "results\\s1-debug\\HagenDaSquad\\HagenDaSquad-49992.pt"
+                ]
+            },
+            {
+                "steps": 99944,
+                "file_path": "results\\s1-debug\\HagenDaSquad\\HagenDaSquad-99944.onnx",
+                "reward": null,
+                "creation_time": 1787576718.5011666,
+                "auxillary_file_paths": [
+                    "results\\s1-debug\\HagenDaSquad\\HagenDaSquad-99944.pt"
+                ]
+            },
+            {
+                "steps": 102120,
+                "file_path": "results\\s1-debug\\HagenDaSquad\\HagenDaSquad-102120.onnx",
+                "reward": null,
+                "creation_time": 1787576718.9783864,
+                "auxillary_file_paths": [
+                    "results\\s1-debug\\HagenDaSquad\\HagenDaSquad-102120.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 102120,
+            "file_path": "results\\s1-debug\\HagenDaSquad.onnx",
+            "reward": null,
+            "creation_time": 1787576718.9783864,
+            "auxillary_file_paths": [
+                "results\\s1-debug\\HagenDaSquad\\HagenDaSquad-102120.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.30.0",
+        "torch_version": "2.8.0+cu126"
+    }
+}

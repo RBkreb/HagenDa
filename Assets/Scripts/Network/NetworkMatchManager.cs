@@ -114,6 +114,23 @@ namespace HagenDa.Networking
             AssignCombatant(c);
         }
 
+        /// <summary>ML 训练观测：当前注册的全部作战单位（服务器权威注册表）。</summary>
+        public static void GetAllCombatants(List<NetworkCombatant> output)
+        {
+            output.Clear();
+            if (Instance != null)
+            {
+                // 剔除已销毁的引用。
+                Instance.combatants.RemoveAll(c => c == null);
+                output.AddRange(Instance.combatants);
+            }
+            else
+            {
+                pending.RemoveAll(c => c == null);
+                output.AddRange(pending);
+            }
+        }
+
         // ---------------------------------------------------------------
         // TEAM / SQUAD ASSIGNMENT
         // ---------------------------------------------------------------

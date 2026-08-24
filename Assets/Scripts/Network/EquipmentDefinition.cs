@@ -34,7 +34,8 @@ namespace HagenDa.Networking
         HealingSyringe,     // 治疗针（特有）
         Defibrillator,      // 除颤仪（特有）
         Sensor,             // 感应器（特有，固定地面标记敌方）
-        DeployBeacon        // 部署信标（可选，同小队重部署点）
+        DeployBeacon,       // 部署信标（可选，同小队重部署点）
+        Jammer              // 干扰器（可选，瞬发清除标记 + 30s 免疫标记）
     }
 
     /// <summary>
