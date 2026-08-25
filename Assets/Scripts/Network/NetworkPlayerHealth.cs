@@ -457,6 +457,10 @@ namespace HagenDa.Networking
             var ai = GetComponent<NetworkAIController>();
             if (ai != null) ai.OnRedeploy(pos);
 
+            // PHASE9 FSM 大脑：从新位置重新开始常态。
+            var fsm = GetComponent<FSMAIController>();
+            if (fsm != null) fsm.OnRedeploy(pos);
+
             RpcRedeploy();
         }
 
@@ -482,6 +486,10 @@ namespace HagenDa.Networking
             // 脚本陪练（与 ML AI 共存于同一身体）：冻结状态机。
             var scripted = GetComponent<ScriptedAIController>();
             if (scripted != null) scripted.SetDead(dead);
+
+            // PHASE9 FSM 大脑：冻结决策（重部署钩子在 DoDeploy 里单独调用）。
+            var fsm = GetComponent<FSMAIController>();
+            if (fsm != null) fsm.SetDead(dead);
         }
 
         /// <summary>The enabled capsule collider (stand/crouch/prone), used by bullets

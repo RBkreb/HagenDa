@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Mirror;
+using Unity.Collections;
 using UnityEngine;
 
 namespace HagenDa.Networking
@@ -44,6 +45,9 @@ namespace HagenDa.Networking
         /// <summary>总输出维度：48 根 × (距离 + 9 类 one-hot)。</summary>
         public const int OutputSize = (ForwardRays * 2 + RingRays * 2) * 10;
 
+        /// <summary>总射线数（前向双高度 32 + 环形双高度 16）。批处理数组按此分配。</summary>
+        public const int TotalRays = ForwardRays * 2 + RingRays * 2;
+
         /// <summary>每根射线的最新命中（供广播/调试读取；index 与输出一致）。</summary>
         public struct RayHit
         {
@@ -68,11 +72,69 @@ namespace HagenDa.Networking
 
         private void Awake()
         {
-            Latest = new RayHit[ForwardRays * 2 + RingRays * 2];
+            Latest = new RayHit[TotalRays];
         }
 
         /// <summary>每决策步采样。originBase = 实体脚底位置，yaw = 当前朝向（度）。</summary>
         public void Sample(Vector3 originBase, float yaw, int team)
+        {
+            BeginSample(originBase, team);
+
+            for (int i = 0; i < TotalRays; i++)
+            {
+                GetRay(i, originBase, yaw, out var origin, out var dir, out var range);
+                CastRay(origin, dir, range, i);
+            }
+        }
+
+        /// <summary>
+        /// 批处理路径（PHASE9 FSM）：把本传感器的 48 根射线写入共享命令数组
+        /// （从 offset 开始），由 FSMBattleSystem 统一 ScheduleBatch 后同帧
+        /// Complete。语义与 <see cref="Sample"/> 一致（同样重置缓存、更新
+        /// SensorOrigin*），仅发射方式不同。
+        /// </summary>
+        public void BuildBatchCommands(Vector3 originBase, float yaw, int team,
+                                       NativeArray<RaycastCommand> commands, int offset)
+        {
+            BeginSample(originBase, team);
+
+            for (int i = 0; i < TotalRays; i++)
+            {
+                GetRay(i, originBase, yaw, out var origin, out var dir, out var range);
+                commands[offset + i] = new RaycastCommand(
+                    origin, dir,
+                    new QueryParameters(Physics.DefaultRaycastLayers, true,
+                                        QueryTriggerInteraction.Ignore, true),
+                    range);
+            }
+        }
+
+        /// <summary>
+        /// 批处理路径结果解析：读取共享命中数组（从 offset 开始），分类并填充
+        /// <see cref="Latest"/>。在 ScheduleBatch 完成后由 FSMBattleSystem 调用。
+        /// </summary>
+        public void ParseBatchHits(NativeArray<RaycastHit> results, int offset)
+        {
+            for (int i = 0; i < TotalRays; i++)
+            {
+                RayHit hit = default;
+                hit.kind = RayHitKind.None;
+                hit.distance = RangeOf(i);
+
+                var res = results[offset + i];
+                if (res.collider != null)
+                {
+                    hit.point = res.point;
+                    hit.distance = res.distance;
+                    hit.kind = Classify(res.collider, out var c);
+                    hit.combatant = c;
+                }
+
+                Latest[i] = hit;
+            }
+        }
+
+        private void BeginSample(Vector3 originBase, int team)
         {
             myTeam = team;
             kindCache.Clear();
@@ -80,39 +142,50 @@ namespace HagenDa.Networking
 
             SensorOriginForward = originBase + Vector3.up * 0f; // 扇形环心（脚底）
             SensorOriginRing = originBase;
+        }
 
-            int idx = 0;
-            float half = ForwardFovDeg * 0.5f;
-
-            // 前向扇形：两高度面 × 16 根，从左到右扫过 FOV。
-            for (int p = 0; p < 2; p++)
+        /// <summary>第 idx 根射线的原点/方向/长度（布局的唯一真源）。</summary>
+        private void GetRay(int idx, Vector3 originBase, float yaw,
+                            out Vector3 origin, out Vector3 dir, out float range)
+        {
+            if (idx < ForwardRays * 2)
             {
-                float h = p == 0 ? FootHeight : HeadHeight;
-                for (int i = 0; i < ForwardRays; i++)
-                {
-                    float t = ForwardRays == 1 ? 0.5f : i / (float)(ForwardRays - 1);
-                    float ang = yaw + Mathf.Lerp(-half, half, t);
-                    CastRay(originBase + Vector3.up * h, ang, ForwardRange, idx++);
-                }
+                // 前向扇形：两高度面 × 16 根，从左到右扫过 FOV。
+                float half = ForwardFovDeg * 0.5f;
+                int p = idx / ForwardRays;
+                int i = idx % ForwardRays;
+                float t = ForwardRays == 1 ? 0.5f : i / (float)(ForwardRays - 1);
+                float ang = yaw + Mathf.Lerp(-half, half, t);
+                range = ForwardRange;
+                origin = originBase + Vector3.up * (p == 0 ? FootHeight : HeadHeight);
+                dir = DirFromYaw(ang);
             }
-
-            // 环形近距：两高度面 × 8 根，均匀 360°。
-            for (int p = 0; p < 2; p++)
+            else
             {
-                float h = p == 0 ? FootHeight : HeadHeight;
-                for (int i = 0; i < RingRays; i++)
-                {
-                    float ang = yaw + (360f / RingRays) * i;
-                    CastRay(originBase + Vector3.up * h, ang, RingRange, idx++);
-                }
+                // 环形近距：两高度面 × 8 根，均匀 360°。
+                int j = idx - ForwardRays * 2;
+                int p = j / RingRays;
+                int i = j % RingRays;
+                float ang = yaw + (360f / RingRays) * i;
+                range = RingRange;
+                origin = originBase + Vector3.up * (p == 0 ? FootHeight : HeadHeight);
+                dir = DirFromYaw(ang);
             }
         }
 
-        private void CastRay(Vector3 origin, float yawDeg, float range, int idx)
+        private static float RangeOf(int idx)
         {
-            Vector3 dir = new Vector3(Mathf.Sin(yawDeg * Mathf.Deg2Rad), 0f,
-                                      Mathf.Cos(yawDeg * Mathf.Deg2Rad));
+            return idx < ForwardRays * 2 ? ForwardRange : RingRange;
+        }
 
+        private static Vector3 DirFromYaw(float yawDeg)
+        {
+            return new Vector3(Mathf.Sin(yawDeg * Mathf.Deg2Rad), 0f,
+                               Mathf.Cos(yawDeg * Mathf.Deg2Rad));
+        }
+
+        private void CastRay(Vector3 origin, Vector3 dir, float range, int idx)
+        {
             RayHit hit = default;
             hit.kind = RayHitKind.None;
             hit.distance = range;
@@ -213,7 +286,7 @@ namespace HagenDa.Networking
             for (int i = 0; i < Latest.Length; i++)
             {
                 var h = Latest[i];
-                float range = i < ForwardRays * 2 ? ForwardRange : RingRange;
+                float range = RangeOf(i);
                 output[o++] = h.kind == RayHitKind.None ? 1f : h.distance / range;
 
                 for (int k = 0; k < Kinds; k++)

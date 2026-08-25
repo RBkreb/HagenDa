@@ -1,10 +1,10 @@
 {
-  "unity_port": -1,
-  "stream_port": 6775,
+  "unity_port": 2152,
+  "stream_port": 2165,
   "created_date": "2026-08-13T07:24:50.304Z",
   "project_path": "D:/HagenTa/HagenDa/Assets",
   "reloading": false,
-  "reason": "unity_quit",
-  "seq": 11136,
-  "last_heartbeat": "2026-08-24T13:07:45.408Z"
+  "reason": "ready",
+  "seq": 7822,
+  "last_heartbeat": "2026-08-25T03:22:15.236Z"
 }

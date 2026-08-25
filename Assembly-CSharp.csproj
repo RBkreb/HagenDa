@@ -138,6 +138,7 @@
     <Compile Include="Assets\Scripts\Network\NetworkAIController.cs" />
     <Compile Include="Assets\Scripts\Network\SpecialCover.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
+    <Compile Include="Assets\Scripts\Network\FSMBattleSystem.cs" />
     <Compile Include="Assets\Scripts\Network\DebugHud.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
@@ -150,7 +151,9 @@
     <Compile Include="Assets\Scripts\Network\NetworkEquipment.cs" />
     <Compile Include="Assets\Scripts\Network\RescueThrowable.cs" />
     <Compile Include="Assets\Scripts\Network\LargeSupplyCrate.cs" />
+    <Compile Include="Assets\Scripts\Network\FSMAIController.cs" />
     <Compile Include="Assets\Scripts\Network\DeployableUtil.cs" />
+    <Compile Include="Assets\Scripts\Network\CoverRegistrar.cs" />
     <Compile Include="Assets\Scripts\Network\DeployScreen.cs" />
     <Compile Include="Assets\Scripts\Network\HeadMarker.cs" />
     <Compile Include="Assets\Scripts\Network\S1EvaluationStats.cs" />

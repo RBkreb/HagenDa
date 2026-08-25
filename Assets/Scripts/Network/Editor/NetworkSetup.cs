@@ -406,6 +406,266 @@ namespace HagenDa.Networking.EditorTools
             Debug.Log("[NetworkSetup] NavMesh built on " + floorName + ".");
         }
 
+        // ---------------------------------------------------------------
+        // PHASE9: FSM BATTLE SCENE (59 AI, 30 vs 29)
+        // ---------------------------------------------------------------
+
+        private const string FSMBattleScenePath = "Assets/Scenes/FSMBattle.scene";
+        private const string FSMAIPrefabPath = "Assets/Scripts/Network/Prefabs/FSMAIEntity.prefab";
+
+        [MenuItem("HagenDa/Create FSM Battle Scene (59 AI)")]
+        public static void CreateFSMBattleScene()
+        {
+            EnsureFolder("Assets", "Scenes");
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            EnsureFolder("Assets/Scripts/Network", "Equipment");
+            EnsureMapLayers();
+
+            // Prefabs + equipment assets (idempotent).
+            List<EquipmentDefinition> equipmentList = BuildEquipmentAssets();
+            GameObject grenadePrefab = BuildGrenadePrefab();
+            GameObject smokePrefab = BuildSmokePrefab();
+            GameObject rescuePrefab = BuildRescuePrefab();
+            GameObject bulletPrefab = BuildBulletPrefab();
+            GameObject playerPrefab = BuildPlayerPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab, equipmentList);
+            GameObject aiPrefab = BuildAIEntityPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab, equipmentList);
+            GameObject fsmPrefab = BuildFSMAIPrefab(aiPrefab);
+
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(
+                UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Single);
+
+            EnsureLighting();
+
+            // --- 120 x 220 map: red GR z<0, blue GR z>0, 3 zones along Z ---
+            const float mapW = 120f;   // X
+            const float mapL = 220f;   // Z
+            const float wallH = 6f;
+
+            var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            floor.name = "Floor";
+            floor.transform.position = Vector3.zero;
+            floor.transform.localScale = new Vector3(mapW / 10f, 1f, mapL / 10f);
+
+            CreateWall(new Vector3(0f, wallH * 0.5f, mapL * 0.5f), new Vector3(mapW, wallH, 1f));   // north
+            CreateWall(new Vector3(0f, wallH * 0.5f, -mapL * 0.5f), new Vector3(mapW, wallH, 1f));  // south
+            CreateWall(new Vector3(-mapW * 0.5f, wallH * 0.5f, 0f), new Vector3(1f, wallH, mapL));  // west
+            CreateWall(new Vector3(mapW * 0.5f, wallH * 0.5f, 0f), new Vector3(1f, wallH, mapL));   // east
+
+            // Garrisons (GR = 基地重生区).
+            var redGr = CreateGarrison("RedGR", new Vector3(0f, 0f, -mapL * 0.42f), (int)MatchTeam.Red, 20f);
+            var blueGr = CreateGarrison("BlueGR", new Vector3(0f, 0f, mapL * 0.42f), (int)MatchTeam.Blue, 20f);
+
+            // 3 capture points + StrategicZone wrappers（抽象争夺点，注册表上限 3）.
+            var zoneA = CreateCapturePoint("Zone_A", new Vector3(-18f, 0f, -45f), 12f);
+            var zoneB = CreateCapturePoint("Zone_B", new Vector3(0f, 0f, 0f), 12f);
+            var zoneC = CreateCapturePoint("Zone_C", new Vector3(18f, 0f, 45f), 12f);
+            zoneA.letter = "A";
+            zoneB.letter = "B";
+            zoneC.letter = "C";
+            CreateStrategicZone("StrategicZone_A", zoneA);
+            CreateStrategicZone("StrategicZone_B", zoneB);
+            CreateStrategicZone("StrategicZone_C", zoneC);
+
+            // Match manager：持续战斗（无终局），6 小队 × 5 人。
+            var mmGo = new GameObject("NetworkMatchManager");
+            var mm = mmGo.AddComponent<NetworkMatchManager>();
+            mm.winScore = 999999;
+            mm.squadsPerTeam = 6;
+            mm.squadSize = 5;
+            mm.redeployDelay = 10f;
+            mm.garrisons = new List<GarrisonZone> { redGr, blueGr };
+            mm.capturePoints = new List<CapturePoint> { zoneA, zoneB, zoneC };
+
+            // Zone registry + FSM 调度器（10Hz 决策 tick + 批感知 + 寻路错峰）.
+            var registryGo = new GameObject("StrategicZoneRegistry");
+            registryGo.AddComponent<StrategicZoneRegistry>();
+
+            var systemGo = new GameObject("FSMBattleSystem");
+            systemGo.AddComponent<FSMBattleSystem>();
+
+            // 静态掩体场（种子化）+ 运行时注册器.
+            BuildFSMCoverField(mapW, mapL);
+
+            // NetworkManager：无 HUD（全自动对局），Play 即自动 Host.
+            var nmGo = new GameObject("NetworkManager");
+            var nm = nmGo.AddComponent<NetworkManager>();
+            nm.playerPrefab = playerPrefab;
+            nm.autoCreatePlayer = false;
+            var kcp = nmGo.AddComponent<kcp2k.KcpTransport>();
+            nm.transport = kcp;
+            nmGo.AddComponent<TrainingAutoHost>();
+            RegisterSpawnPrefabs(grenadePrefab, smokePrefab, rescuePrefab, aiPrefab, fsmPrefab);
+            foreach (var def in equipmentList)
+                if (def != null && def.throwablePrefab != null)
+                    RegisterSpawnPrefabs(def.throwablePrefab);
+            var empField = AssetDatabase.LoadAssetAtPath<GameObject>(EmpFieldPrefabPath);
+            if (empField != null) RegisterSpawnPrefabs(empField);
+
+            // 观战相机（场景无玩家相机）.
+            var camGo = new GameObject("BattleCamera");
+            camGo.transform.position = new Vector3(0f, 85f, -105f);
+            camGo.transform.rotation = Quaternion.Euler(55f, 0f, 0f);
+            var cam = camGo.AddComponent<Camera>();
+            cam.farClipPlane = 500f;
+            camGo.AddComponent<AudioListener>();
+
+            // NavMesh：必须在实体生成之前烘焙（CollectObjects.All 会把
+            // 实体胶囊当障碍物，在出生点打出洞）。
+            BuildNavMeshForFloor();
+
+            // 59 实体：30 红（z<0）/ 29 蓝（z>0）。生成顺序 = 小队 round-robin
+            // 顺序；每小队 5 人 = 2 突击 + 2 支援 + 1 侦察。
+            CreateFSMTeam(fsmPrefab, (int)MatchTeam.Red, 30, -92f);
+            CreateFSMTeam(fsmPrefab, (int)MatchTeam.Blue, 29, 92f);
+
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, FSMBattleScenePath);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[NetworkSetup] Done. Created {FSMBattleScenePath} " +
+                      "(59 FSM AI, 3 zones, 2 GR, static covers, baked NavMesh).");
+        }
+
+        /// <summary>FSM AI prefab：ML AI prefab 克隆 - MLAgentBridge + FSMAIController。</summary>
+        private static GameObject BuildFSMAIPrefab(GameObject aiPrefab)
+        {
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+
+            var existing = AssetDatabase.LoadAssetAtPath<GameObject>(FSMAIPrefabPath);
+            var root = existing != null
+                ? (GameObject)PrefabUtility.InstantiatePrefab(existing)
+                : (GameObject)PrefabUtility.InstantiatePrefab(aiPrefab);
+            root.name = "FSMAIEntity";
+
+            // FSM：无 ML 桥（不进采样），大脑走 intent 管线 + 批感知。
+            var bridge = root.GetComponent<MLAgentBridge>();
+            if (bridge != null) Object.DestroyImmediate(bridge);
+
+            if (root.GetComponent<FSMAIController>() == null)
+                root.AddComponent<FSMAIController>();
+
+            var prefab = PrefabUtility.SaveAsPrefabAsset(root, FSMAIPrefabPath);
+            Object.DestroyImmediate(root);
+            return prefab;
+        }
+
+        /// <summary>把一个 CapturePoint 包装成 StrategicZone（AI 只见抽象要地）。</summary>
+        private static void CreateStrategicZone(string name, CapturePoint cp)
+        {
+            var go = new GameObject(name);
+            go.transform.position = cp.transform.position;
+            var z = go.AddComponent<StrategicZone>();
+            z.capturePoint = cp;
+        }
+
+        /// <summary>
+        /// 一支 FSM 队伍：每小队 5 人（2 突击 + 2 支援 + 1 侦察），小队顺序即
+        /// 生成顺序（NetworkMatchManager 按 nextSquad round-robin 分配小队）。
+        /// 出生位置 z 符号决定阵营（红 z&lt;0 / 蓝 z&gt;0）。
+        /// </summary>
+        private static void CreateFSMTeam(GameObject fsmPrefab, int team, int count, float zLine)
+        {
+            string teamName = team == (int)MatchTeam.Red ? "Red" : "Blue";
+            for (int i = 0; i < count; i++)
+            {
+                int squadIndex = i / 5;
+                int inSquad = i % 5;
+
+                var go = (GameObject)PrefabUtility.InstantiatePrefab(fsmPrefab);
+                go.name = $"FSM_{teamName}_S{squadIndex}_{i}";
+                float x = -9f + inSquad * 4.5f + (squadIndex % 3) * 1.8f;
+                float z = zLine + (squadIndex / 3) * 5f;
+                go.transform.position = new Vector3(x, 1.5f, z);
+
+                var fsm = go.GetComponent<FSMAIController>();
+                if (fsm != null)
+                {
+                    fsm.aiClass = inSquad < 2 ? FsmClass.Assault
+                                : inSquad < 4 ? FsmClass.Support
+                                : FsmClass.Recon;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 静态掩体场（种子化，编辑期摆放）：种类比例沿 TrainingMap 约定
+        /// （高/矮/高位/斜面），间距 ≥5m，要地半径+2m 与 GR 半径+2m 净空。
+        /// </summary>
+        private static void BuildFSMCoverField(float mapW, float mapL)
+        {
+            var root = new GameObject("Covers");
+            root.AddComponent<CoverRegistrar>();
+
+            var rng = new System.Random(20260825);
+            const int count = 64;
+            const float minGap = 5f;
+
+            var zones = new[]
+            {
+                new Vector2(-18f, -45f), Vector2.zero, new Vector2(18f, 45f)
+            };
+            var garrisons = new[]
+            {
+                new Vector2(0f, -mapL * 0.42f), new Vector2(0f, mapL * 0.42f)
+            };
+
+            var placed = new List<Vector2>();
+            int made = 0;
+            int guard = 0;
+            while (made < count && guard++ < count * 40)
+            {
+                float x = ((float)rng.NextDouble() * 2f - 1f) * (mapW * 0.5f - 6f);
+                float z = ((float)rng.NextDouble() * 2f - 1f) * (mapL * 0.5f - 12f);
+                var p = new Vector2(x, z);
+
+                bool ok = true;
+                foreach (var zc in zones)
+                    if (Vector2.Distance(p, zc) < 14f) { ok = false; break; }
+                if (ok)
+                    foreach (var g in garrisons)
+                        if (Vector2.Distance(p, g) < 22f) { ok = false; break; }
+                if (ok)
+                    foreach (var q in placed)
+                        if (Vector2.Distance(p, q) < minGap) { ok = false; break; }
+                if (!ok) continue;
+
+                placed.Add(p);
+
+                var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                go.transform.SetParent(root.transform, false);
+                go.transform.localPosition = new Vector3(p.x, 0f, p.y);
+                go.transform.localRotation = Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f);
+
+                int roll = rng.Next(100);
+                if (roll < 35)
+                {
+                    go.name = "Cover_Tall";
+                    go.transform.localScale = new Vector3(2f, 2.2f, 0.6f);
+                    go.transform.localPosition = new Vector3(p.x, 1.1f, p.y);
+                }
+                else if (roll < 70)
+                {
+                    go.name = "Cover_Low";
+                    go.transform.localScale = new Vector3(2f, 1.0f, 0.8f);
+                    go.transform.localPosition = new Vector3(p.x, 0.5f, p.y);
+                }
+                else if (roll < 88)
+                {
+                    go.name = "Cover_High";
+                    go.transform.localScale = new Vector3(3f, 1.4f, 3f);
+                    go.transform.localPosition = new Vector3(p.x, 0.7f, p.y);
+                }
+                else
+                {
+                    go.name = "Cover_Ramp";
+                    go.transform.localScale = new Vector3(3f, 1.2f, 6f);
+                    go.transform.localPosition = new Vector3(p.x, 0.6f, p.y);
+                }
+                made++;
+            }
+
+            Debug.Log($"[NetworkSetup] FSM cover field: {made} covers (seed 20260825).");
+        }
+
         [MenuItem("HagenDa/Create Phase3 Scene")]
         public static void CreatePhase3Scene()
         {

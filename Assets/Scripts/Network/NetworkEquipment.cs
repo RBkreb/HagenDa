@@ -295,7 +295,7 @@ namespace HagenDa.Networking
             return idx >= 0 && idx < Count ? idx : -1;
         }
 
-        private int IndexOfType(EquipmentType type)
+        public int IndexOfType(EquipmentType type)
         {
             for (int i = 0; i < Count; i++)
                 if (equipmentList[i] != null && equipmentList[i].type == type)
