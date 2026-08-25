@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace HagenDa.Networking
 {
-    /// <summary>射线命中分类（ML 训练共识 §3：9 类 one-hot）。</summary>
+    /// <summary>射线命中分类（PHASE9：10 类 one-hot，新增 Smoke）。</summary>
     public enum RayHitKind : byte
     {
         None = 0,       // 无命中
@@ -16,7 +16,8 @@ namespace HagenDa.Networking
         Beacon = 5,     // 部署信标
         Crate = 6,      // 补给箱
         Sensor = 7,     // 感应器
-        Interceptor = 8 // 拦截装置
+        Interceptor = 8, // 拦截装置
+        Smoke = 9       // 烟雾（PHASE9：视线遮挡但不挡子弹）
     }
 
     /// <summary>
@@ -70,6 +71,10 @@ namespace HagenDa.Networking
         private int myTeam = -1;
         private readonly RaycastHit[] hits = new RaycastHit[32];
 
+        // PHASE9: 缓存本次采样的原点/朝向，供 ParseBatchHits 烟雾检测重建射线方向。
+        private Vector3 lastOrigin;
+        private float lastYaw;
+
         private void Awake()
         {
             Latest = new RayHit[TotalRays];
@@ -97,6 +102,7 @@ namespace HagenDa.Networking
                                        NativeArray<RaycastCommand> commands, int offset)
         {
             BeginSample(originBase, team);
+            lastYaw = yaw;
 
             for (int i = 0; i < TotalRays; i++)
             {
@@ -130,6 +136,15 @@ namespace HagenDa.Networking
                     hit.combatant = c;
                 }
 
+                // PHASE9: 烟雾遮挡——如果烟雾比物理命中更近，视线被烟雾挡住。
+                GetRay(i, lastOrigin, lastYaw, out var origin, out var dir, out var range);
+                if (NetworkSmokeVolume.SegmentIntersects(origin, dir, hit.distance, out float smokeDist))
+                {
+                    hit.kind = RayHitKind.Smoke;
+                    hit.distance = smokeDist;
+                    hit.combatant = null;
+                }
+
                 Latest[i] = hit;
             }
         }
@@ -140,8 +155,10 @@ namespace HagenDa.Networking
             kindCache.Clear();
             combatantCache.Clear();
 
-            SensorOriginForward = originBase + Vector3.up * 0f; // 扇形环心（脚底）
+            SensorOriginForward = originBase + Vector3.up * 0f;
             SensorOriginRing = originBase;
+            lastOrigin = originBase;
+            lastYaw = 0f;   // Set by BuildBatchCommands/GetRay caller
         }
 
         /// <summary>第 idx 根射线的原点/方向/长度（布局的唯一真源）。</summary>
@@ -212,6 +229,14 @@ namespace HagenDa.Networking
                 hit.distance = hits[bestIdx].distance;
                 hit.kind = Classify(col, out var c);
                 hit.combatant = c;
+            }
+
+            // PHASE9: 烟雾遮挡（单射线路径，ML 兼容）。
+            if (NetworkSmokeVolume.SegmentIntersects(origin, dir, hit.distance, out float smokeDist))
+            {
+                hit.kind = RayHitKind.Smoke;
+                hit.distance = smokeDist;
+                hit.combatant = null;
             }
 
             Latest[idx] = hit;

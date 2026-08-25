@@ -150,5 +150,47 @@ namespace HagenDa.Networking
             isLow = best.bounds.size.y <= 1.1f;
             return best.bounds.center;
         }
+
+        /// <summary>
+        /// PHASE9：找朝威胁侧的掩体（掩体在 self 与 threatDir 之间 = 掩体挡住威胁方向）。
+        /// 返回最近满足条件的掩体位置 + 高低分类；无匹配回退 NearestCover。
+        /// </summary>
+        public static Vector3? BestCover(Vector3 position, Vector3 threatDir,
+                                          out bool isLow)
+        {
+            isLow = false;
+            if (covers.Count == 0) return null;
+
+            threatDir.y = 0f;
+            if (threatDir.sqrMagnitude < 0.0001f)
+                return NearestCover(position, out isLow);
+            threatDir.Normalize();
+
+            Collider best = null;
+            float bestScore = float.MaxValue;
+
+            foreach (var c in covers)
+            {
+                if (c == null) continue;
+                Vector3 toCover = c.bounds.center - position;
+                toCover.y = 0f;
+                if (toCover.sqrMagnitude < 0.01f) continue;
+
+                // 掩体在 self→threat 方向上（dot > 0.3 = 30° 内）
+                float dot = Vector3.Dot(toCover.normalized, threatDir);
+                if (dot < 0.3f) continue;
+
+                float dist = toCover.magnitude;
+                // 评分 = 距离 - 朝向加成（越正对越优先）
+                float score = dist - dot * 2f;
+                if (score < bestScore) { bestScore = score; best = c; }
+            }
+
+            if (best == null)
+                return NearestCover(position, out isLow);
+
+            isLow = best.bounds.size.y <= 1.1f;
+            return best.bounds.center;
+        }
     }
 }

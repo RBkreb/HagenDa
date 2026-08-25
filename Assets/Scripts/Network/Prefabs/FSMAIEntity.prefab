@@ -108,3 +108,14 @@ MonoBehaviour:
   scanIntervalMin: 1.5
   scanIntervalMax: 2.5
   repathInterval: 1.5
+  detectRange: 50
+  combatSearchTimeout: 5
+  combatStrafeInterval: 2
+  jumpChance: 0.15
+  grenadeCooldown: 8
+  grenadeMaxRange: 30
+  survivalHpThreshold: 0.5
+  survivalExitHp: 0.75
+  survivalExitAmmo: 0.75
+  hipEffectiveDist: 1.5384616
+  adsEffectiveDist: 3.9215686

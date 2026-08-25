@@ -35,9 +35,15 @@ namespace HagenDa.Networking
             public Vector3 position;   // world space (semantic depends on type)
             public double time;        // NetworkTime.time
             public int squadId;        // emitter's squad (-1 unknown)
+            public int targetId;       // PHASE9: 定向广播目标 instanceId（-1 = 广播全部）
         }
 
         private static readonly Dictionary<int, List<Entry>> channels = new Dictionary<int, List<Entry>>();
+
+        /// <summary>PHASE9: DeathSOS 独立存储——不被 59 人的 EnemySpotted/Damaged
+        /// 广播挤出 8 条窗口。支援兵直接从这里读 SOS，不依赖主频道。</summary>
+        private static readonly Dictionary<int, List<Entry>> sosChannels = new Dictionary<int, List<Entry>>();
+        private const int MaxSOS = 16;   // 最多保留 16 条 SOS（59 人最多 ~30 同时死亡）
 
         /// <summary>Per-emitter spam gating（规则触发最小间隔，按事件类型）。</summary>
         private static readonly Dictionary<(int, IntelEvent), double> lastEmit =
@@ -55,6 +61,14 @@ namespace HagenDa.Networking
 
         [Server]
         public static void Broadcast(int team, IntelEvent type, Vector3 position, int squadId, int emitterId)
+        {
+            Broadcast(team, type, position, squadId, emitterId, -1);
+        }
+
+        /// <summary>PHASE9: 定向广播（targetId = 目标 instanceId，-1 = 广播全部）。</summary>
+        [Server]
+        public static void Broadcast(int team, IntelEvent type, Vector3 position,
+                                       int squadId, int emitterId, int targetId)
         {
             if (team < 0) return;
 
@@ -80,8 +94,22 @@ namespace HagenDa.Networking
                 type = type,
                 position = position,
                 time = NetworkTime.time,
-                squadId = squadId
+                squadId = squadId,
+                targetId = targetId,
             };
+
+            // PHASE9: DeathSOS 同时写入独立频道，防止被主频道 8 条窗口挤出。
+            if (type == IntelEvent.DeathSOS)
+            {
+                if (!sosChannels.TryGetValue(team, out var sosList))
+                {
+                    sosList = new List<Entry>();
+                    sosChannels[team] = sosList;
+                }
+                sosList.Add(e);
+                if (sosList.Count > MaxSOS)
+                    sosList.RemoveRange(0, sosList.Count - MaxSOS);
+            }
 
             list.Add(e);
             if (list.Count > MaxEntries)
@@ -111,7 +139,26 @@ namespace HagenDa.Networking
         public static void Reset()
         {
             channels.Clear();
+            sosChannels.Clear();
             lastEmit.Clear();
+        }
+
+        /// <summary>
+        /// PHASE9: 读取某队最近的 DeathSOS 事件（独立频道，不受主频道 8 条窗口限制）。
+        /// </summary>
+        public static List<Entry> GetSOS(int team, int max = MaxSOS)
+        {
+            var result = new List<Entry>();
+            if (team < 0) return result;
+            if (!sosChannels.TryGetValue(team, out var list)) return result;
+
+            double now = NetworkTime.time;
+            for (int i = list.Count - 1; i >= 0 && result.Count < max; i--)
+            {
+                if (now - list[i].time > WindowSeconds) break;
+                result.Add(list[i]);
+            }
+            return result;
         }
     }
 }

@@ -52,6 +52,7 @@ namespace HagenDa.Networking
             if (dead)
             {
                 controller.SetServerInput(default);
+                UpdateVisualPosture();   // PHASE9: 死亡时也同步视觉趴姿
                 return;
             }
 
@@ -76,6 +77,34 @@ namespace HagenDa.Networking
             intent.slotSpecial = false;
             intent.slotThrowable = false;
             intent.deployChoice = 0;
+
+            // PHASE9: 视觉姿态同步——AI 的 Body 胶囊网格随姿态旋转/缩放，
+            // 否则趴姿/蹲姿只改了 collider 但视觉上仍是站立胶囊。
+            UpdateVisualPosture();
+        }
+
+        private void UpdateVisualPosture()
+        {
+            if (visual == null || controller == null) return;
+
+            switch (controller.posture)
+            {
+                case PlayerPosture.Prone:
+                    visual.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                    visual.transform.localPosition = new Vector3(0f, 0.25f, 0f);
+                    visual.transform.localScale = new Vector3(0.5f, 0.9f, 0.5f);
+                    break;
+                case PlayerPosture.Crouch:
+                    visual.transform.localRotation = Quaternion.identity;
+                    visual.transform.localPosition = new Vector3(0f, 0.45f, 0f);
+                    visual.transform.localScale = new Vector3(0.5f, 0.45f, 0.5f);
+                    break;
+                default:
+                    visual.transform.localRotation = Quaternion.identity;
+                    visual.transform.localPosition = new Vector3(0f, 0.9f, 0f);
+                    visual.transform.localScale = new Vector3(0.5f, 0.9f, 0.5f);
+                    break;
+            }
         }
 
         /// <summary>

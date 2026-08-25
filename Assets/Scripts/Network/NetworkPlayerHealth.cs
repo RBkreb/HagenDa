@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 using UnityEngine.AI;
@@ -58,6 +59,13 @@ namespace HagenDa.Networking
 
         [Tooltip("首次部署：玩家连接后处于观战/大厅状态，选定部署点+配装前不进入世界。")]
         [SyncVar] public bool awaitingInitialDeploy;
+
+        // PHASE9: DeathSOS 定向重复（每 1s × 9 次，定向 40m 内最近支援兵）
+        private float sosRepeatTimer;
+        private int sosRepeatCount;
+        private const float SosRepeatInterval = 1f;
+        private const int SosRepeatMax = 9;
+        private const float SosRange = 40f;
 
         private Rigidbody rb;
         private float redeployDeadline;           // server-only
@@ -213,6 +221,16 @@ namespace HagenDa.Networking
 
             HandleRedeploy();
 
+            // PHASE9: DeathSOS 定向重复（每 1s × 9 次，被救起/重部署即停）。
+            if (deathHandled && sosRepeatCount < SosRepeatMax && Time.time >= sosRepeatTimer)
+            {
+                var self = GetComponent<NetworkCombatant>();
+                if (self != null)
+                    SendDirectedDeathSOS(self);
+                sosRepeatCount++;
+                sosRepeatTimer = Time.time + SosRepeatInterval;
+            }
+
             if (IsDead) return;
             if (health >= maxHealth)
             {
@@ -282,10 +300,13 @@ namespace HagenDa.Networking
             // ML 训练奖励：击杀 + 阵亡 + 助攻 + 团队共享 + 标记引导。
             RewardBus.Kill(this, lastAttacker);
 
-            // 团队广播：阵亡求救（ML 训练共识 §3）。
+            // 团队广播：阵亡求救（PHASE9：定向 40m 内最近支援兵，每 1s × 9 次重复）。
             if (self != null)
-                TeamIntel.Broadcast(self.teamId, IntelEvent.DeathSOS,
-                    transform.position, self.squadId, GetInstanceID());
+            {
+                SendDirectedDeathSOS(self);
+                sosRepeatTimer = Time.time + SosRepeatInterval;
+                sosRepeatCount = 1;
+            }
 
             // 死亡 10s 后可重新部署。
             var mm = NetworkMatchManager.Instance;
@@ -300,6 +321,7 @@ namespace HagenDa.Networking
 
             deathHandled = false;
             awaitingRedeploy = false;
+            sosRepeatCount = SosRepeatMax;   // 停止 SOS 重复
             health = maxHealth;
             lastAttacker = null;
             SetDeadState(false);
@@ -340,12 +362,53 @@ namespace HagenDa.Networking
             var mm = NetworkMatchManager.Instance;
             if (mm == null) return null;
 
-            if (Random.value < 0.5f)
+            var self = GetComponent<NetworkCombatant>();
+            int team = self != null && self.teamId >= 0 ? self.teamId : (int)MatchTeam.Red;
+            int squad = self != null ? self.squadId : -1;
+
+            // PHASE9 重新部署优先级：信标 > 最近小队队友 > 最近己方已占点 > GR
+            if (squad >= 0)
             {
-                var hq = mm.GetHqDeployPoint(MyTeam());
-                if (hq.HasValue) return hq;
+                var beacon = mm.GetBeaconDeployPoint(team, squad, self);
+                if (beacon.HasValue) return beacon;
+
+                var squadPt = mm.GetSquadDeployPoint(team, squad, self);
+                if (squadPt.HasValue) return squadPt;
             }
-            return mm.GetGarrisonDeployPoint(MyTeam());
+
+            var hq = mm.GetHqDeployPoint((MatchTeam)team);
+            if (hq.HasValue) return hq;
+
+            return mm.GetGarrisonDeployPoint((MatchTeam)team);
+        }
+
+        /// <summary>
+        /// PHASE9: 定向向 40m 内最近的支援兵发送 DeathSOS 广播。
+        /// 找不到支援兵时退回全队广播。
+        /// </summary>
+        [Server]
+        private void SendDirectedDeathSOS(NetworkCombatant self)
+        {
+            int targetId = -1;
+            float bestD = SosRange * SosRange;
+
+            var buf = new List<NetworkCombatant>();
+            NetworkMatchManager.GetAllCombatants(buf);
+            foreach (var c in buf)
+            {
+                if (c == null || c == self || c.IsDead) continue;
+                if (c.teamId != self.teamId) continue;
+
+                // 检查是否为支援兵
+                var fsm = c.GetComponent<FSMAIController>();
+                if (fsm == null || fsm.aiClass != FsmClass.Support) continue;
+
+                float d = (c.transform.position - transform.position).sqrMagnitude;
+                if (d < bestD) { bestD = d; targetId = fsm.GetInstanceID(); }
+            }
+
+            TeamIntel.Broadcast(self.teamId, IntelEvent.DeathSOS,
+                transform.position, self.squadId, GetInstanceID(), targetId);
         }
 
         /// <summary>统一部署点解析（1=GR / 2=HQ / 3=squad / 4=beacon，fallback GR）。</summary>
@@ -427,6 +490,7 @@ namespace HagenDa.Networking
             unrevivable = false;
             awaitingRedeploy = false;
             awaitingInitialDeploy = false;
+            sosRepeatCount = SosRepeatMax;   // 停止 SOS 重复
             lastAttacker = null;
             health = maxHealth;
             armor = 0f;

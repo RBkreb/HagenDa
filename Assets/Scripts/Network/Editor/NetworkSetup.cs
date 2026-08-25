@@ -410,12 +410,23 @@ namespace HagenDa.Networking.EditorTools
         // PHASE9: FSM BATTLE SCENE (59 AI, 30 vs 29)
         // ---------------------------------------------------------------
 
-        private const string FSMBattleScenePath = "Assets/Scenes/FSMBattle.scene";
         private const string FSMAIPrefabPath = "Assets/Scripts/Network/Prefabs/FSMAIEntity.prefab";
 
         [MenuItem("HagenDa/Create FSM Battle Scene (59 AI)")]
         public static void CreateFSMBattleScene()
         {
+            CreateFSMBattleSceneInternal(FsmClass.Assault, "FSMBattle.scene");
+        }
+
+        [MenuItem("HagenDa/Create FSM Battle Scene (All Support)")]
+        public static void CreateFSMBattleSceneAllSupport()
+        {
+            CreateFSMBattleSceneInternal(FsmClass.Support, "FSMBattleSupport.scene");
+        }
+
+        private static void CreateFSMBattleSceneInternal(FsmClass defaultClass, string sceneFile)
+        {
+            string scenePath = "Assets/Scenes/" + sceneFile;
             EnsureFolder("Assets", "Scenes");
             EnsureFolder("Assets/Scripts/Network", "Prefabs");
             EnsureFolder("Assets/Scripts/Network", "Equipment");
@@ -483,6 +494,7 @@ namespace HagenDa.Networking.EditorTools
 
             var systemGo = new GameObject("FSMBattleSystem");
             systemGo.AddComponent<FSMBattleSystem>();
+            systemGo.AddComponent<FSMStatsHud>();
 
             // 静态掩体场（种子化）+ 运行时注册器.
             BuildFSMCoverField(mapW, mapL);
@@ -508,7 +520,19 @@ namespace HagenDa.Networking.EditorTools
             camGo.transform.rotation = Quaternion.Euler(55f, 0f, 0f);
             var cam = camGo.AddComponent<Camera>();
             cam.farClipPlane = 500f;
-            camGo.AddComponent<AudioListener>();
+
+            // PHASE9: 自由观战相机（WASD/空格/Shift，鼠标拖拽视角，无碰撞）.
+            var freeCamGo = new GameObject("FreeCamera");
+            freeCamGo.transform.position = new Vector3(0f, 60f, -50f);
+            var freeCam = freeCamGo.AddComponent<Camera>();
+            freeCam.farClipPlane = 500f;
+            freeCam.depth = 1f;   // 覆盖 BattleCamera
+            freeCamGo.AddComponent<AudioListener>();
+            freeCamGo.AddComponent<FreeCamera>();
+
+            // PHASE9 指挥官：每 20s 给所有小队随机分配未占领/敌方要地.
+            var cmdGo = new GameObject("SquadCommander");
+            cmdGo.AddComponent<SquadCommander>();
 
             // NavMesh：必须在实体生成之前烘焙（CollectObjects.All 会把
             // 实体胶囊当障碍物，在出生点打出洞）。
@@ -516,12 +540,12 @@ namespace HagenDa.Networking.EditorTools
 
             // 59 实体：30 红（z<0）/ 29 蓝（z>0）。生成顺序 = 小队 round-robin
             // 顺序；每小队 5 人 = 2 突击 + 2 支援 + 1 侦察。
-            CreateFSMTeam(fsmPrefab, (int)MatchTeam.Red, 30, -92f);
-            CreateFSMTeam(fsmPrefab, (int)MatchTeam.Blue, 29, 92f);
+            CreateFSMTeam(fsmPrefab, (int)MatchTeam.Red, 30, -92f, defaultClass);
+            CreateFSMTeam(fsmPrefab, (int)MatchTeam.Blue, 29, 92f, defaultClass);
 
-            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, FSMBattleScenePath);
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, scenePath);
             AssetDatabase.SaveAssets();
-            Debug.Log($"[NetworkSetup] Done. Created {FSMBattleScenePath} " +
+            Debug.Log($"[NetworkSetup] Done. Created {scenePath} " +
                       "(59 FSM AI, 3 zones, 2 GR, static covers, baked NavMesh).");
         }
 
@@ -564,6 +588,11 @@ namespace HagenDa.Networking.EditorTools
         /// </summary>
         private static void CreateFSMTeam(GameObject fsmPrefab, int team, int count, float zLine)
         {
+            CreateFSMTeam(fsmPrefab, team, count, zLine, FsmClass.Assault);
+        }
+
+        private static void CreateFSMTeam(GameObject fsmPrefab, int team, int count, float zLine, FsmClass classOverride)
+        {
             string teamName = team == (int)MatchTeam.Red ? "Red" : "Blue";
             for (int i = 0; i < count; i++)
             {
@@ -579,9 +608,16 @@ namespace HagenDa.Networking.EditorTools
                 var fsm = go.GetComponent<FSMAIController>();
                 if (fsm != null)
                 {
-                    fsm.aiClass = inSquad < 2 ? FsmClass.Assault
-                                : inSquad < 4 ? FsmClass.Support
-                                : FsmClass.Recon;
+                    if (classOverride != FsmClass.Assault)
+                    {
+                        fsm.aiClass = classOverride;
+                    }
+                    else
+                    {
+                        fsm.aiClass = inSquad < 2 ? FsmClass.Assault
+                                    : inSquad < 4 ? FsmClass.Support
+                                    : FsmClass.Recon;
+                    }
                 }
             }
         }

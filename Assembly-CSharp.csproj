@@ -76,6 +76,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
     <Compile Include="Assets\Scripts\Network\TrainingAutoHost.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
+    <Compile Include="Assets\Scripts\Network\SquadCommander.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkMatchManager.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkShootableTarget.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
@@ -103,8 +104,10 @@
     <Compile Include="Assets\Scripts\Network\MapLayers.cs" />
     <Compile Include="Assets\Scripts\Network\MLAgentBridge.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkPlayerController.cs" />
+    <Compile Include="Assets\Scripts\Network\FSMStatsHud.cs" />
     <Compile Include="Assets\Scripts\Network\BlastShield.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkInputState.cs" />
+    <Compile Include="Assets\Scripts\Network\FreeCamera.cs" />
     <Compile Include="Assets\Scripts\Network\StrategicZone.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
@@ -135,6 +138,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
     <Compile Include="Assets\Scripts\Network\LoadoutDefinition.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkSmokeVolume.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkAIController.cs" />
     <Compile Include="Assets\Scripts\Network\SpecialCover.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />

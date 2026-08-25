@@ -116,6 +116,9 @@ namespace HagenDa.Networking
             PruneAgents();
             if (agents.Count == 0) return;
 
+            // PHASE9: 清理过期服务器端烟雾体积。
+            NetworkSmokeVolume.Cleanup();
+
             tickWatch.Restart();
 
             BuildSnapshot();

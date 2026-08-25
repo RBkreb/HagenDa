@@ -63,6 +63,26 @@ namespace HagenDa.Networking
         }
 
         public int Count => zones.Count;
+
+        /// <summary>距 position 最近的未占领/敌方要地（ownerTeam != myTeam）。无匹配时回退最近要地。</summary>
+        public StrategicZoneState? NearestZone(Vector3 position, int myTeam)
+        {
+            StrategicZoneState best = default, fallback = default;
+            float bestD = float.MaxValue, fallbackD = float.MaxValue;
+            bool found = false, foundAny = false;
+
+            int n = Mathf.Min(zones.Count, MaxZones);
+            for (int i = 0; i < n; i++)
+            {
+                var z = zones[i].GetState();
+                float d = (z.position - position).sqrMagnitude;
+                if (d < fallbackD) { fallbackD = d; fallback = z; foundAny = true; }
+                if (z.ownerTeam != myTeam && d < bestD) { bestD = d; best = z; found = true; }
+            }
+            if (found) return best;
+            if (foundAny) return fallback;
+            return null;
+        }
     }
 
     /// <summary>

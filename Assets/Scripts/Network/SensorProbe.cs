@@ -48,6 +48,8 @@ namespace HagenDa.Networking
             }
         }
 
+        private static readonly Collider[] overlapBuf = new Collider[64];
+
         private void Update()
         {
             if (!isServer) return;
@@ -59,11 +61,18 @@ namespace HagenDa.Networking
             var pos = transform.position;
             float r2 = radius * radius;
 
-            foreach (var c in Object.FindObjectsOfType<NetworkCombatant>())
+            // PHASE9: OverlapSphere 替代 FindObjectsOfType（59 规模性能修复）。
+            int n = Physics.OverlapSphereNonAlloc(pos, radius, overlapBuf,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+
+            for (int i = 0; i < n; i++)
             {
+                var col = overlapBuf[i];
+                if (col == null) continue;
+                var c = col.GetComponentInParent<NetworkCombatant>();
                 if (c == null || c.IsDead) continue;
                 if (c.teamId < 0 || ownerTeam < 0) continue;
-                if (c.teamId == ownerTeam) continue;   // 只标记敌方
+                if (c.teamId == ownerTeam) continue;
 
                 if ((c.transform.position - pos).sqrMagnitude <= r2)
                     c.SetMarked(NetworkTime.time + markDuration, ownerTeam, null);

@@ -15,6 +15,8 @@ namespace HagenDa.Networking
 
         protected override void OnImpact()
         {
+            // PHASE9: 服务器端注册烟雾体积（AI 视野遮挡用）。
+            NetworkSmokeVolume.Register(transform.position, radius, decayTime, concentration);
             RpcSmokeVisual(transform.position, concentration, radius, decayTime);
         }
 
