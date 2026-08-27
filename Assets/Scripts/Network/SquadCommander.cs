@@ -32,6 +32,9 @@ namespace HagenDa.Networking
             AssignSquadObjectives();
         }
 
+        /// <summary>PHASE10：LLM 指挥官退化时立即下发一轮（由协调器调用），不必等下一周期。</summary>
+        public void ImmediateAssign() => AssignSquadObjectives();
+
         private void AssignSquadObjectives()
         {
             var registry = StrategicZoneRegistry.Instance;

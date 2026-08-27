@@ -67,6 +67,8 @@
     <Compile Include="Assets\ScriptTemplates\Editor\MoveToAssetsFolder.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\BuildScript.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\NetworkSetup.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\Editor\CommanderSetup.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\Editor\CommanderSmokeTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -506,7 +508,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Codely.Newtonsoft.Json">
-      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.75\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
+      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.76\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Grpc.Core">

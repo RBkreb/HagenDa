@@ -89,6 +89,8 @@ namespace HagenDa.Networking
         private Vector3 objective;
         private bool hasObjective;
         private float objectiveRefreshAt;
+        /// <summary>PHASE10：true=当前目标来自指挥官指令（权威，不被自动选点覆盖）。</summary>
+        public bool commanderObjective;
         private bool patrolling;
         private Vector3 patrolPoint;
         private float nextPatrolAt;
@@ -101,7 +103,11 @@ namespace HagenDa.Networking
         {
             objective = zonePos;
             hasObjective = true;
-            objectiveRefreshAt = Time.time + 20f;   // 指挥官下发后 20s 内不自动刷新
+            // PHASE10：指挥官目标为权威指令——永久生效直到下一次指令/重部署，
+            // 不再被 RefreshObjective 的"就近未占领要地"自动逻辑覆盖
+            // （旧版 20s 后放行导致全员汇聚到唯一自动选点，实测踩坑）。
+            commanderObjective = true;
+            objectiveRefreshAt = Time.time + 20f;
             patrolling = false;
             RequestPath(objective, force: true);
         }
@@ -335,6 +341,8 @@ namespace HagenDa.Networking
 
         private void RefreshObjective()
         {
+            // PHASE10：指挥官权威指令期间，不自动刷新（永远不被就近选点覆盖）。
+            if (commanderObjective) return;
             if (hasObjective && Time.time < objectiveRefreshAt) return;
             objectiveRefreshAt = Time.time + 5f;
 
@@ -1337,6 +1345,7 @@ namespace HagenDa.Networking
             dead = false;
             ClearPath();
             hasObjective = false;
+            commanderObjective = false;   // 重部署后恢复自动选点（直到指挥官重新下令）
             patrolling = false;
             hasCover = false;
             hasLastKnownPos = false;

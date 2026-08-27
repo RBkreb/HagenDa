@@ -67,8 +67,10 @@
     <Compile Include="Assets\Scripts\Network\TrainingMap.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderPrompts.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
     <Compile Include="Assets\Scripts\Network\DeployableSlot.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderMapCamera.cs" />
     <Compile Include="Assets\Scripts\Network\CapturePoint.cs" />
     <Compile Include="Assets\Scripts\Network\DeployBeacon.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
@@ -78,10 +80,14 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
     <Compile Include="Assets\Scripts\Network\SquadCommander.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkMatchManager.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderHud.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkShootableTarget.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderWeaponSystem.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkCombat.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderOrchestrator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderRoundLogger.cs" />
     <Compile Include="Assets\Scripts\Network\MapIndicator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
     <Compile Include="Assets\Scripts\Network\PlayerHud.cs" />
@@ -96,6 +102,7 @@
     <Compile Include="Assets\Scripts\Network\MinimapCamera.cs" />
     <Compile Include="Assets\Scripts\Network\TrainingSessionManager.cs" />
     <Compile Include="Assets\Scripts\Network\AgentRaySensor.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\LlmRestClient.cs" />
     <Compile Include="Assets\Scripts\Network\WeaponDefinition.cs" />
     <Compile Include="Assets\Scripts\Network\GrenadeThrowable.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
@@ -106,6 +113,7 @@
     <Compile Include="Assets\Scripts\Network\NetworkPlayerController.cs" />
     <Compile Include="Assets\Scripts\Network\FSMStatsHud.cs" />
     <Compile Include="Assets\Scripts\Network\BlastShield.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\NetworkCommanderState.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkInputState.cs" />
     <Compile Include="Assets\Scripts\Network\FreeCamera.cs" />
     <Compile Include="Assets\Scripts\Network\StrategicZone.cs" />
@@ -121,6 +129,7 @@
     <Compile Include="Assets\Scripts\Network\TeamIntel.cs" />
     <Compile Include="Assets\Scripts\Network\EquipmentDefinition.cs" />
     <Compile Include="Assets\Scripts\Network\TrainingArena.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderConfig.cs" />
     <Compile Include="Assets\Scripts\Network\ScriptedAIController.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkExplosion.cs" />
@@ -135,6 +144,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkInterceptor.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderTools.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
     <Compile Include="Assets\Scripts\Network\LoadoutDefinition.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
@@ -150,6 +160,7 @@
     <Compile Include="Assets\Scripts\Network\HudMath.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
     <Compile Include="Assets\Scripts\Network\MapPointMarker.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderGateController.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkSmoke.cs" />
     <Compile Include="Assets\Scripts\Network\EmpGrenadeThrowable.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkEquipment.cs" />
@@ -162,6 +173,7 @@
     <Compile Include="Assets\Scripts\Network\HeadMarker.cs" />
     <Compile Include="Assets\Scripts\Network\S1EvaluationStats.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkCombatant.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderMapOverlay.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -602,7 +614,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Codely.Newtonsoft.Json">
-      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.75\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
+      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.76\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Grpc.Core">

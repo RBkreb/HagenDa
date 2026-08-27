@@ -49,6 +49,8 @@ namespace HagenDa.Networking
         private void Update()
         {
             if (!isServer) return;
+            // PHASE10 开局门控：部署阶段争夺/计分全部暂停。
+            if (NetworkCommanderState.GateActive) return;
             if (NetworkMatchManager.Instance != null && NetworkMatchManager.Instance.matchOver) return;
 
             CountTeams(out int red, out int blue);

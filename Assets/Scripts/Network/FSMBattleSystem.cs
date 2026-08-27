@@ -102,6 +102,8 @@ namespace HagenDa.Networking
         private void Update()
         {
             if (!NetworkServer.active) return;
+            // PHASE10 开局门控：部署阶段 FSM 大脑整体暂停（保持原位待命）。
+            if (NetworkCommanderState.GateActive) return;
 
             float dt = 1f / Mathf.Max(1f, decisionHz);
             accum += Time.deltaTime;

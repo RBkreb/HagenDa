@@ -540,6 +540,19 @@ namespace HagenDa.Networking
                 return;
             }
 
+            // PHASE10 开局门控：指挥官部署期间玩家与 AI 身体一并冻结（Q16: 全体冻结）。
+            // 注意：全场为零摩擦材质（PHASE2），必须显式刹停水平速度，
+            // 否则出生落体的微小分离速度会让实体无摩擦滑行到四角（实测踩坑）。
+            if (NetworkCommanderState.GateActive)
+            {
+                Vector3 ghVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+                if (ghVel.sqrMagnitude > 0.0001f)
+                    rb.AddForce(-ghVel * stoppingFriction, ForceMode.Acceleration);
+                if (!grounded)
+                    rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
+                return;
+            }
+
             // PHASE8: 首次部署前（观战/大厅）冻结 3C 与战斗，仅让身体落地。
             if (health != null && health.awaitingInitialDeploy)
             {
