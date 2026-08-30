@@ -15,8 +15,8 @@ MonoBehaviour:
   baseUrl: http://localhost:1234
   model: qwen3.5-4b
   apiKey: 
-  maxTokens: 2048
-  temperature: 0.2
+  maxTokens: 8192
+  temperature: 0.02
   openingTimeout: 300
   roundTimeout: 120
   idleInterval: 30

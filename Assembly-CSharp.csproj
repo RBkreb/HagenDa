@@ -106,6 +106,7 @@
     <Compile Include="Assets\Scripts\Network\WeaponDefinition.cs" />
     <Compile Include="Assets\Scripts\Network\GrenadeThrowable.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
+    <Compile Include="Assets\Scripts\Network\DeployPointSet.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\Scripts\Network\LoadoutRules.cs" />
     <Compile Include="Assets\Scripts\Network\MapLayers.cs" />
@@ -614,7 +615,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Codely.Newtonsoft.Json">
-      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.76\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
+      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.78\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Grpc.Core">

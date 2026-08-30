@@ -62,17 +62,16 @@ namespace HagenDa.Networking
                     ["function"] = new JObject
                     {
                         ["name"] = "commander_weapon",
-                        ["description"] = "使用指挥官武器投放至指定网格坐标。冷却中会排队并于冷却结束自动投放；再次下达同编号即更新坐标。",
+                        ["description"] = "使用指挥官武器投放至目标网格（cell=快照上印刷的网格代号）。冷却中会排队并于冷却结束自动投放；再次下达同编号即更新坐标。",
                         ["parameters"] = new JObject
                         {
                             ["type"] = "object",
                             ["properties"] = new JObject
                             {
                                 ["weaponNumber"] = new JObject { ["type"] = "integer", ["description"] = "1=广域侦测 2=广域电磁干扰 3=炮击支援" },
-                                ["x"] = new JObject { ["type"] = "number" },
-                                ["z"] = new JObject { ["type"] = "number" },
+                                ["cell"] = new JObject { ["type"] = "string", ["description"] = "目标网格代号，如 C4" },
                             },
-                            ["required"] = new JArray("weaponNumber", "x", "z"),
+                            ["required"] = new JArray("weaponNumber", "cell"),
                         }
                     }
                 },
@@ -221,14 +220,22 @@ namespace HagenDa.Networking
 
         private string CommanderWeapon(JToken args)
         {
-            var a = ResolveArgs(args, "weaponNumber", "x", "z");
-            int num = (int)a[0];
-            float gx = a[1], gz = a[2];
+            var wArg = args?["weaponNumber"]?.ToString();
+            if (!int.TryParse(wArg, out int num))
+                return Err($"缺少或非法 weaponNumber: {wArg}");
+            string cell = args?["cell"]?.ToString();
+            float gx = 0f, gz = 0f;
+            if (string.IsNullOrEmpty(cell))
+            {
+                // 兼容旧米制坐标。
+                var v = ResolveArgs(args, "x", "z");
+                gx = v[0]; gz = v[1];
+            }
 
             if (NetworkCommanderState.GateActive)
                 return Err("对局尚未开始，请先完成所有小队的部署指令");
 
-            string text = orch.Weapons.TryOrder(num, gx, gz);
+            string text = orch.Weapons.TryOrder(num, cell, gx, gz);
             return new JObject { ["result"] = text }.ToString(Newtonsoft.Json.Formatting.None);
         }
 

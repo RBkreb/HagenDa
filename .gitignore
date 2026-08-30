@@ -18,6 +18,11 @@ MiniCPM-V-4_6/
 *.DotSettings.user
 .codely-cli/
 .vscode/
+.agent/
+.dsh/
+.omp/
+.zcode/
+MapSource/
 
 # OS
 .DS_Store

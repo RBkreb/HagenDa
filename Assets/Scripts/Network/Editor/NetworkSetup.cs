@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Mirror;
 using UnityEditor;
 using UnityEngine;
@@ -579,6 +580,395 @@ namespace HagenDa.Networking.EditorTools
             go.transform.position = cp.transform.position;
             var z = go.AddComponent<StrategicZone>();
             z.capturePoint = cp;
+        }
+
+        // ---------------------------------------------------------------
+        // HGTR (Blender map): 30v30 FSM battle on the imported map
+        // ---------------------------------------------------------------
+
+        private const string HGTRMapRootName = "HGTR_map";
+
+        /// <summary>
+        /// 在当前已打开的 HGTR 场景上部署 30v30 FSM 对局（幂等，可重跑）：
+        ///   - 地图层归类：地板/墙/掩体 → Ground，天花板 → ceiling
+        ///     （小地图/大地图/指挥官快照可见 Ground、不可见 ceiling，室内可见）
+        ///   - 3 据点（西庭院 / 中心峡谷 / 东庭院）+ 2 安全区（西=红 / 东=蓝）
+        ///   - 每个安全区/据点挂 DeployPointSet 重部署点模板
+        ///   - 对局系统 + StrategicZoneRegistry + FSMBattleSystem + 指挥官快照
+        ///   - 30v30 FSM AI（红出西安全区，蓝出东安全区）
+        ///   - NavMesh 重烘（排除 ceiling）
+        /// </summary>
+        [MenuItem("HagenDa/Create HGTR Battle Scene (30v30 FSM)")]
+        public static void CreateHGTRBattleScene()
+        {
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            if (!scene.name.StartsWith("HGTR"))
+            {
+                Debug.LogError($"[NetworkSetup] Active scene '{scene.name}' is not HGTR. Open HGTR.scene first.");
+                return;
+            }
+
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            EnsureFolder("Assets/Scripts/Network", "Equipment");
+            EnsureMapLayers();
+
+            var mapRoot = GameObject.Find(HGTRMapRootName);
+            if (mapRoot == null)
+            {
+                Debug.LogError($"[NetworkSetup] '{HGTRMapRootName}' not found in scene.");
+                return;
+            }
+
+            // --- 1) 地图层归类（幂等）：ceiling → ceiling layer，其余 → Ground ---
+            int ceilingLayer = LayerMask.NameToLayer(MapLayers.CeilingName);
+            int groundLayer = LayerMask.NameToLayer(MapLayers.GroundName);
+            if (ceilingLayer < 0 || groundLayer < 0)
+            {
+                Debug.LogError($"[NetworkSetup] Missing layers '{MapLayers.CeilingName}' / '{MapLayers.GroundName}'.");
+                return;
+            }
+            int movedGround = 0, keptCeiling = 0;
+            foreach (var t in mapRoot.GetComponentsInChildren<Transform>(true))
+            {
+                if (t == mapRoot.transform) continue;
+                if (t.name.ToLowerInvariant().Contains("ceiling"))
+                {
+                    if (t.gameObject.layer != ceilingLayer) t.gameObject.layer = ceilingLayer;
+                    keptCeiling++;
+                }
+                else if (t.gameObject.layer != groundLayer)
+                {
+                    t.gameObject.layer = groundLayer;
+                    movedGround++;
+                }
+            }
+            Debug.Log($"[NetworkSetup] Layers: ground={movedGround + keptCeiling} objects, ceiling={keptCeiling}.");
+
+            EnableMapMaterialsDoubleSided();
+            EnsureMapColliders();
+
+            // --- 2) Prefabs / assets (idempotent) ---
+            List<EquipmentDefinition> equipmentList = BuildEquipmentAssets();
+            GameObject grenadePrefab = BuildGrenadePrefab();
+            GameObject smokePrefab = BuildSmokePrefab();
+            GameObject rescuePrefab = BuildRescuePrefab();
+            GameObject bulletPrefab = BuildBulletPrefab();
+            GameObject playerPrefab = BuildPlayerPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab, equipmentList);
+            GameObject aiPrefab = BuildAIEntityPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab, equipmentList);
+            GameObject fsmPrefab = BuildFSMAIPrefab(aiPrefab);
+
+            // --- 3) 布局：按建筑名组 bounds 中心定位（避免硬编码坐标漂移）。
+            // Blender 导出命名与场景朝向可能镜像：不信任名字的东西/西含义，
+            // 一律按 X 排序 —— X 小=西（红方），X 大=东（蓝方）。
+            Vector3 groundY = new Vector3(0f, 0.5f, 0f);   // floor 顶面高度
+            var safeA = GroupCenter("wsafe_a") + groundY;
+            var safeB = GroupCenter("esafe_a") + groundY;
+            var safeWest = safeA.x <= safeB.x ? safeA : safeB;
+            var safeEast = safeA.x <= safeB.x ? safeB : safeA;
+
+            var cpA = GroupCenter("w1_courtyard") + groundY;
+            var cpB = GroupCenter("canyon_boulder") + groundY;
+            var cpC = GroupCenter("e_courtyard") + groundY;
+            var byX = new[] { cpA, cpB, cpC }.OrderBy(v => v.x).ToList();
+            var cpWest = byX[0];
+            var cpMid = byX[1];
+            var cpEast = byX[2];
+
+            // --- 4) 安全区 ×2（GR，红西/蓝东）---
+            ClearOld("MatchManager", "StrategicZoneRegistry", "FSMBattleSystem",
+                     "RedGR", "BlueGR", "Zone_W", "Zone_M", "Zone_E",
+                     "StrategicZone_W", "StrategicZone_M", "StrategicZone_E",
+                     "NetworkManager", "BattleCamera", "FreeCamera", "SquadCommander");
+            ClearAllFSMEntities();
+            var redSafe = CreateGarrison("RedGR", safeWest, (int)MatchTeam.Red, 25f);
+            var blueSafe = CreateGarrison("BlueGR", safeEast, (int)MatchTeam.Blue, 25f);
+            AttachDeployPointTemplate(redSafe.gameObject, 4, 8f);
+            AttachDeployPointTemplate(blueSafe.gameObject, 4, 8f);
+
+            // --- 5) 据点 ×3 + StrategicZone 包装 ---
+            // 中心据点在 canyon_boulder 岩石上（骨架图红框）：半径/部署点避开
+            // 岩石本体（直径 ~43m）。
+            var zoneW = CreateCapturePoint("Zone_W", cpWest, 14f);
+            var zoneM = CreateCapturePoint("Zone_M", cpMid, 22f);
+            var zoneE = CreateCapturePoint("Zone_E", cpEast, 14f);
+            zoneW.letter = "W"; zoneM.letter = "M"; zoneE.letter = "E";
+            AttachDeployPointTemplate(zoneW.gameObject, 2, 12f);
+            AttachDeployPointTemplate(zoneM.gameObject, 2, 26f);
+            AttachDeployPointTemplate(zoneE.gameObject, 2, 12f);
+            CreateStrategicZone("StrategicZone_W", zoneW);
+            CreateStrategicZone("StrategicZone_M", zoneM);
+            CreateStrategicZone("StrategicZone_E", zoneE);
+
+            // --- 6) 对局系统（持续战斗 30v30：6 小队 × 5 人） ---
+            var mmGo = new GameObject("NetworkMatchManager");
+            var mm = mmGo.AddComponent<NetworkMatchManager>();
+            mm.winScore = 999999;
+            mm.squadsPerTeam = 6;
+            mm.squadSize = 5;
+            mm.redeployDelay = 10f;
+            mm.garrisons = new List<GarrisonZone> { redSafe, blueSafe };
+            mm.capturePoints = new List<CapturePoint> { zoneW, zoneM, zoneE };
+
+            var registryGo = new GameObject("StrategicZoneRegistry");
+            registryGo.AddComponent<StrategicZoneRegistry>();
+
+            var systemGo = new GameObject("FSMBattleSystem");
+            systemGo.AddComponent<FSMBattleSystem>();
+            systemGo.AddComponent<FSMStatsHud>();
+
+            var cmdGo = new GameObject("SquadCommander");
+            cmdGo.AddComponent<SquadCommander>();
+
+            // --- 7) NetworkManager（全自动对局，Play 即 Host）---
+            var nmGo = new GameObject("NetworkManager");
+            var nm = nmGo.AddComponent<NetworkManager>();
+            nm.playerPrefab = playerPrefab;
+            nm.autoCreatePlayer = false;
+            var kcp = nmGo.AddComponent<kcp2k.KcpTransport>();
+            nm.transport = kcp;
+            nmGo.AddComponent<TrainingAutoHost>();
+            RegisterSpawnPrefabs(grenadePrefab, smokePrefab, rescuePrefab, aiPrefab, fsmPrefab);
+            foreach (var def in equipmentList)
+                if (def != null && def.throwablePrefab != null)
+                    RegisterSpawnPrefabs(def.throwablePrefab);
+            var empField = AssetDatabase.LoadAssetAtPath<GameObject>(EmpFieldPrefabPath);
+            if (empField != null) RegisterSpawnPrefabs(empField);
+
+            // --- 8) 观战相机（Blender 地图 396×234，拉高拉远）---
+            var camGo = new GameObject("BattleCamera");
+            camGo.transform.position = new Vector3(0f, 120f, -200f);
+            camGo.transform.rotation = Quaternion.Euler(55f, 0f, 0f);
+            var cam = camGo.AddComponent<Camera>();
+            cam.farClipPlane = 800f;
+
+            var freeCamGo = new GameObject("FreeCamera");
+            freeCamGo.transform.position = new Vector3(0f, 80f, -110f);
+            var freeCam = freeCamGo.AddComponent<Camera>();
+            freeCam.farClipPlane = 800f;
+            freeCam.depth = 1f;
+            freeCamGo.AddComponent<AudioListener>();
+            freeCamGo.AddComponent<FreeCamera>();
+            // 俯视/穿墙观战需要看到建筑内部：屏蔽 ceiling 层。
+            int ceilLayer = LayerMask.NameToLayer(MapLayers.CeilingName);
+            if (ceilLayer >= 0)
+                freeCam.cullingMask &= ~(1 << ceilLayer);
+
+            // HGTR 光照策略：只用地图自带灯（LGT_*），去除场景光照——
+            // 关闭地图外的灯（遗留 Directional Light）、环境光置黑、天空盒置空。
+            foreach (var l in Object.FindObjectsOfType<Light>(true))
+            {
+                if (l.transform.root.name == HGTRMapRootName) continue;
+                l.gameObject.SetActive(false);
+            }
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+            RenderSettings.ambientLight = Color.black;
+            RenderSettings.skybox = null;
+
+            // 导入场景可能自带 Unity 默认 Main Camera（含 AudioListener）：
+            // 移除多余的监听器/冗余相机，保证全场唯一 AudioListener 在 FreeCamera。
+            foreach (var al in Object.FindObjectsOfType<AudioListener>())
+                if (al.gameObject != freeCamGo)
+                    Object.DestroyImmediate(al.gameObject.GetComponent<AudioListener>());
+
+            // Blender 导入的室内填充灯（120+ Point/Spot）默认全部开阴影，
+            // 远超 HDRP maxShadowRequests → 每帧刷 "Max shadow requests" 警告。
+            // 填充灯不需要阴影：全部关闭，仅保留 Directional 的阴影。
+            int shadowOff = 0;
+            foreach (var l in Object.FindObjectsOfType<Light>(true))
+            {
+                if (l.type == LightType.Directional) continue;
+                if (l.shadows != LightShadows.None)
+                {
+                    l.shadows = LightShadows.None;
+                    EditorUtility.SetDirty(l);
+                    shadowOff++;
+                }
+            }
+            if (shadowOff > 0)
+                Debug.Log($"[NetworkSetup] Disabled shadows on {shadowOff} fill lights (kept directional).");
+
+            // --- 9) NavMesh 重烘（排除 ceiling；先于实体生成）---
+            BuildNavMeshForMapRoot(HGTRMapRootName);
+
+            // --- 10) 30v30 FSM AI：红方驻西安全区，蓝方驻东安全区 ---
+            CreateFSMTeamAround(fsmPrefab, (int)MatchTeam.Red, 30, safeWest);
+            CreateFSMTeamAround(fsmPrefab, (int)MatchTeam.Blue, 30, safeEast);
+
+            // --- 11) 指挥官快照 rig（含 PHASE10 网格线/标尺/格子代号）---
+            CommanderSetup.Setup();
+
+            // --- 12) 保障 ceiling 处于激活（NavMesh 烘焙会临时隐藏它）---
+            foreach (var r in mapRoot.GetComponentsInChildren<Renderer>(true))
+                if (r.name.ToLowerInvariant().Contains("ceiling"))
+                    r.gameObject.SetActive(true);
+
+            // --- 13) 保存 ---
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+            AssetDatabase.SaveAssets();
+            Debug.Log("[NetworkSetup] Done. HGTR battle scene ready: " +
+                      "2 safe zones, 3 capture points, 30v30 FSM AI, commander rig, NavMesh (ceiling excluded).");
+        }
+
+        /// <summary>
+        /// HGTR 地图 (Blender 导出) 网格默认无碰撞体：AI/玩家开局直接坠落穿地。
+        /// 给全部带网格的地图物体补 MeshCollider 并标记 static（静态几何利于
+        /// 物理/光照优化）。幂等；FBX 重导入后重跑本菜单即可恢复。
+        /// </summary>
+        private static void EnsureMapColliders()
+        {
+            var mapRoot = GameObject.Find(HGTRMapRootName);
+            if (mapRoot == null) return;
+
+            int added = 0, markedStatic = 0;
+            foreach (var mf in mapRoot.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh == null) continue;
+                if (mf.GetComponent<MeshCollider>() == null)
+                {
+                    mf.gameObject.AddComponent<MeshCollider>();
+                    added++;
+                }
+                if (!mf.gameObject.isStatic)
+                {
+                    mf.gameObject.isStatic = true;
+                    markedStatic++;
+                }
+            }
+            if (added > 0 || markedStatic > 0)
+                Debug.Log($"[NetworkSetup] Map colliders: +{added} MeshColliders, {markedStatic} objects marked static.");
+        }
+
+        private static Vector3 MinX(Vector3 a, Vector3 b, Vector3 c)
+            => a.x <= b.x && a.x <= c.x ? a : (b.x <= c.x ? b : c);
+
+        /// <summary>
+        /// HGTR 地图 (Blender 导出) 部分墙体网格面朝向翻转：背面剔除下从室内
+        /// 看不可见。FBX 内嵌材质全部启用 HDRP 双面渲染（Flip 法线照明），
+        /// 内外面都渲染且光照正确。幂等；FBX 重导入后重跑本菜单即可恢复。
+        /// </summary>
+        private static void EnableMapMaterialsDoubleSided()
+        {
+            const string fbxPath = "Assets/Map/HGTR_map.fbx";
+            int fixedCount = 0;
+            foreach (var asset in AssetDatabase.LoadAllAssetsAtPath(fbxPath))
+            {
+                if (asset is Material m && m.HasProperty("_DoubleSidedEnable")
+                                       && m.GetFloat("_DoubleSidedEnable") < 0.5f)
+                {
+                    m.SetFloat("_DoubleSidedEnable", 1f);
+                    if (m.HasProperty("_DoubleSidedNormalMode"))
+                        m.SetFloat("_DoubleSidedNormalMode", 0f);   // Flip
+                    if (m.HasProperty("_CullMode"))
+                        m.SetFloat("_CullMode", 0f);                // None (HDRP: 0=None,1=Front,2=Back)
+                    EditorUtility.SetDirty(m);
+                    fixedCount++;
+                }
+            }
+            if (fixedCount > 0)
+            {
+                AssetDatabase.SaveAssets();
+                Debug.Log($"[NetworkSetup] Enabled double-sided rendering on {fixedCount} map materials (interior walls visible).");
+            }
+        }
+
+        private static Vector3 MaxX(Vector3 a, Vector3 b, Vector3 c)
+            => a.x >= b.x && a.x >= c.x ? a : (b.x >= c.x ? b : c);
+
+        private static void ClearAllFSMEntities()
+        {
+            foreach (var fsm in Object.FindObjectsOfType<FSMAIController>(true))
+                Object.DestroyImmediate(fsm.gameObject);
+        }
+
+        /// <summary>按名字前缀（忽略大小写）计算一组物体的合并 bounds 中心（XZ 为主）。</summary>
+        private static Vector3 GroupCenter(string namePrefix)        {
+            var mapRoot = GameObject.Find(HGTRMapRootName);
+            if (mapRoot != null)
+            {
+                Bounds? combined = null;
+                string lower = namePrefix.ToLowerInvariant();
+                foreach (var r in mapRoot.GetComponentsInChildren<Renderer>())
+                {
+                    if (!r.name.ToLowerInvariant().StartsWith(lower)) continue;
+                    combined = combined.HasValue
+                        ? new Bounds(
+                            (combined.Value.center + r.bounds.center) * 0.5f,
+                            Vector3.Max(combined.Value.extents, r.bounds.extents) * 2f)
+                        : r.bounds;
+                }
+                if (combined.HasValue)
+                    return new Vector3(combined.Value.center.x, 0f, combined.Value.center.z);
+            }
+            Debug.LogWarning($"[NetworkSetup] GroupCenter '{namePrefix}' not found; fallback to origin.");
+            return Vector3.zero;
+        }
+
+        /// <summary>清除同名旧对象（幂等重跑）。</summary>
+        private static void ClearOld(params string[] names)
+        {
+            foreach (var n in names)
+            {
+                var go = GameObject.Find(n);
+                if (go != null) Object.DestroyImmediate(go);
+            }
+        }
+
+        /// <summary>
+        /// 在安全区/据点上挂重新部署点模板（DeployPointSet prefab 实例）：
+        /// count 个点位绕中心均匀分布 radius 半径。
+        /// </summary>
+        private static void AttachDeployPointTemplate(GameObject owner, int count, float radius)
+        {
+            // 清掉旧模板（幂等）。
+            foreach (Transform child in owner.transform)
+                if (child.name == "DeployPointSet")
+                    Object.DestroyImmediate(child.gameObject);
+
+            var setGo = new GameObject("DeployPointSet");
+            setGo.transform.SetParent(owner.transform, false);
+            var set = setGo.AddComponent<DeployPointSet>();
+            for (int i = 0; i < count; i++)
+            {
+                var dp = new GameObject($"DP_{i}");
+                dp.transform.SetParent(setGo.transform, false);
+                float a = (i / (float)count) * Mathf.PI * 2f;
+                dp.transform.localPosition = new Vector3(Mathf.Cos(a) * radius, 0f, Mathf.Sin(a) * radius);
+            }
+            // 编辑期直接注册（运行时 Awake 也会兜底注册）。
+            set.points.Clear();
+            for (int i = 0; i < setGo.transform.childCount; i++)
+                set.points.Add(setGo.transform.GetChild(i));
+
+            var gz = owner.GetComponent<GarrisonZone>();
+            if (gz != null) gz.deployPoints = new List<Transform>(set.points);
+            var cp = owner.GetComponent<CapturePoint>();
+            if (cp != null) cp.deployPoints = new List<Transform>(set.points);
+        }
+
+        /// <summary>
+        /// 在安全区中心周围生成一支 30 人 FSM 队伍（6 小队 × 5 人，网格驻扎）。
+        /// </summary>
+        private static void CreateFSMTeamAround(GameObject fsmPrefab, int team, int count, Vector3 center)
+        {
+            string teamName = team == (int)MatchTeam.Red ? "Red" : "Blue";
+            for (int i = 0; i < count; i++)
+            {
+                int squadIndex = i / 5;
+                int inSquad = i % 5;
+
+                var go = (GameObject)PrefabUtility.InstantiatePrefab(fsmPrefab);
+                go.name = $"FSM_{teamName}_S{squadIndex}_{i}";
+                float x = center.x - 10f + inSquad * 4.5f + (squadIndex % 3) * 1.5f;
+                float z = center.z - 8f + (squadIndex / 3) * 5f + (squadIndex % 2) * 2f;
+                go.transform.position = new Vector3(x, 1.5f, z);
+
+                var fsm = go.GetComponent<FSMAIController>();
+                if (fsm != null)
+                    fsm.aiClass = inSquad < 2 ? FsmClass.Assault
+                                : inSquad < 4 ? FsmClass.Support
+                                : FsmClass.Recon;
+            }
         }
 
         /// <summary>
@@ -2400,6 +2790,45 @@ namespace HagenDa.Networking.EditorTools
             surface.BuildNavMesh();
 
             Debug.Log("[NetworkSetup] NavMesh built on Floor.");
+        }
+
+        /// <summary>
+        /// HGTR (Blender map): bake from ALL scene colliders with the surface on the
+        /// map root. Ceiling objects are temporarily deactivated so the bake cannot
+        /// produce a walkable roof layer above the playable space.
+        /// </summary>
+        private static void BuildNavMeshForMapRoot(string mapRootName)
+        {
+            var mapRoot = GameObject.Find(mapRootName);
+            if (mapRoot == null)
+            {
+                Debug.LogWarning($"[NetworkSetup] Map root '{mapRootName}' not found; skipping NavMesh build.");
+                return;
+            }
+
+            // 临时隐藏天花板（避免烘出屋顶可行走层），烘完恢复。
+            var ceilings = new List<Renderer>();
+            foreach (var r in mapRoot.GetComponentsInChildren<Renderer>(true))
+                if (r.name.ToLowerInvariant().Contains("ceiling"))
+                    ceilings.Add(r);
+            foreach (var r in ceilings) r.gameObject.SetActive(false);
+
+            try
+            {
+                var surface = mapRoot.GetComponent<NavMeshSurface>();
+                if (surface == null)
+                    surface = mapRoot.AddComponent<NavMeshSurface>();
+
+                surface.collectObjects = CollectObjects.All;
+                surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+                surface.BuildNavMesh();
+
+                Debug.Log($"[NetworkSetup] NavMesh built on '{mapRootName}' ({ceilings.Count} ceilings excluded).");
+            }
+            finally
+            {
+                foreach (var r in ceilings) r.gameObject.SetActive(true);
+            }
         }
 
         private static void EnsureFolder(string parent, string folder)

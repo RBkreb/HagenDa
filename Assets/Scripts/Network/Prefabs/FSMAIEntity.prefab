@@ -119,3 +119,4 @@ MonoBehaviour:
   survivalExitAmmo: 0.75
   hipEffectiveDist: 1.5384616
   adsEffectiveDist: 3.9215686
+  commanderObjective: 0

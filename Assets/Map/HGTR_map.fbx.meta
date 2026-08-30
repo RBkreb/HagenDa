@@ -1,0 +1,5789 @@
+fileFormatVersion: 2
+guid: XnMbvHiqVinLjZWbCtfgoHRp12FAtYCxhyL+Jv1BLRPpyDf2yirt7Eg=
+ModelImporter:
+  serializedVersion: 22361
+  internalIDToNameTable: []
+  externalObjects: {}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    aCLCompressionLevel: 3
+    aCLCurvePrecision: 0.01
+    aCLFastSampleMode: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+    tuanjieGIEnable: 0
+    tuanjieGIGenSDFFactor: 1
+    tuanjieGIGenSDFBias: 0.25
+    tuanjieGIDoubleSidedMode: 0
+    tuanjieGIGenFacetNums: 12
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    totalVerticesCount: 42460
+    totalTrianglesCount: 23094
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  virtualGeometry:
+    virtualGeometry: 0
+    useTransparent: 0
+    setVGForeachMesh: 0
+    isFirstUse: 1
+    virtualGeometrySettings:
+      generateGeometryBuffer: 0
+      surfaceCompensation: 0
+      allMeshUse: 1
+      ignoreSimpleMesh: 0
+      transformScaleState: 0
+      isPossibleOverflow: 0
+      hasBoneData: 0
+      isBoneCountOverflow: 0
+    virtualGeometryPlatformSettings: []
+    selectedVGMeshes:
+    - index: 0
+      meshName: E_M2_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 1
+      meshName: E_M2_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 2
+      meshName: E_M2_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 3
+      meshName: E_M2_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 4
+      meshName: E_M2_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 5
+      meshName: E_M2_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 6
+      meshName: E_M2_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 7
+      meshName: E_M2_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 8
+      meshName: E_M2_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 9
+      meshName: E_M2_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 10
+      meshName: E_M2_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 11
+      meshName: E_M2_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 12
+      meshName: E_M2_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 13
+      meshName: E_M2_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 14
+      meshName: E_M2_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 15
+      meshName: E_M2_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 16
+      meshName: E_M2_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 17
+      meshName: E_M2_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 18
+      meshName: E_M2_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 19
+      meshName: E_M2_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 20
+      meshName: E_M2_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 21
+      meshName: E_M2_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 22
+      meshName: E_M2_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 23
+      meshName: E_M2_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 24
+      meshName: E_M2_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 25
+      meshName: E_M2_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 26
+      meshName: E_M2_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 27
+      meshName: E_M2_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 28
+      meshName: E_W2_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 29
+      meshName: E_W2_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 30
+      meshName: E_W2_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 31
+      meshName: E_W2_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 32
+      meshName: E_W2_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 33
+      meshName: E_W2_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 34
+      meshName: E_W2_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 35
+      meshName: E_W2_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 36
+      meshName: E_W2_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 37
+      meshName: E_W2_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 38
+      meshName: E_W2_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 39
+      meshName: E_W2_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 40
+      meshName: E_W2_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 41
+      meshName: E_W2_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 42
+      meshName: E_W2_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 43
+      meshName: E_W2_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 44
+      meshName: E_W2_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 45
+      meshName: E_W2_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 46
+      meshName: E_W2_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 47
+      meshName: E_W2_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 48
+      meshName: E_W2_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 49
+      meshName: E_W2e_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 50
+      meshName: E_W2e_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 51
+      meshName: E_W2e_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 52
+      meshName: E_W2e_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 53
+      meshName: E_W2e_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 54
+      meshName: E_W2e_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 55
+      meshName: E_W2e_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 56
+      meshName: E_W2e_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 57
+      meshName: E_W2e_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 58
+      meshName: E_W2e_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 59
+      meshName: E_W2e_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 60
+      meshName: E_W2e_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 61
+      meshName: E_W2e_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 62
+      meshName: E_W2e_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 63
+      meshName: E_W2e_cb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 64
+      meshName: E_W2e_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 65
+      meshName: E_W2e_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 66
+      meshName: E_W2e_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 67
+      meshName: E_W2e_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 68
+      meshName: E_W2e_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 69
+      meshName: E_W2e_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 70
+      meshName: E_W2e_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 71
+      meshName: E_W2e_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 72
+      meshName: E_W2e_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 73
+      meshName: E_W2e_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 74
+      meshName: E_W2e_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 75
+      meshName: E_W2e_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 76
+      meshName: E_W2e_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 77
+      meshName: E_W2e_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 78
+      meshName: E_W2e_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 79
+      meshName: E_W2e_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 80
+      meshName: E_W2e_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 81
+      meshName: E_W2e_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 82
+      meshName: E_W2e_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 83
+      meshName: E_W2e_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 84
+      meshName: E_corr_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 85
+      meshName: E_corr_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 86
+      meshName: E_corr_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 87
+      meshName: E_corr_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 88
+      meshName: E_corr_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 89
+      meshName: E_corr_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 90
+      meshName: E_corr_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 91
+      meshName: E_corr_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 92
+      meshName: E_corr_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 93
+      meshName: E_corr_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 94
+      meshName: E_corr_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 95
+      meshName: E_corr_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 96
+      meshName: E_corr_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 97
+      meshName: E_corr_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 98
+      meshName: E_corr_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 99
+      meshName: E_corr_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 100
+      meshName: E_corr_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 101
+      meshName: E_corr_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 102
+      meshName: E_corr_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 103
+      meshName: E_corr_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 104
+      meshName: E_corr_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 105
+      meshName: E_corr_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 106
+      meshName: E_corr_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 107
+      meshName: E_corr_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 108
+      meshName: E_corr_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 109
+      meshName: E_corr_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 110
+      meshName: E_corr_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 111
+      meshName: E_corr_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 112
+      meshName: E_corr_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 113
+      meshName: E_corr_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 114
+      meshName: E_corr_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 115
+      meshName: E_corr_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 116
+      meshName: E_courtyard_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 117
+      meshName: E_courtyard_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 118
+      meshName: E_courtyard_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 119
+      meshName: E_courtyard_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 120
+      meshName: E_courtyard_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 121
+      meshName: E_courtyard_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 122
+      meshName: E_courtyard_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 123
+      meshName: E_courtyard_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 124
+      meshName: E_courtyard_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 125
+      meshName: E_courtyard_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 126
+      meshName: E_courtyard_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 127
+      meshName: E_courtyard_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 128
+      meshName: E_courtyard_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 129
+      meshName: E_courtyard_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 130
+      meshName: E_courtyard_cb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 131
+      meshName: E_courtyard_cb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 132
+      meshName: E_courtyard_cb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 133
+      meshName: E_courtyard_cb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 134
+      meshName: E_courtyard_cb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 135
+      meshName: E_courtyard_cb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 136
+      meshName: E_courtyard_cb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 137
+      meshName: E_courtyard_cb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 138
+      meshName: E_courtyard_cb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 139
+      meshName: E_courtyard_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 140
+      meshName: E_courtyard_cb_30
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 141
+      meshName: E_courtyard_cb_31
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 142
+      meshName: E_courtyard_cb_32
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 143
+      meshName: E_courtyard_cb_33
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 144
+      meshName: E_courtyard_cb_34
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 145
+      meshName: E_courtyard_cb_35
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 146
+      meshName: E_courtyard_cb_36
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 147
+      meshName: E_courtyard_cb_37
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 148
+      meshName: E_courtyard_cb_38
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 149
+      meshName: E_courtyard_cb_39
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 150
+      meshName: E_courtyard_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 151
+      meshName: E_courtyard_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 152
+      meshName: E_courtyard_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 153
+      meshName: E_courtyard_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 154
+      meshName: E_courtyard_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 155
+      meshName: E_courtyard_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 156
+      meshName: E_courtyard_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 157
+      meshName: E_courtyard_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 158
+      meshName: E_courtyard_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 159
+      meshName: E_courtyard_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 160
+      meshName: E_courtyard_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 161
+      meshName: E_courtyard_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 162
+      meshName: E_courtyard_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 163
+      meshName: E_courtyard_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 164
+      meshName: E_courtyard_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 165
+      meshName: E_courtyard_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 166
+      meshName: E_courtyard_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 167
+      meshName: E_courtyard_sb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 168
+      meshName: E_courtyard_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 169
+      meshName: E_courtyard_sb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 170
+      meshName: E_courtyard_sb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 171
+      meshName: E_courtyard_sb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 172
+      meshName: E_courtyard_sb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 173
+      meshName: E_courtyard_sb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 174
+      meshName: E_courtyard_sb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 175
+      meshName: E_courtyard_sb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 176
+      meshName: E_courtyard_sb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 177
+      meshName: E_courtyard_sb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 178
+      meshName: E_courtyard_sb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 179
+      meshName: E_courtyard_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 180
+      meshName: E_courtyard_sb_30
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 181
+      meshName: E_courtyard_sb_31
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 182
+      meshName: E_courtyard_sb_32
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 183
+      meshName: E_courtyard_sb_33
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 184
+      meshName: E_courtyard_sb_34
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 185
+      meshName: E_courtyard_sb_35
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 186
+      meshName: E_courtyard_sb_36
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 187
+      meshName: E_courtyard_sb_37
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 188
+      meshName: E_courtyard_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 189
+      meshName: E_courtyard_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 190
+      meshName: E_courtyard_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 191
+      meshName: E_courtyard_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 192
+      meshName: E_courtyard_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 193
+      meshName: E_courtyard_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 194
+      meshName: Esafe_a_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 195
+      meshName: Esafe_a_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 196
+      meshName: Esafe_a_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 197
+      meshName: Esafe_a_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 198
+      meshName: Esafe_a_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 199
+      meshName: Esafe_a_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 200
+      meshName: Esafe_a_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 201
+      meshName: Esafe_a_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 202
+      meshName: Esafe_a_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 203
+      meshName: Esafe_a_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 204
+      meshName: Esafe_a_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 205
+      meshName: Esafe_a_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 206
+      meshName: Esafe_a_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 207
+      meshName: Esafe_a_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 208
+      meshName: Esafe_a_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 209
+      meshName: Esafe_a_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 210
+      meshName: Esafe_a_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 211
+      meshName: Esafe_a_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 212
+      meshName: Esafe_a_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 213
+      meshName: Esafe_a_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 214
+      meshName: Esafe_a_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 215
+      meshName: Esafe_a_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 216
+      meshName: Esafe_a_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 217
+      meshName: Esafe_a_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 218
+      meshName: Esafe_a_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 219
+      meshName: Esafe_a_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 220
+      meshName: Esafe_a_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 221
+      meshName: Esafe_a_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 222
+      meshName: Esafe_a_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 223
+      meshName: Esafe_a_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 224
+      meshName: Esafe_a_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 225
+      meshName: Esafe_a_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 226
+      meshName: Esafe_a_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 227
+      meshName: Esafe_a_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 228
+      meshName: Esafe_a_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 229
+      meshName: Esafe_a_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 230
+      meshName: Esafe_a_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 231
+      meshName: Esafe_a_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 232
+      meshName: Esafe_a_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 233
+      meshName: Esafe_a_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 234
+      meshName: Esafe_b_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 235
+      meshName: Esafe_b_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 236
+      meshName: Esafe_b_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 237
+      meshName: Esafe_b_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 238
+      meshName: Esafe_b_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 239
+      meshName: Esafe_b_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 240
+      meshName: Esafe_b_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 241
+      meshName: Esafe_b_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 242
+      meshName: Esafe_b_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 243
+      meshName: Esafe_b_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 244
+      meshName: Esafe_b_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 245
+      meshName: Esafe_b_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 246
+      meshName: Esafe_b_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 247
+      meshName: Esafe_b_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 248
+      meshName: Esafe_b_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 249
+      meshName: Esafe_b_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 250
+      meshName: Esafe_b_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 251
+      meshName: Esafe_b_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 252
+      meshName: Esafe_b_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 253
+      meshName: Esafe_b_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 254
+      meshName: Esafe_b_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 255
+      meshName: Esafe_b_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 256
+      meshName: Esafe_b_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 257
+      meshName: Esafe_b_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 258
+      meshName: Esafe_b_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 259
+      meshName: Esafe_b_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 260
+      meshName: Esafe_b_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 261
+      meshName: Esafe_b_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 262
+      meshName: Esafe_b_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 263
+      meshName: Esafe_b_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 264
+      meshName: Esafe_b_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 265
+      meshName: Esafe_b_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 266
+      meshName: Esafe_b_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 267
+      meshName: Esafe_b_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 268
+      meshName: Esafe_b_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 269
+      meshName: Esafe_b_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 270
+      meshName: Esafe_b_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 271
+      meshName: HGTR_ceiling
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 272
+      meshName: HGTR_floor_union
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 273
+      meshName: M2_hall_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 274
+      meshName: M2_hall_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 275
+      meshName: M2_hall_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 276
+      meshName: M2_hall_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 277
+      meshName: M2_hall_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 278
+      meshName: M2_hall_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 279
+      meshName: M2_hall_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 280
+      meshName: M2_hall_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 281
+      meshName: M2_hall_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 282
+      meshName: M2_hall_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 283
+      meshName: M2_hall_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 284
+      meshName: M2_hall_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 285
+      meshName: M2_hall_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 286
+      meshName: M2_hall_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 287
+      meshName: M2_hall_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 288
+      meshName: M2_hall_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 289
+      meshName: M2_hall_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 290
+      meshName: M2_hall_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 291
+      meshName: M2_hall_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 292
+      meshName: M2_hall_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 293
+      meshName: M2_hall_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 294
+      meshName: M2_hall_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 295
+      meshName: M2_hall_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 296
+      meshName: M2_hall_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 297
+      meshName: M2_hall_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 298
+      meshName: M2_hall_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 299
+      meshName: M2_hall_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 300
+      meshName: M2_hall_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 301
+      meshName: M2_hall_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 302
+      meshName: M2_hall_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 303
+      meshName: M2_hall_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 304
+      meshName: S_arm_ne_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 305
+      meshName: S_arm_ne_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 306
+      meshName: S_arm_ne_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 307
+      meshName: S_arm_ne_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 308
+      meshName: S_arm_ne_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 309
+      meshName: S_arm_ne_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 310
+      meshName: S_arm_ne_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 311
+      meshName: S_arm_ne_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 312
+      meshName: S_arm_ne_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 313
+      meshName: S_arm_ne_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 314
+      meshName: S_arm_ne_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 315
+      meshName: S_arm_ne_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 316
+      meshName: S_arm_ne_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 317
+      meshName: S_arm_ne_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 318
+      meshName: S_arm_ne_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 319
+      meshName: S_arm_ne_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 320
+      meshName: S_arm_ne_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 321
+      meshName: S_arm_ne_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 322
+      meshName: S_arm_ne_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 323
+      meshName: S_arm_ne_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 324
+      meshName: S_arm_ne_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 325
+      meshName: S_arm_ne_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 326
+      meshName: S_arm_ne_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 327
+      meshName: S_arm_ne_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 328
+      meshName: S_arm_ne_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 329
+      meshName: S_arm_ne_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 330
+      meshName: S_arm_ne_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 331
+      meshName: S_arm_ne_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 332
+      meshName: S_arm_ne_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 333
+      meshName: S_arm_ne_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 334
+      meshName: S_arm_ne_sb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 335
+      meshName: S_arm_ne_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 336
+      meshName: S_arm_ne_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 337
+      meshName: S_arm_ne_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 338
+      meshName: S_arm_ne_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 339
+      meshName: S_arm_ne_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 340
+      meshName: S_arm_ne_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 341
+      meshName: S_arm_ne_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 342
+      meshName: S_arm_ne_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 343
+      meshName: S_arm_sw_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 344
+      meshName: S_arm_sw_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 345
+      meshName: S_arm_sw_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 346
+      meshName: S_arm_sw_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 347
+      meshName: S_arm_sw_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 348
+      meshName: S_arm_sw_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 349
+      meshName: S_arm_sw_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 350
+      meshName: S_arm_sw_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 351
+      meshName: S_arm_sw_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 352
+      meshName: S_arm_sw_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 353
+      meshName: S_arm_sw_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 354
+      meshName: S_arm_sw_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 355
+      meshName: S_arm_sw_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 356
+      meshName: S_arm_sw_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 357
+      meshName: S_arm_sw_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 358
+      meshName: S_arm_sw_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 359
+      meshName: S_arm_sw_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 360
+      meshName: S_arm_sw_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 361
+      meshName: S_arm_sw_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 362
+      meshName: S_arm_sw_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 363
+      meshName: S_arm_sw_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 364
+      meshName: S_arm_sw_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 365
+      meshName: S_arm_sw_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 366
+      meshName: S_arm_sw_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 367
+      meshName: S_arm_sw_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 368
+      meshName: S_arm_sw_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 369
+      meshName: S_arm_sw_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 370
+      meshName: S_arm_sw_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 371
+      meshName: W1_courtyard_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 372
+      meshName: W1_courtyard_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 373
+      meshName: W1_courtyard_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 374
+      meshName: W1_courtyard_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 375
+      meshName: W1_courtyard_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 376
+      meshName: W1_courtyard_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 377
+      meshName: W1_courtyard_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 378
+      meshName: W1_courtyard_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 379
+      meshName: W1_courtyard_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 380
+      meshName: W1_courtyard_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 381
+      meshName: W1_courtyard_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 382
+      meshName: W1_courtyard_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 383
+      meshName: W1_courtyard_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 384
+      meshName: W1_courtyard_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 385
+      meshName: W1_courtyard_cb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 386
+      meshName: W1_courtyard_cb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 387
+      meshName: W1_courtyard_cb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 388
+      meshName: W1_courtyard_cb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 389
+      meshName: W1_courtyard_cb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 390
+      meshName: W1_courtyard_cb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 391
+      meshName: W1_courtyard_cb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 392
+      meshName: W1_courtyard_cb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 393
+      meshName: W1_courtyard_cb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 394
+      meshName: W1_courtyard_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 395
+      meshName: W1_courtyard_cb_30
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 396
+      meshName: W1_courtyard_cb_31
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 397
+      meshName: W1_courtyard_cb_32
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 398
+      meshName: W1_courtyard_cb_33
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 399
+      meshName: W1_courtyard_cb_34
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 400
+      meshName: W1_courtyard_cb_35
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 401
+      meshName: W1_courtyard_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 402
+      meshName: W1_courtyard_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 403
+      meshName: W1_courtyard_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 404
+      meshName: W1_courtyard_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 405
+      meshName: W1_courtyard_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 406
+      meshName: W1_courtyard_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 407
+      meshName: W1_courtyard_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 408
+      meshName: W1_courtyard_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 409
+      meshName: W1_courtyard_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 410
+      meshName: W1_courtyard_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 411
+      meshName: W1_courtyard_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 412
+      meshName: W1_courtyard_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 413
+      meshName: W1_courtyard_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 414
+      meshName: W1_courtyard_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 415
+      meshName: W1_courtyard_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 416
+      meshName: W1_courtyard_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 417
+      meshName: W1_courtyard_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 418
+      meshName: W1_courtyard_sb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 419
+      meshName: W1_courtyard_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 420
+      meshName: W1_courtyard_sb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 421
+      meshName: W1_courtyard_sb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 422
+      meshName: W1_courtyard_sb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 423
+      meshName: W1_courtyard_sb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 424
+      meshName: W1_courtyard_sb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 425
+      meshName: W1_courtyard_sb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 426
+      meshName: W1_courtyard_sb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 427
+      meshName: W1_courtyard_sb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 428
+      meshName: W1_courtyard_sb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 429
+      meshName: W1_courtyard_sb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 430
+      meshName: W1_courtyard_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 431
+      meshName: W1_courtyard_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 432
+      meshName: W1_courtyard_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 433
+      meshName: W1_courtyard_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 434
+      meshName: W1_courtyard_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 435
+      meshName: W1_courtyard_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 436
+      meshName: W1_courtyard_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 437
+      meshName: W2_corridor_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 438
+      meshName: W2_corridor_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 439
+      meshName: W2_corridor_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 440
+      meshName: W2_corridor_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 441
+      meshName: W2_corridor_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 442
+      meshName: W2_corridor_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 443
+      meshName: W2_corridor_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 444
+      meshName: W2_corridor_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 445
+      meshName: W2_corridor_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 446
+      meshName: W2_corridor_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 447
+      meshName: W2_corridor_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 448
+      meshName: W2_corridor_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 449
+      meshName: W2_corridor_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 450
+      meshName: W2_corridor_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 451
+      meshName: W2_corridor_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 452
+      meshName: W2_corridor_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 453
+      meshName: W2_corridor_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 454
+      meshName: W2_corridor_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 455
+      meshName: W2_corridor_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 456
+      meshName: W2_corridor_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 457
+      meshName: W2_corridor_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 458
+      meshName: W2_corridor_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 459
+      meshName: W2_corridor_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 460
+      meshName: W2_corridor_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 461
+      meshName: W2_corridor_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 462
+      meshName: W2_corridor_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 463
+      meshName: W2e-S-BR
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 464
+      meshName: W2e_chamber_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 465
+      meshName: W2e_chamber_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 466
+      meshName: W2e_chamber_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 467
+      meshName: W2e_chamber_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 468
+      meshName: W2e_chamber_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 469
+      meshName: W2e_chamber_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 470
+      meshName: W2e_chamber_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 471
+      meshName: W2e_chamber_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 472
+      meshName: W2e_chamber_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 473
+      meshName: W2e_chamber_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 474
+      meshName: W2e_chamber_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 475
+      meshName: W2e_chamber_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 476
+      meshName: W2e_chamber_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 477
+      meshName: W2e_chamber_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 478
+      meshName: W2e_chamber_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 479
+      meshName: W2e_chamber_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 480
+      meshName: W2e_chamber_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 481
+      meshName: W2e_chamber_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 482
+      meshName: W2e_chamber_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 483
+      meshName: W2e_chamber_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 484
+      meshName: W2e_chamber_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 485
+      meshName: W2e_chamber_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 486
+      meshName: W2e_chamber_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 487
+      meshName: W2e_chamber_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 488
+      meshName: W2e_chamber_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 489
+      meshName: W2e_chamber_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 490
+      meshName: W2e_chamber_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 491
+      meshName: W2e_chamber_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 492
+      meshName: W2e_chamber_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 493
+      meshName: W2e_chamber_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 494
+      meshName: W2e_chamber_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 495
+      meshName: W2e_chamber_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 496
+      meshName: canyon_boulder
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 497
+      meshName: canyon_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 498
+      meshName: canyon_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 499
+      meshName: canyon_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 500
+      meshName: canyon_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 501
+      meshName: canyon_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 502
+      meshName: canyon_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 503
+      meshName: canyon_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 504
+      meshName: canyon_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 505
+      meshName: canyon_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 506
+      meshName: canyon_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 507
+      meshName: canyon_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 508
+      meshName: canyon_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 509
+      meshName: canyon_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 510
+      meshName: canyon_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 511
+      meshName: canyon_cb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 512
+      meshName: canyon_cb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 513
+      meshName: canyon_cb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 514
+      meshName: canyon_cb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 515
+      meshName: canyon_cb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 516
+      meshName: canyon_cb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 517
+      meshName: canyon_cb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 518
+      meshName: canyon_cb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 519
+      meshName: canyon_cb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 520
+      meshName: canyon_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 521
+      meshName: canyon_cb_30
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 522
+      meshName: canyon_cb_31
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 523
+      meshName: canyon_cb_32
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 524
+      meshName: canyon_cb_33
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 525
+      meshName: canyon_cb_34
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 526
+      meshName: canyon_cb_35
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 527
+      meshName: canyon_cb_36
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 528
+      meshName: canyon_cb_37
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 529
+      meshName: canyon_cb_38
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 530
+      meshName: canyon_cb_39
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 531
+      meshName: canyon_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 532
+      meshName: canyon_cb_40
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 533
+      meshName: canyon_cb_41
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 534
+      meshName: canyon_cb_42
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 535
+      meshName: canyon_cb_43
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 536
+      meshName: canyon_cb_44
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 537
+      meshName: canyon_cb_45
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 538
+      meshName: canyon_cb_46
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 539
+      meshName: canyon_cb_47
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 540
+      meshName: canyon_cb_48
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 541
+      meshName: canyon_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 542
+      meshName: canyon_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 543
+      meshName: canyon_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 544
+      meshName: canyon_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 545
+      meshName: canyon_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 546
+      meshName: canyon_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 547
+      meshName: canyon_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 548
+      meshName: canyon_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 549
+      meshName: canyon_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 550
+      meshName: canyon_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 551
+      meshName: canyon_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 552
+      meshName: canyon_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 553
+      meshName: canyon_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 554
+      meshName: canyon_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 555
+      meshName: canyon_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 556
+      meshName: canyon_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 557
+      meshName: canyon_sb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 558
+      meshName: canyon_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 559
+      meshName: canyon_sb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 560
+      meshName: canyon_sb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 561
+      meshName: canyon_sb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 562
+      meshName: canyon_sb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 563
+      meshName: canyon_sb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 564
+      meshName: canyon_sb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 565
+      meshName: canyon_sb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 566
+      meshName: canyon_sb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 567
+      meshName: canyon_sb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 568
+      meshName: canyon_sb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 569
+      meshName: canyon_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 570
+      meshName: canyon_sb_30
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 571
+      meshName: canyon_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 572
+      meshName: canyon_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 573
+      meshName: canyon_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 574
+      meshName: canyon_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 575
+      meshName: canyon_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 576
+      meshName: canyon_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 577
+      meshName: corr_W1W3_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 578
+      meshName: corr_W1W3_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 579
+      meshName: corr_W1W3_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 580
+      meshName: corr_W1W3_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 581
+      meshName: corr_W1W3_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 582
+      meshName: corr_W1W3_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 583
+      meshName: corr_W1W3_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 584
+      meshName: corr_W1W3_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 585
+      meshName: corr_W1W3_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 586
+      meshName: corr_W1W3_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 587
+      meshName: corr_W1W3_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 588
+      meshName: corr_W1W3_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 589
+      meshName: corr_W1W3_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 590
+      meshName: corr_W1W3_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 591
+      meshName: corr_W1W3_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 592
+      meshName: corr_W1W3_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 593
+      meshName: corr_W1W3_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 594
+      meshName: corr_W1W3_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 595
+      meshName: corr_W1W3_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 596
+      meshName: corr_W1W3_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 597
+      meshName: corr_W1W3_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 598
+      meshName: corr_W1W3_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 599
+      meshName: corr_W1W3_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 600
+      meshName: corr_W1W3_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 601
+      meshName: corr_W1W3_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 602
+      meshName: corr_W1W3_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 603
+      meshName: corr_W1W3_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 604
+      meshName: corr_W1W3_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 605
+      meshName: corr_W1W3_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 606
+      meshName: wall_loop_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 607
+      meshName: wall_loop_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 608
+      meshName: wall_loop_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 609
+      meshName: wall_loop_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 610
+      meshName: wall_loop_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 611
+      meshName: wall_loop_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 612
+      meshName: wall_loop_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 613
+      meshName: wall_loop_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 614
+      meshName: wall_loop_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 615
+      meshName: wall_loop_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 616
+      meshName: wall_loop_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 617
+      meshName: wall_loop_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 618
+      meshName: wall_loop_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 619
+      meshName: wall_loop_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 620
+      meshName: wall_loop_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 621
+      meshName: wall_loop_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 622
+      meshName: wall_loop_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 623
+      meshName: wall_loop_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 624
+      meshName: wall_loop_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 625
+      meshName: wall_loop_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 626
+      meshName: wall_loop_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 627
+      meshName: wall_loop_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 628
+      meshName: wall_loop_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 629
+      meshName: wsafe_a_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 630
+      meshName: wsafe_a_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 631
+      meshName: wsafe_a_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 632
+      meshName: wsafe_a_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 633
+      meshName: wsafe_a_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 634
+      meshName: wsafe_a_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 635
+      meshName: wsafe_a_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 636
+      meshName: wsafe_a_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 637
+      meshName: wsafe_a_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 638
+      meshName: wsafe_a_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 639
+      meshName: wsafe_a_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 640
+      meshName: wsafe_a_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 641
+      meshName: wsafe_a_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 642
+      meshName: wsafe_a_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 643
+      meshName: wsafe_a_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 644
+      meshName: wsafe_a_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 645
+      meshName: wsafe_a_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 646
+      meshName: wsafe_a_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 647
+      meshName: wsafe_a_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 648
+      meshName: wsafe_a_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 649
+      meshName: wsafe_a_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 650
+      meshName: wsafe_a_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 651
+      meshName: wsafe_a_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 652
+      meshName: wsafe_a_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 653
+      meshName: wsafe_a_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 654
+      meshName: wsafe_a_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 655
+      meshName: wsafe_a_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 656
+      meshName: wsafe_a_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 657
+      meshName: wsafe_a_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 658
+      meshName: wsafe_a_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 659
+      meshName: wsafe_a_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 660
+      meshName: wsafe_a_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 661
+      meshName: wsafe_a_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 662
+      meshName: wsafe_a_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 663
+      meshName: wsafe_a_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 664
+      meshName: wsafe_b_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 665
+      meshName: wsafe_b_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 666
+      meshName: wsafe_b_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 667
+      meshName: wsafe_b_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 668
+      meshName: wsafe_b_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 669
+      meshName: wsafe_b_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 670
+      meshName: wsafe_b_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 671
+      meshName: wsafe_b_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 672
+      meshName: wsafe_b_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 673
+      meshName: wsafe_b_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 674
+      meshName: wsafe_b_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 675
+      meshName: wsafe_b_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 676
+      meshName: wsafe_b_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 677
+      meshName: wsafe_b_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 678
+      meshName: wsafe_b_cb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 679
+      meshName: wsafe_b_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 680
+      meshName: wsafe_b_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 681
+      meshName: wsafe_b_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 682
+      meshName: wsafe_b_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 683
+      meshName: wsafe_b_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 684
+      meshName: wsafe_b_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 685
+      meshName: wsafe_b_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 686
+      meshName: wsafe_b_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 687
+      meshName: wsafe_b_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 688
+      meshName: wsafe_b_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 689
+      meshName: wsafe_b_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 690
+      meshName: wsafe_b_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 691
+      meshName: wsafe_b_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 692
+      meshName: wsafe_b_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 693
+      meshName: wsafe_b_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 694
+      meshName: wsafe_b_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 695
+      meshName: wsafe_b_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 696
+      meshName: wsafe_b_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 697
+      meshName: wsafe_b_sb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 698
+      meshName: wsafe_b_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 699
+      meshName: wsafe_b_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 700
+      meshName: wsafe_b_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 701
+      meshName: wsafe_b_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 702
+      meshName: wsafe_b_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 703
+      meshName: wsafe_b_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 704
+      meshName: wsafe_b_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 705
+      meshName: wsafe_b_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    supportVGMeshes:
+    - index: 0
+      meshName: E_M2_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 1
+      meshName: E_M2_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 2
+      meshName: E_M2_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 3
+      meshName: E_M2_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 4
+      meshName: E_M2_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 5
+      meshName: E_M2_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 6
+      meshName: E_M2_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 7
+      meshName: E_M2_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 8
+      meshName: E_M2_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 9
+      meshName: E_M2_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 10
+      meshName: E_M2_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 11
+      meshName: E_M2_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 12
+      meshName: E_M2_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 13
+      meshName: E_M2_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 14
+      meshName: E_M2_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 15
+      meshName: E_M2_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 16
+      meshName: E_M2_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 17
+      meshName: E_M2_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 18
+      meshName: E_M2_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 19
+      meshName: E_M2_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 20
+      meshName: E_M2_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 21
+      meshName: E_M2_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 22
+      meshName: E_M2_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 23
+      meshName: E_M2_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 24
+      meshName: E_M2_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 25
+      meshName: E_M2_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 26
+      meshName: E_M2_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 27
+      meshName: E_M2_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 28
+      meshName: E_W2_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 29
+      meshName: E_W2_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 30
+      meshName: E_W2_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 31
+      meshName: E_W2_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 32
+      meshName: E_W2_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 33
+      meshName: E_W2_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 34
+      meshName: E_W2_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 35
+      meshName: E_W2_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 36
+      meshName: E_W2_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 37
+      meshName: E_W2_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 38
+      meshName: E_W2_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 39
+      meshName: E_W2_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 40
+      meshName: E_W2_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 41
+      meshName: E_W2_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 42
+      meshName: E_W2_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 43
+      meshName: E_W2_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 44
+      meshName: E_W2_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 45
+      meshName: E_W2_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 46
+      meshName: E_W2_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 47
+      meshName: E_W2_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 48
+      meshName: E_W2_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 49
+      meshName: E_W2e_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 50
+      meshName: E_W2e_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 51
+      meshName: E_W2e_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 52
+      meshName: E_W2e_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 53
+      meshName: E_W2e_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 54
+      meshName: E_W2e_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 55
+      meshName: E_W2e_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 56
+      meshName: E_W2e_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 57
+      meshName: E_W2e_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 58
+      meshName: E_W2e_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 59
+      meshName: E_W2e_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 60
+      meshName: E_W2e_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 61
+      meshName: E_W2e_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 62
+      meshName: E_W2e_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 63
+      meshName: E_W2e_cb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 64
+      meshName: E_W2e_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 65
+      meshName: E_W2e_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 66
+      meshName: E_W2e_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 67
+      meshName: E_W2e_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 68
+      meshName: E_W2e_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 69
+      meshName: E_W2e_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 70
+      meshName: E_W2e_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 71
+      meshName: E_W2e_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 72
+      meshName: E_W2e_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 73
+      meshName: E_W2e_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 74
+      meshName: E_W2e_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 75
+      meshName: E_W2e_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 76
+      meshName: E_W2e_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 77
+      meshName: E_W2e_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 78
+      meshName: E_W2e_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 79
+      meshName: E_W2e_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 80
+      meshName: E_W2e_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 81
+      meshName: E_W2e_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 82
+      meshName: E_W2e_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 83
+      meshName: E_W2e_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 84
+      meshName: E_corr_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 85
+      meshName: E_corr_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 86
+      meshName: E_corr_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 87
+      meshName: E_corr_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 88
+      meshName: E_corr_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 89
+      meshName: E_corr_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 90
+      meshName: E_corr_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 91
+      meshName: E_corr_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 92
+      meshName: E_corr_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 93
+      meshName: E_corr_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 94
+      meshName: E_corr_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 95
+      meshName: E_corr_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 96
+      meshName: E_corr_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 97
+      meshName: E_corr_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 98
+      meshName: E_corr_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 99
+      meshName: E_corr_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 100
+      meshName: E_corr_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 101
+      meshName: E_corr_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 102
+      meshName: E_corr_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 103
+      meshName: E_corr_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 104
+      meshName: E_corr_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 105
+      meshName: E_corr_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 106
+      meshName: E_corr_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 107
+      meshName: E_corr_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 108
+      meshName: E_corr_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 109
+      meshName: E_corr_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 110
+      meshName: E_corr_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 111
+      meshName: E_corr_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 112
+      meshName: E_corr_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 113
+      meshName: E_corr_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 114
+      meshName: E_corr_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 115
+      meshName: E_corr_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 116
+      meshName: E_courtyard_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 117
+      meshName: E_courtyard_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 118
+      meshName: E_courtyard_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 119
+      meshName: E_courtyard_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 120
+      meshName: E_courtyard_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 121
+      meshName: E_courtyard_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 122
+      meshName: E_courtyard_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 123
+      meshName: E_courtyard_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 124
+      meshName: E_courtyard_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 125
+      meshName: E_courtyard_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 126
+      meshName: E_courtyard_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 127
+      meshName: E_courtyard_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 128
+      meshName: E_courtyard_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 129
+      meshName: E_courtyard_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 130
+      meshName: E_courtyard_cb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 131
+      meshName: E_courtyard_cb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 132
+      meshName: E_courtyard_cb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 133
+      meshName: E_courtyard_cb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 134
+      meshName: E_courtyard_cb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 135
+      meshName: E_courtyard_cb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 136
+      meshName: E_courtyard_cb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 137
+      meshName: E_courtyard_cb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 138
+      meshName: E_courtyard_cb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 139
+      meshName: E_courtyard_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 140
+      meshName: E_courtyard_cb_30
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 141
+      meshName: E_courtyard_cb_31
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 142
+      meshName: E_courtyard_cb_32
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 143
+      meshName: E_courtyard_cb_33
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 144
+      meshName: E_courtyard_cb_34
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 145
+      meshName: E_courtyard_cb_35
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 146
+      meshName: E_courtyard_cb_36
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 147
+      meshName: E_courtyard_cb_37
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 148
+      meshName: E_courtyard_cb_38
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 149
+      meshName: E_courtyard_cb_39
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 150
+      meshName: E_courtyard_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 151
+      meshName: E_courtyard_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 152
+      meshName: E_courtyard_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 153
+      meshName: E_courtyard_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 154
+      meshName: E_courtyard_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 155
+      meshName: E_courtyard_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 156
+      meshName: E_courtyard_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 157
+      meshName: E_courtyard_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 158
+      meshName: E_courtyard_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 159
+      meshName: E_courtyard_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 160
+      meshName: E_courtyard_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 161
+      meshName: E_courtyard_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 162
+      meshName: E_courtyard_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 163
+      meshName: E_courtyard_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 164
+      meshName: E_courtyard_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 165
+      meshName: E_courtyard_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 166
+      meshName: E_courtyard_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 167
+      meshName: E_courtyard_sb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 168
+      meshName: E_courtyard_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 169
+      meshName: E_courtyard_sb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 170
+      meshName: E_courtyard_sb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 171
+      meshName: E_courtyard_sb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 172
+      meshName: E_courtyard_sb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 173
+      meshName: E_courtyard_sb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 174
+      meshName: E_courtyard_sb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 175
+      meshName: E_courtyard_sb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 176
+      meshName: E_courtyard_sb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 177
+      meshName: E_courtyard_sb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 178
+      meshName: E_courtyard_sb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 179
+      meshName: E_courtyard_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 180
+      meshName: E_courtyard_sb_30
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 181
+      meshName: E_courtyard_sb_31
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 182
+      meshName: E_courtyard_sb_32
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 183
+      meshName: E_courtyard_sb_33
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 184
+      meshName: E_courtyard_sb_34
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 185
+      meshName: E_courtyard_sb_35
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 186
+      meshName: E_courtyard_sb_36
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 187
+      meshName: E_courtyard_sb_37
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 188
+      meshName: E_courtyard_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 189
+      meshName: E_courtyard_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 190
+      meshName: E_courtyard_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 191
+      meshName: E_courtyard_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 192
+      meshName: E_courtyard_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 193
+      meshName: E_courtyard_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 194
+      meshName: Esafe_a_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 195
+      meshName: Esafe_a_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 196
+      meshName: Esafe_a_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 197
+      meshName: Esafe_a_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 198
+      meshName: Esafe_a_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 199
+      meshName: Esafe_a_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 200
+      meshName: Esafe_a_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 201
+      meshName: Esafe_a_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 202
+      meshName: Esafe_a_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 203
+      meshName: Esafe_a_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 204
+      meshName: Esafe_a_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 205
+      meshName: Esafe_a_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 206
+      meshName: Esafe_a_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 207
+      meshName: Esafe_a_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 208
+      meshName: Esafe_a_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 209
+      meshName: Esafe_a_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 210
+      meshName: Esafe_a_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 211
+      meshName: Esafe_a_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 212
+      meshName: Esafe_a_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 213
+      meshName: Esafe_a_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 214
+      meshName: Esafe_a_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 215
+      meshName: Esafe_a_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 216
+      meshName: Esafe_a_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 217
+      meshName: Esafe_a_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 218
+      meshName: Esafe_a_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 219
+      meshName: Esafe_a_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 220
+      meshName: Esafe_a_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 221
+      meshName: Esafe_a_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 222
+      meshName: Esafe_a_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 223
+      meshName: Esafe_a_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 224
+      meshName: Esafe_a_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 225
+      meshName: Esafe_a_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 226
+      meshName: Esafe_a_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 227
+      meshName: Esafe_a_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 228
+      meshName: Esafe_a_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 229
+      meshName: Esafe_a_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 230
+      meshName: Esafe_a_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 231
+      meshName: Esafe_a_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 232
+      meshName: Esafe_a_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 233
+      meshName: Esafe_a_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 234
+      meshName: Esafe_b_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 235
+      meshName: Esafe_b_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 236
+      meshName: Esafe_b_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 237
+      meshName: Esafe_b_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 238
+      meshName: Esafe_b_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 239
+      meshName: Esafe_b_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 240
+      meshName: Esafe_b_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 241
+      meshName: Esafe_b_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 242
+      meshName: Esafe_b_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 243
+      meshName: Esafe_b_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 244
+      meshName: Esafe_b_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 245
+      meshName: Esafe_b_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 246
+      meshName: Esafe_b_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 247
+      meshName: Esafe_b_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 248
+      meshName: Esafe_b_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 249
+      meshName: Esafe_b_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 250
+      meshName: Esafe_b_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 251
+      meshName: Esafe_b_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 252
+      meshName: Esafe_b_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 253
+      meshName: Esafe_b_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 254
+      meshName: Esafe_b_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 255
+      meshName: Esafe_b_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 256
+      meshName: Esafe_b_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 257
+      meshName: Esafe_b_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 258
+      meshName: Esafe_b_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 259
+      meshName: Esafe_b_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 260
+      meshName: Esafe_b_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 261
+      meshName: Esafe_b_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 262
+      meshName: Esafe_b_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 263
+      meshName: Esafe_b_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 264
+      meshName: Esafe_b_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 265
+      meshName: Esafe_b_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 266
+      meshName: Esafe_b_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 267
+      meshName: Esafe_b_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 268
+      meshName: Esafe_b_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 269
+      meshName: Esafe_b_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 270
+      meshName: Esafe_b_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 271
+      meshName: HGTR_ceiling
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 272
+      meshName: HGTR_floor_union
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 273
+      meshName: M2_hall_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 274
+      meshName: M2_hall_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 275
+      meshName: M2_hall_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 276
+      meshName: M2_hall_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 277
+      meshName: M2_hall_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 278
+      meshName: M2_hall_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 279
+      meshName: M2_hall_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 280
+      meshName: M2_hall_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 281
+      meshName: M2_hall_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 282
+      meshName: M2_hall_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 283
+      meshName: M2_hall_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 284
+      meshName: M2_hall_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 285
+      meshName: M2_hall_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 286
+      meshName: M2_hall_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 287
+      meshName: M2_hall_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 288
+      meshName: M2_hall_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 289
+      meshName: M2_hall_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 290
+      meshName: M2_hall_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 291
+      meshName: M2_hall_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 292
+      meshName: M2_hall_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 293
+      meshName: M2_hall_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 294
+      meshName: M2_hall_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 295
+      meshName: M2_hall_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 296
+      meshName: M2_hall_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 297
+      meshName: M2_hall_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 298
+      meshName: M2_hall_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 299
+      meshName: M2_hall_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 300
+      meshName: M2_hall_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 301
+      meshName: M2_hall_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 302
+      meshName: M2_hall_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 303
+      meshName: M2_hall_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 304
+      meshName: S_arm_ne_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 305
+      meshName: S_arm_ne_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 306
+      meshName: S_arm_ne_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 307
+      meshName: S_arm_ne_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 308
+      meshName: S_arm_ne_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 309
+      meshName: S_arm_ne_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 310
+      meshName: S_arm_ne_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 311
+      meshName: S_arm_ne_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 312
+      meshName: S_arm_ne_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 313
+      meshName: S_arm_ne_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 314
+      meshName: S_arm_ne_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 315
+      meshName: S_arm_ne_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 316
+      meshName: S_arm_ne_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 317
+      meshName: S_arm_ne_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 318
+      meshName: S_arm_ne_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 319
+      meshName: S_arm_ne_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 320
+      meshName: S_arm_ne_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 321
+      meshName: S_arm_ne_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 322
+      meshName: S_arm_ne_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 323
+      meshName: S_arm_ne_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 324
+      meshName: S_arm_ne_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 325
+      meshName: S_arm_ne_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 326
+      meshName: S_arm_ne_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 327
+      meshName: S_arm_ne_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 328
+      meshName: S_arm_ne_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 329
+      meshName: S_arm_ne_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 330
+      meshName: S_arm_ne_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 331
+      meshName: S_arm_ne_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 332
+      meshName: S_arm_ne_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 333
+      meshName: S_arm_ne_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 334
+      meshName: S_arm_ne_sb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 335
+      meshName: S_arm_ne_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 336
+      meshName: S_arm_ne_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 337
+      meshName: S_arm_ne_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 338
+      meshName: S_arm_ne_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 339
+      meshName: S_arm_ne_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 340
+      meshName: S_arm_ne_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 341
+      meshName: S_arm_ne_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 342
+      meshName: S_arm_ne_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 343
+      meshName: S_arm_sw_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 344
+      meshName: S_arm_sw_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 345
+      meshName: S_arm_sw_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 346
+      meshName: S_arm_sw_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 347
+      meshName: S_arm_sw_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 348
+      meshName: S_arm_sw_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 349
+      meshName: S_arm_sw_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 350
+      meshName: S_arm_sw_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 351
+      meshName: S_arm_sw_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 352
+      meshName: S_arm_sw_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 353
+      meshName: S_arm_sw_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 354
+      meshName: S_arm_sw_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 355
+      meshName: S_arm_sw_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 356
+      meshName: S_arm_sw_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 357
+      meshName: S_arm_sw_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 358
+      meshName: S_arm_sw_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 359
+      meshName: S_arm_sw_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 360
+      meshName: S_arm_sw_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 361
+      meshName: S_arm_sw_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 362
+      meshName: S_arm_sw_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 363
+      meshName: S_arm_sw_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 364
+      meshName: S_arm_sw_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 365
+      meshName: S_arm_sw_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 366
+      meshName: S_arm_sw_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 367
+      meshName: S_arm_sw_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 368
+      meshName: S_arm_sw_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 369
+      meshName: S_arm_sw_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 370
+      meshName: S_arm_sw_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 371
+      meshName: W1_courtyard_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 372
+      meshName: W1_courtyard_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 373
+      meshName: W1_courtyard_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 374
+      meshName: W1_courtyard_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 375
+      meshName: W1_courtyard_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 376
+      meshName: W1_courtyard_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 377
+      meshName: W1_courtyard_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 378
+      meshName: W1_courtyard_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 379
+      meshName: W1_courtyard_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 380
+      meshName: W1_courtyard_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 381
+      meshName: W1_courtyard_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 382
+      meshName: W1_courtyard_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 383
+      meshName: W1_courtyard_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 384
+      meshName: W1_courtyard_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 385
+      meshName: W1_courtyard_cb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 386
+      meshName: W1_courtyard_cb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 387
+      meshName: W1_courtyard_cb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 388
+      meshName: W1_courtyard_cb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 389
+      meshName: W1_courtyard_cb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 390
+      meshName: W1_courtyard_cb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 391
+      meshName: W1_courtyard_cb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 392
+      meshName: W1_courtyard_cb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 393
+      meshName: W1_courtyard_cb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 394
+      meshName: W1_courtyard_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 395
+      meshName: W1_courtyard_cb_30
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 396
+      meshName: W1_courtyard_cb_31
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 397
+      meshName: W1_courtyard_cb_32
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 398
+      meshName: W1_courtyard_cb_33
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 399
+      meshName: W1_courtyard_cb_34
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 400
+      meshName: W1_courtyard_cb_35
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 401
+      meshName: W1_courtyard_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 402
+      meshName: W1_courtyard_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 403
+      meshName: W1_courtyard_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 404
+      meshName: W1_courtyard_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 405
+      meshName: W1_courtyard_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 406
+      meshName: W1_courtyard_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 407
+      meshName: W1_courtyard_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 408
+      meshName: W1_courtyard_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 409
+      meshName: W1_courtyard_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 410
+      meshName: W1_courtyard_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 411
+      meshName: W1_courtyard_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 412
+      meshName: W1_courtyard_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 413
+      meshName: W1_courtyard_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 414
+      meshName: W1_courtyard_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 415
+      meshName: W1_courtyard_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 416
+      meshName: W1_courtyard_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 417
+      meshName: W1_courtyard_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 418
+      meshName: W1_courtyard_sb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 419
+      meshName: W1_courtyard_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 420
+      meshName: W1_courtyard_sb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 421
+      meshName: W1_courtyard_sb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 422
+      meshName: W1_courtyard_sb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 423
+      meshName: W1_courtyard_sb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 424
+      meshName: W1_courtyard_sb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 425
+      meshName: W1_courtyard_sb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 426
+      meshName: W1_courtyard_sb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 427
+      meshName: W1_courtyard_sb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 428
+      meshName: W1_courtyard_sb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 429
+      meshName: W1_courtyard_sb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 430
+      meshName: W1_courtyard_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 431
+      meshName: W1_courtyard_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 432
+      meshName: W1_courtyard_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 433
+      meshName: W1_courtyard_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 434
+      meshName: W1_courtyard_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 435
+      meshName: W1_courtyard_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 436
+      meshName: W1_courtyard_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 437
+      meshName: W2_corridor_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 438
+      meshName: W2_corridor_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 439
+      meshName: W2_corridor_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 440
+      meshName: W2_corridor_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 441
+      meshName: W2_corridor_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 442
+      meshName: W2_corridor_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 443
+      meshName: W2_corridor_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 444
+      meshName: W2_corridor_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 445
+      meshName: W2_corridor_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 446
+      meshName: W2_corridor_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 447
+      meshName: W2_corridor_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 448
+      meshName: W2_corridor_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 449
+      meshName: W2_corridor_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 450
+      meshName: W2_corridor_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 451
+      meshName: W2_corridor_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 452
+      meshName: W2_corridor_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 453
+      meshName: W2_corridor_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 454
+      meshName: W2_corridor_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 455
+      meshName: W2_corridor_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 456
+      meshName: W2_corridor_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 457
+      meshName: W2_corridor_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 458
+      meshName: W2_corridor_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 459
+      meshName: W2_corridor_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 460
+      meshName: W2_corridor_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 461
+      meshName: W2_corridor_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 462
+      meshName: W2_corridor_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 463
+      meshName: W2e-S-BR
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 464
+      meshName: W2e_chamber_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 465
+      meshName: W2e_chamber_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 466
+      meshName: W2e_chamber_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 467
+      meshName: W2e_chamber_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 468
+      meshName: W2e_chamber_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 469
+      meshName: W2e_chamber_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 470
+      meshName: W2e_chamber_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 471
+      meshName: W2e_chamber_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 472
+      meshName: W2e_chamber_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 473
+      meshName: W2e_chamber_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 474
+      meshName: W2e_chamber_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 475
+      meshName: W2e_chamber_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 476
+      meshName: W2e_chamber_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 477
+      meshName: W2e_chamber_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 478
+      meshName: W2e_chamber_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 479
+      meshName: W2e_chamber_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 480
+      meshName: W2e_chamber_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 481
+      meshName: W2e_chamber_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 482
+      meshName: W2e_chamber_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 483
+      meshName: W2e_chamber_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 484
+      meshName: W2e_chamber_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 485
+      meshName: W2e_chamber_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 486
+      meshName: W2e_chamber_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 487
+      meshName: W2e_chamber_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 488
+      meshName: W2e_chamber_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 489
+      meshName: W2e_chamber_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 490
+      meshName: W2e_chamber_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 491
+      meshName: W2e_chamber_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 492
+      meshName: W2e_chamber_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 493
+      meshName: W2e_chamber_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 494
+      meshName: W2e_chamber_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 495
+      meshName: W2e_chamber_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 496
+      meshName: canyon_boulder
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 497
+      meshName: canyon_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 498
+      meshName: canyon_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 499
+      meshName: canyon_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 500
+      meshName: canyon_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 501
+      meshName: canyon_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 502
+      meshName: canyon_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 503
+      meshName: canyon_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 504
+      meshName: canyon_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 505
+      meshName: canyon_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 506
+      meshName: canyon_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 507
+      meshName: canyon_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 508
+      meshName: canyon_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 509
+      meshName: canyon_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 510
+      meshName: canyon_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 511
+      meshName: canyon_cb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 512
+      meshName: canyon_cb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 513
+      meshName: canyon_cb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 514
+      meshName: canyon_cb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 515
+      meshName: canyon_cb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 516
+      meshName: canyon_cb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 517
+      meshName: canyon_cb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 518
+      meshName: canyon_cb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 519
+      meshName: canyon_cb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 520
+      meshName: canyon_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 521
+      meshName: canyon_cb_30
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 522
+      meshName: canyon_cb_31
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 523
+      meshName: canyon_cb_32
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 524
+      meshName: canyon_cb_33
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 525
+      meshName: canyon_cb_34
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 526
+      meshName: canyon_cb_35
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 527
+      meshName: canyon_cb_36
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 528
+      meshName: canyon_cb_37
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 529
+      meshName: canyon_cb_38
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 530
+      meshName: canyon_cb_39
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 531
+      meshName: canyon_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 532
+      meshName: canyon_cb_40
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 533
+      meshName: canyon_cb_41
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 534
+      meshName: canyon_cb_42
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 535
+      meshName: canyon_cb_43
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 536
+      meshName: canyon_cb_44
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 537
+      meshName: canyon_cb_45
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 538
+      meshName: canyon_cb_46
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 539
+      meshName: canyon_cb_47
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 540
+      meshName: canyon_cb_48
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 541
+      meshName: canyon_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 542
+      meshName: canyon_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 543
+      meshName: canyon_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 544
+      meshName: canyon_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 545
+      meshName: canyon_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 546
+      meshName: canyon_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 547
+      meshName: canyon_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 548
+      meshName: canyon_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 549
+      meshName: canyon_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 550
+      meshName: canyon_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 551
+      meshName: canyon_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 552
+      meshName: canyon_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 553
+      meshName: canyon_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 554
+      meshName: canyon_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 555
+      meshName: canyon_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 556
+      meshName: canyon_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 557
+      meshName: canyon_sb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 558
+      meshName: canyon_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 559
+      meshName: canyon_sb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 560
+      meshName: canyon_sb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 561
+      meshName: canyon_sb_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 562
+      meshName: canyon_sb_23
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 563
+      meshName: canyon_sb_24
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 564
+      meshName: canyon_sb_25
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 565
+      meshName: canyon_sb_26
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 566
+      meshName: canyon_sb_27
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 567
+      meshName: canyon_sb_28
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 568
+      meshName: canyon_sb_29
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 569
+      meshName: canyon_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 570
+      meshName: canyon_sb_30
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 571
+      meshName: canyon_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 572
+      meshName: canyon_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 573
+      meshName: canyon_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 574
+      meshName: canyon_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 575
+      meshName: canyon_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 576
+      meshName: canyon_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 577
+      meshName: corr_W1W3_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 578
+      meshName: corr_W1W3_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 579
+      meshName: corr_W1W3_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 580
+      meshName: corr_W1W3_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 581
+      meshName: corr_W1W3_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 582
+      meshName: corr_W1W3_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 583
+      meshName: corr_W1W3_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 584
+      meshName: corr_W1W3_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 585
+      meshName: corr_W1W3_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 586
+      meshName: corr_W1W3_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 587
+      meshName: corr_W1W3_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 588
+      meshName: corr_W1W3_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 589
+      meshName: corr_W1W3_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 590
+      meshName: corr_W1W3_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 591
+      meshName: corr_W1W3_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 592
+      meshName: corr_W1W3_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 593
+      meshName: corr_W1W3_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 594
+      meshName: corr_W1W3_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 595
+      meshName: corr_W1W3_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 596
+      meshName: corr_W1W3_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 597
+      meshName: corr_W1W3_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 598
+      meshName: corr_W1W3_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 599
+      meshName: corr_W1W3_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 600
+      meshName: corr_W1W3_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 601
+      meshName: corr_W1W3_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 602
+      meshName: corr_W1W3_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 603
+      meshName: corr_W1W3_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 604
+      meshName: corr_W1W3_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 605
+      meshName: corr_W1W3_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 606
+      meshName: wall_loop_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 607
+      meshName: wall_loop_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 608
+      meshName: wall_loop_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 609
+      meshName: wall_loop_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 610
+      meshName: wall_loop_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 611
+      meshName: wall_loop_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 612
+      meshName: wall_loop_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 613
+      meshName: wall_loop_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 614
+      meshName: wall_loop_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 615
+      meshName: wall_loop_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 616
+      meshName: wall_loop_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 617
+      meshName: wall_loop_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 618
+      meshName: wall_loop_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 619
+      meshName: wall_loop_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 620
+      meshName: wall_loop_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 621
+      meshName: wall_loop_22
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 622
+      meshName: wall_loop_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 623
+      meshName: wall_loop_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 624
+      meshName: wall_loop_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 625
+      meshName: wall_loop_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 626
+      meshName: wall_loop_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 627
+      meshName: wall_loop_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 628
+      meshName: wall_loop_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 629
+      meshName: wsafe_a_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 630
+      meshName: wsafe_a_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 631
+      meshName: wsafe_a_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 632
+      meshName: wsafe_a_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 633
+      meshName: wsafe_a_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 634
+      meshName: wsafe_a_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 635
+      meshName: wsafe_a_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 636
+      meshName: wsafe_a_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 637
+      meshName: wsafe_a_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 638
+      meshName: wsafe_a_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 639
+      meshName: wsafe_a_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 640
+      meshName: wsafe_a_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 641
+      meshName: wsafe_a_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 642
+      meshName: wsafe_a_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 643
+      meshName: wsafe_a_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 644
+      meshName: wsafe_a_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 645
+      meshName: wsafe_a_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 646
+      meshName: wsafe_a_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 647
+      meshName: wsafe_a_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 648
+      meshName: wsafe_a_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 649
+      meshName: wsafe_a_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 650
+      meshName: wsafe_a_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 651
+      meshName: wsafe_a_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 652
+      meshName: wsafe_a_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 653
+      meshName: wsafe_a_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 654
+      meshName: wsafe_a_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 655
+      meshName: wsafe_a_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 656
+      meshName: wsafe_a_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 657
+      meshName: wsafe_a_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 658
+      meshName: wsafe_a_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 659
+      meshName: wsafe_a_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 660
+      meshName: wsafe_a_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 661
+      meshName: wsafe_a_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 662
+      meshName: wsafe_a_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 663
+      meshName: wsafe_a_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 664
+      meshName: wsafe_b_cb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 665
+      meshName: wsafe_b_cb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 666
+      meshName: wsafe_b_cb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 667
+      meshName: wsafe_b_cb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 668
+      meshName: wsafe_b_cb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 669
+      meshName: wsafe_b_cb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 670
+      meshName: wsafe_b_cb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 671
+      meshName: wsafe_b_cb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 672
+      meshName: wsafe_b_cb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 673
+      meshName: wsafe_b_cb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 674
+      meshName: wsafe_b_cb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 675
+      meshName: wsafe_b_cb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 676
+      meshName: wsafe_b_cb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 677
+      meshName: wsafe_b_cb_20
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 678
+      meshName: wsafe_b_cb_21
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 679
+      meshName: wsafe_b_cb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 680
+      meshName: wsafe_b_cb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 681
+      meshName: wsafe_b_cb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 682
+      meshName: wsafe_b_cb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 683
+      meshName: wsafe_b_cb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 684
+      meshName: wsafe_b_cb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 685
+      meshName: wsafe_b_cb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 686
+      meshName: wsafe_b_sb_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 687
+      meshName: wsafe_b_sb_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 688
+      meshName: wsafe_b_sb_10
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 689
+      meshName: wsafe_b_sb_11
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 690
+      meshName: wsafe_b_sb_12
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 691
+      meshName: wsafe_b_sb_13
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 692
+      meshName: wsafe_b_sb_14
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 693
+      meshName: wsafe_b_sb_15
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 694
+      meshName: wsafe_b_sb_16
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 695
+      meshName: wsafe_b_sb_17
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 696
+      meshName: wsafe_b_sb_18
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 697
+      meshName: wsafe_b_sb_19
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 698
+      meshName: wsafe_b_sb_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 699
+      meshName: wsafe_b_sb_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 700
+      meshName: wsafe_b_sb_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 701
+      meshName: wsafe_b_sb_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 702
+      meshName: wsafe_b_sb_6
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 703
+      meshName: wsafe_b_sb_7
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 704
+      meshName: wsafe_b_sb_8
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 705
+      meshName: wsafe_b_sb_9
+      lodLevel: 0
+      meshGeometryBuffer: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  overrideDefaultPose: 0
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    namedPoseList:
+    - name: Default
+      skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    defaultPoseIndex: -1
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

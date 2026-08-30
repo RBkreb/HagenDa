@@ -78,7 +78,8 @@ namespace HagenDa.Networking
         }
 
         /// <summary>commander_weapon 工具入口。返回给 LLM 的结果文本。</summary>
-        public string TryOrder(int weaponNumber, float gx, float gz)
+        /// <summary>commander_weapon 工具入口（PHASE10 v3：cell=快照网格代号）。</summary>
+        public string TryOrder(int weaponNumber, string cell, float gx, float gz)
         {
             // 硬闸：门控阶段无论调用来源（LLM/脚本）一律拒绝。
             if (NetworkCommanderState.GateActive)
@@ -88,21 +89,28 @@ namespace HagenDa.Networking
             if (idx < 0 || idx >= 3)
                 return $"错误:未知武器编号 {weaponNumber}（可用 1-3）";
 
-            // 越界截断到地图内（非法输入不丢轮次，反馈式纠错）。
+            // cell 优先；无 cell 时退回米制坐标。两者都会夹取到图内。
+            bool hasCell = !string.IsNullOrEmpty(cell);
+            if (hasCell)
+            {
+                if (!overlay.TryCellToGrid(cell, out gx, out gz))
+                    return $"错误:非法网格代号 '{cell}'（列 A-{(char)('A' + overlay.Cols - 1)}，行 1-{overlay.Rows}）";
+            }
             gx = Mathf.Clamp(gx, 0f, overlay.MapWidth);
             gz = Mathf.Clamp(gz, 0f, overlay.MapLength);
 
             float remain = Mathf.Max(0f, readyAt[idx] - Time.time);
             pendingGrid[idx] = new Vector2(gx, gz);
 
+            string at = hasCell ? cell.ToUpperInvariant() : $"({gx:F0},{gz:F0})";
             if (remain <= 0f)
             {
                 Execute(idx);
-                return $"投放成功:{Names[idx]} @({gx:F0},{gz:F0})";
+                return $"投放成功:{Names[idx]} @{at}";
             }
 
             hasPending[idx] = true;
-            return $"冷却中({remain:F0}秒)，已排队并将于冷却结束后自动投放 @({gx:F0},{gz:F0})"
+            return $"冷却中({remain:F0}秒)，已排队并将于冷却结束后自动投放 @{at}"
                  + ";可再次下达同编号指令以更新坐标";
         }
 

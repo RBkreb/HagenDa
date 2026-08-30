@@ -53,13 +53,15 @@ namespace HagenDa.Networking
             if (mode == Mode.Minimap)
             {
                 cam.orthographicSize = MapLayers.MinimapCoverage;   // ±75m
-                // 小地图：实体球体 + GR/HQ 高亮（HQ/GR 标记可见）。
-                cam.cullingMask = MapLayers.IndicatorMask | MapLayers.HighlightMask;
+                // 小地图：地形(Ground，不含 ceiling——室内可见) + 实体球体 + GR/HQ 高亮。
+                cam.cullingMask = MapLayers.IndicatorMask | MapLayers.HighlightMask
+                                  | MapLayers.GroundMask;
             }
             else
             {
                 cam.orthographicSize = bigMapHalfExtent;
-                cam.cullingMask = MapLayers.MapMask;
+                // 大地图：同样可见地形但排除 ceiling（ceiling 不在 GroundMask 内）。
+                cam.cullingMask = MapLayers.MapMask | MapLayers.GroundMask;
             }
 
             cam.clearFlags = CameraClearFlags.SolidColor;

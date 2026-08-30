@@ -53,7 +53,9 @@ namespace HagenDa.Networking
 
         // 轮次状态
         private bool busy;
-        private float lastOutputAt;
+        // 开局为 -∞：EnsureRuntime/开局轮完成时会重置为"门控解除瞬间"，
+        // 保证空闲计时从解禁后才开始（实测：默认 0 会导致解禁瞬间立即触发空闲轮）。
+        private float lastOutputAt = float.NegativeInfinity;
         private float minGapUntil;
         private float? wakeOverrideSec;            // wait 工具写入，轮次结束消费
         private bool manualTriggerPending;
@@ -403,6 +405,8 @@ namespace HagenDa.Networking
             bool wasOpening = CurrentPhase == Phase.Opening;
             if (degraded) CurrentPhase = Phase.Dormant;
             else CurrentPhase = Phase.Active;
+            // 空闲计时起点由 GateController 在"双方全部落定、门控正式解除"时
+            // 统一重置（NotifyMatchStarted）——单侧重置会先于解禁空转一轮（实测踩坑）。
 
             if (wasOpening || degraded)
             {
@@ -503,61 +507,38 @@ namespace HagenDa.Networking
             var mm = NetworkMatchManager.Instance;
             if (mm == null) return;
 
+            // PHASE10 调优（用户定案）：据点类触发仅保留【己方据点失去点位保护
+            // （中立化）】。完全争夺/占领预警只记事件流、不触发轮次——此前三类
+            // 全开会高频打断 LLM 导致响应积压。
             foreach (var cache in hqCaches)
             {
                 var cp = cache.cp;
                 if (cp == null) continue;
 
+                int prevOwner = cache.owner;       // 上一轮询的归属
                 int newOwner = cp.ownerTeam;
-                float newCont = cp.contention;
 
                 cp.GetTeamCounts(out int redN, out int blueN);
                 bool myEnemyIsRed = Team == (int)MatchTeam.Blue;
                 bool enemyPresent = myEnemyIsRed ? redN > 0 : blueN > 0;
 
-                // 完全争夺（易主且达上限值附近——CapturePoint 内部在 ±60 时改 owner）
-                if (newOwner != cache.owner && newOwner >= 0)
-                    PushEvent($"HQ-{cache.letter} 完全争夺（{(newOwner == (int)MatchTeam.Red ? "红方" : "蓝方")}）");
-
-                // 中立化（有主 → 无主）
-                if (cache.owner >= 0 && newOwner < 0)
-                    PushEvent($"HQ-{cache.letter} 中立化");
-
-                // 占领预警（有主 + 敌军入场争夺，同一 episode 一次）
+                // 事件流记录（随下轮附带，不触发）：
+                if (prevOwner >= 0 && newOwner >= 0 && prevOwner != newOwner)
+                    PushEvent($"HQ-{cache.letter} 完全争夺（{(newOwner == (int)MatchTeam.Red ? "红方" : "蓝方")}占领）");
                 if (newOwner >= 0 && enemyPresent && !cache.enemyContesting)
                     PushEvent($"HQ-{cache.letter} 被敌方争夺（占领预警）");
 
-                cache.owner = newOwner;
-                cache.contention = newCont;
-                cache.enemyContesting = newOwner >= 0 && enemyPresent;
-
-                if (manualTriggerPending) return;   // 已有待发触发，本轮不再叠加
-                if (HasFreshCritical())
+                // 触发：己方据点失去点位保护（我方有主 → 非我方归属）。
+                if (prevOwner == Team && newOwner != Team)
                 {
+                    PushEvent($"HQ-{cache.letter} 中立化");
                     manualTriggerPending = true;
-                    manualTriggerReason = LatestCriticalReason();
+                    manualTriggerReason = "我方据点失去保护";
                 }
-            }
-        }
 
-        private bool HasFreshCritical()
-        {
-            foreach (var e in infoBuffer)
-                if (e.Contains("完全争夺") || e.Contains("中立化") || e.Contains("占领预警"))
-                    return true;
-            return false;
-        }
-
-        private string LatestCriticalReason()
-        {
-            for (int i = infoBuffer.Count - 1; i >= 0; i--)
-            {
-                var e = infoBuffer[i];
-                if (e.Contains("占领预警")) return "占领预警";
-                if (e.Contains("中立化")) return "据点中立化";
-                if (e.Contains("完全争夺")) return "据点易主";
+                cache.owner = newOwner;
+                cache.enemyContesting = newOwner >= 0 && enemyPresent;
             }
-            return "战场事件";
         }
 
         private void PollSquadWipes()
@@ -927,6 +908,20 @@ namespace HagenDa.Networking
 
         private void OnEnable() => registry.Add(this);
         private void OnDisable() => registry.Remove(this);
+
+        /// <summary>
+        /// 门控正式解除（双方部署完成/超时退化）时由 GateController 调用：
+        /// 全体指挥官的空闲计时从这一刻起算。
+        /// </summary>
+        public static void NotifyMatchStarted()
+        {
+            foreach (var o in registry)
+            {
+                if (o == null) continue;
+                o.lastOutputAt = Time.time;
+                o.minGapUntil = Time.time + o.Config.minRoundGap;
+            }
+        }
 
         /// <summary>全局协调器：任一指挥官休眠 → 启用共享 SquadCommander 桩。</summary>
         public static class Commanders

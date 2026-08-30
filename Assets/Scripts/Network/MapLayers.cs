@@ -21,6 +21,14 @@ namespace HagenDa.Networking
         public const string IndicatorName = "MapIndicator";
         public const string HighlightName = "MapHighlight";
 
+        /// <summary>
+        /// HGTR (Blender map): walkable structure layer (floor / walls / cover) and
+        /// the indoor ceiling. Top-down map cameras render Ground but exclude
+        /// Ceiling so building interiors stay visible from above.
+        /// </summary>
+        public const string GroundName = "Ground";
+        public const string CeilingName = "ceiling";
+
         /// <summary>Fixed world Y of the indicator spheres: the highest point of the
         /// map (6m perimeter wall) plus 5m.</summary>
         public const float IndicatorWorldY = 11f;
@@ -37,11 +45,20 @@ namespace HagenDa.Networking
         /// <summary>Layer index for GR/HQ ground highlight (-1 if not present).</summary>
         public static int Highlight => LayerMask.NameToLayer(HighlightName);
 
+        /// <summary>Layer index for walkable map structure (floor/walls/cover).</summary>
+        public static int Ground => LayerMask.NameToLayer(GroundName);
+
+        /// <summary>Layer index for indoor ceilings (hidden from top-down map cameras).</summary>
+        public static int Ceiling => LayerMask.NameToLayer(CeilingName);
+
         /// <summary>Layer mask containing only the entity indicator layer.</summary>
         public static int IndicatorMask => Indicator >= 0 ? 1 << Indicator : 0;
 
         /// <summary>Layer mask containing only the GR/HQ highlight layer.</summary>
         public static int HighlightMask => Highlight >= 0 ? 1 << Highlight : 0;
+
+        /// <summary>Layer mask containing only the walkable map structure.</summary>
+        public static int GroundMask => Ground >= 0 ? 1 << Ground : 0;
 
         /// <summary>Layer mask containing both map layers (used by the big-map camera).</summary>
         public static int MapMask => IndicatorMask | HighlightMask;

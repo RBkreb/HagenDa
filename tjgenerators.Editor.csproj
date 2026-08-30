@@ -169,6 +169,7 @@
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Pipeline\PipelineSettings.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\UI\ImagePreview.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Models\UserInfoModels.cs" />
+    <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\AssetSearch\AssetDownloadBilling.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\VideoModeResolver.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\GenerationTaskTrackerStatus.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\UnityWebRequestCompat.cs" />
@@ -600,7 +601,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Codely.Newtonsoft.Json">
-      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.76\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
+      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.78\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="mscorlib">

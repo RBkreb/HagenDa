@@ -116,15 +116,15 @@ namespace HagenDa.Networking.EditorTools
 
         private static Bounds ComputeMapBounds()
         {
+            // 优先：名字含 "wall" 的物体组合包围盒（兼容 Wall_N / wall_loop 等命名）。
             Bounds? combined = null;
             foreach (var go in Object.FindObjectsOfType<GameObject>())
             {
-                if (go.name != "Wall") continue;
+                if (!go.name.ToLowerInvariant().Contains("wall")) continue;
                 var r = go.GetComponent<Renderer>();
                 if (r == null) continue;
                 combined = combined.HasValue
-                    ? new Bounds { min = Vector3.Min(combined.Value.min, r.bounds.min),
-                                   max = Vector3.Max(combined.Value.max, r.bounds.max) }
+                    ? Encapsulate(combined.Value, r.bounds)
                     : r.bounds;
             }
             if (combined.HasValue) return combined.Value;
@@ -133,8 +133,20 @@ namespace HagenDa.Networking.EditorTools
             if (floor != null && floor.GetComponent<Renderer>() is Renderer fr)
                 return fr.bounds;
 
+            // HGTR (Blender map): floor union mesh 兜底。
+            var hgtrFloor = GameObject.Find("hgtr_floor_union");
+            if (hgtrFloor != null && hgtrFloor.GetComponent<Renderer>() is Renderer hf)
+                return hf.bounds;
+
             Debug.LogWarning("[CmdSetup] 未找到 Wall/Floor，使用默认边界 ±60/±110");
             return new Bounds(Vector3.zero, new Vector3(120f, 20f, 220f));
+        }
+
+        private static Bounds Encapsulate(Bounds a, Bounds b)
+        {
+            var min = Vector3.Min(a.min, b.min);
+            var max = Vector3.Max(a.max, b.max);
+            return new Bounds((min + max) * 0.5f, max - min);
         }
 
         private static void EnsureLayer(string name)

@@ -79,6 +79,7 @@ namespace HagenDa.Networking
 
             state.SetMatchStarted();
             gateDone = true;
+            HagenDa.Networking.CommanderOrchestrator.NotifyMatchStarted();   // 空闲计时从解禁起算
             Debug.Log($"[Gate] 门控结束，对局正式开始（耗时 {Time.time - gateStart:F0}s）");
         }
 
