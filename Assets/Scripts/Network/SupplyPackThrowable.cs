@@ -40,7 +40,7 @@ namespace HagenDa.Networking
             if (!isServer) return;
             if (Time.time < activateTime) return;   // 1s 延迟
 
-            var colliders = Physics.OverlapSphere(transform.position, detectRadius);
+            var colliders = Physics.OverlapSphere(transform.position, detectRadius, MapLayers.EntityQueryMask);
             foreach (var c in colliders)
             {
                 var health = c.GetComponentInParent<NetworkPlayerHealth>();

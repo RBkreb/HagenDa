@@ -32,6 +32,7 @@ namespace HagenDa.Networking
 
         private Canvas canvas;
         private RawImage bigMapImage;
+        private RectTransform mapRect;        // 大地图面板（尺寸随地图 aspect 动态应用）
         private RectTransform selectionBox;   // 中空圆环跟随框（持续锁定所选部署点）
         private Text hintText;
 
@@ -114,6 +115,21 @@ namespace HagenDa.Networking
             if (controller != null) playerCamera = controller.playerCamera;
         }
 
+        /// <summary>
+        /// ML-branch: 大地图面板尺寸按地图宽高比应用（与 BigMapRT 一致 →
+        /// 无拉伸无压缩）。DeployScreen.Awake 早于 GameHud 建纹理，故在
+        /// SetVisible(true) 时调用而非构建期。
+        /// </summary>
+        private void ApplyMapRectSize()
+        {
+            if (mapRect == null) return;
+            float aspect = GameHud.Instance != null && GameHud.Instance.MapAspect > 0f
+                ? GameHud.Instance.MapAspect : 0.5f;
+            float mapH = 560f, mapW = mapH * aspect;
+            if (mapW > 1500f) { mapW = 1500f; mapH = mapW / aspect; }
+            mapRect.sizeDelta = new Vector2(mapW, mapH);
+        }
+
         private void SetVisible(bool visible)
         {
             if (IsVisible == visible) return;
@@ -123,6 +139,7 @@ namespace HagenDa.Networking
 
             if (visible)
             {
+                ApplyMapRectSize();
                 if (playerCamera != null) playerCamera.enabled = false;
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
@@ -168,15 +185,17 @@ namespace HagenDa.Networking
             bg.GetComponent<Image>().color = new Color(0.05f, 0.06f, 0.08f, 0.96f);
 
             // Big map (centre-top, leaves room for the loadout bar below).
-            // Map is 100 wide x 200 long → 0.5 aspect, matching the BigMap render texture.
+            // ML-branch: 面板宽高比 = 地图宽高比（与 RT 一致 → 不拉伸不压缩）。
+            // Awake 时 GameHud 可能尚未算出 MapAspect（脚本执行序不确定），
+            // 尺寸在 SetVisible(true) 时由 ApplyMapRectSize 动态应用。
             var mapGo = new GameObject("BigMap", typeof(RectTransform), typeof(RawImage));
             mapGo.transform.SetParent(root, false);
-            var mapRect = (RectTransform)mapGo.transform;
+            mapRect = (RectTransform)mapGo.transform;
             mapRect.anchorMin = new Vector2(0.5f, 0.5f);
             mapRect.anchorMax = new Vector2(0.5f, 0.5f);
             mapRect.pivot = new Vector2(0.5f, 0.5f);
             mapRect.anchoredPosition = new Vector2(0f, 40f);
-            mapRect.sizeDelta = new Vector2(480f, 960f);
+            mapRect.sizeDelta = new Vector2(950f, 560f);   // 初始占位（≈1.695 aspect）
             bigMapImage = mapGo.GetComponent<RawImage>();
             bigMapImage.color = Color.white;   // 部署界面大地图不透明
 

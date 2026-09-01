@@ -20,6 +20,11 @@ namespace HagenDa.Networking
         [Header("Zone")]
         public float radius = 20f;
 
+        [Tooltip("矩形半宽/半深 (XZ)。x,y > 0 时为矩形判定，忽略 radius。")]
+        public Vector2 extent = Vector2.zero;
+
+        public bool IsRect => extent.x > 0f && extent.y > 0f;
+
         [Header("Deploy")]
         public List<Transform> deployPoints = new List<Transform>();
 
@@ -37,7 +42,8 @@ namespace HagenDa.Networking
                 ? new Color(0.15f, 0.3f, 0.7f)
                 : new Color(0.7f, 0.15f, 0.15f);
             var marker = gameObject.AddComponent<MapPointMarker>();
-            marker.Init("G", Mathf.Max(12f, radius * 0.7f), c);
+            float shapeSize = IsRect ? Mathf.Max(extent.x, extent.y) * 2f : radius * 2f;
+            marker.Init("G", Mathf.Max(12f, shapeSize * 0.7f), c, IsRect ? extent : default);
         }
 
         private void Update()
@@ -47,7 +53,16 @@ namespace HagenDa.Networking
 
             var present = new HashSet<NetworkCombatant>();
 
-            int n = Physics.OverlapSphereNonAlloc(transform.position, radius, buffer);
+            // ML-branch: 矩形/圆形二选一；EntityQueryMask 排除 700+ 地图碰撞体，
+            // 否则固定 buffer 会被静态几何填满、漏掉 combatant。
+            int n = IsRect
+                ? Physics.OverlapBoxNonAlloc(
+                    transform.position + Vector3.up * 1.5f,
+                    new Vector3(extent.x, 1.5f, extent.y),
+                    buffer, Quaternion.identity, MapLayers.EntityQueryMask)
+                : Physics.OverlapSphereNonAlloc(
+                    transform.position, radius, buffer, MapLayers.EntityQueryMask);
+
             for (int i = 0; i < n; i++)
             {
                 var c = buffer[i].GetComponentInParent<NetworkCombatant>();

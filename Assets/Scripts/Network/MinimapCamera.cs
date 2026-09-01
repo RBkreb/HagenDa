@@ -53,15 +53,29 @@ namespace HagenDa.Networking
             if (mode == Mode.Minimap)
             {
                 cam.orthographicSize = MapLayers.MinimapCoverage;   // ±75m
-                // 小地图：地形(Ground，不含 ceiling——室内可见) + 实体球体 + GR/HQ 高亮。
+                // 小地图：地形(Ground，不含 ceiling——室内可见) + 实体球体
+                // + 据点/安全区标记(MapZone 填充 + MapZoneOutline 描边)。
                 cam.cullingMask = MapLayers.IndicatorMask | MapLayers.HighlightMask
-                                  | MapLayers.GroundMask;
+                                  | MapLayers.GroundMask
+                                  | MapLayers.ZoneMask | MapLayers.ZoneOutlineMask;
             }
             else
             {
+                // ML-branch: 大地图视野自适应地图 AABB（Ground 层）。orthoSize 是
+                // 垂直半高：横向覆盖 = orthoSize * aspect，必须保证两个方向都
+                // 容纳地图 → orthoSize = max(mapW/aspect, mapL) / 2。
+                if (MapLayers.TryGetMapBounds(out var b))
+                {
+                    bigMapCenter = new Vector2(b.center.x, b.center.z);
+                    float mapW = b.size.x;
+                    float mapL = b.size.z;
+                    float aspect = Mathf.Max(0.05f, cam.aspect);
+                    bigMapHalfExtent = Mathf.Max(mapW / aspect, mapL) * 0.5f;
+                }
                 cam.orthographicSize = bigMapHalfExtent;
                 // 大地图：同样可见地形但排除 ceiling（ceiling 不在 GroundMask 内）。
-                cam.cullingMask = MapLayers.MapMask | MapLayers.GroundMask;
+                cam.cullingMask = MapLayers.MapMask | MapLayers.GroundMask
+                                  | MapLayers.ZoneMask | MapLayers.ZoneOutlineMask;
             }
 
             cam.clearFlags = CameraClearFlags.SolidColor;

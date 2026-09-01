@@ -42,7 +42,7 @@ namespace HagenDa.Networking
         {
             if (!isServer) return;
 
-            foreach (var c in Physics.OverlapSphere(transform.position, radius))
+            foreach (var c in Physics.OverlapSphere(transform.position, radius, MapLayers.EntityQueryMask))
             {
                 var grenade = c.GetComponentInParent<GrenadeThrowable>();
                 if (grenade != null)

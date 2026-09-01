@@ -82,7 +82,8 @@ namespace HagenDa.Networking
             cam.farClipPlane = 60f;
             cam.cullingMask = LayerMask.GetMask(CommanderMapOverlay.LayerName,
                                                 MapLayers.HighlightName)
-                              | MapLayers.GroundMask;   // 地形可见，ceiling 被排除（室内可见）
+                              | MapLayers.GroundMask   // 地形可见，ceiling 被排除（室内可见）
+                              | MapLayers.ZoneMask | MapLayers.ZoneOutlineMask;
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = BackgroundColor;
 

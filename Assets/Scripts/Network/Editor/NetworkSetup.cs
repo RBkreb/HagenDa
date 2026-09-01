@@ -646,6 +646,7 @@ namespace HagenDa.Networking.EditorTools
 
             EnableMapMaterialsDoubleSided();
             EnsureMapColliders();
+            EnableBackfaceQueries();
 
             // --- 2) Prefabs / assets (idempotent) ---
             List<EquipmentDefinition> equipmentList = BuildEquipmentAssets();
@@ -660,41 +661,48 @@ namespace HagenDa.Networking.EditorTools
             // --- 3) 布局：按建筑名组 bounds 中心定位（避免硬编码坐标漂移）。
             // Blender 导出命名与场景朝向可能镜像：不信任名字的东西/西含义，
             // 一律按 X 排序 —— X 小=西（红方），X 大=东（蓝方）。
+            // GR / W / E 为矩形：尺寸 = 所在腔室的一半，中心 = 腔室中心。
             Vector3 groundY = new Vector3(0f, 0.5f, 0f);   // floor 顶面高度
-            var safeA = GroupCenter("wsafe_a") + groundY;
-            var safeB = GroupCenter("esafe_a") + groundY;
-            var safeWest = safeA.x <= safeB.x ? safeA : safeB;
-            var safeEast = safeA.x <= safeB.x ? safeB : safeA;
+            var grA = ShiftBounds(ChamberRect("wsafe_a"), groundY);
+            var grB = ShiftBounds(ChamberRect("esafe_a"), groundY);
+            var grWest = grA.center.x <= grB.center.x ? grA : grB;
+            var grEast = grA.center.x <= grB.center.x ? grB : grA;
 
-            var cpA = GroupCenter("w1_courtyard") + groundY;
-            var cpB = GroupCenter("canyon_boulder") + groundY;
-            var cpC = GroupCenter("e_courtyard") + groundY;
-            var byX = new[] { cpA, cpB, cpC }.OrderBy(v => v.x).ToList();
-            var cpWest = byX[0];
-            var cpMid = byX[1];
-            var cpEast = byX[2];
+            var cpA = ShiftBounds(ChamberRect("w1_courtyard"), groundY);
+            var cpC = ShiftBounds(ChamberRect("e_courtyard"), groundY);
+            var cpB = new Bounds(GroupCenter("canyon_boulder") + groundY, Vector3.zero);
+            var cpWest = cpA.center.x <= cpC.center.x ? cpA : cpC;
+            var cpEast = cpA.center.x <= cpC.center.x ? cpC : cpA;
 
-            // --- 4) 安全区 ×2（GR，红西/蓝东）---
+            // --- 4) 安全区 ×2（GR，红西/蓝东，矩形=腔室一半）---
             ClearOld("MatchManager", "StrategicZoneRegistry", "FSMBattleSystem",
                      "RedGR", "BlueGR", "Zone_W", "Zone_M", "Zone_E",
                      "StrategicZone_W", "StrategicZone_M", "StrategicZone_E",
                      "NetworkManager", "BattleCamera", "FreeCamera", "SquadCommander");
             ClearAllFSMEntities();
-            var redSafe = CreateGarrison("RedGR", safeWest, (int)MatchTeam.Red, 25f);
-            var blueSafe = CreateGarrison("BlueGR", safeEast, (int)MatchTeam.Blue, 25f);
-            AttachDeployPointTemplate(redSafe.gameObject, 4, 8f);
-            AttachDeployPointTemplate(blueSafe.gameObject, 4, 8f);
+            var redSafe = CreateGarrison("RedGR", grWest.center, (int)MatchTeam.Red, 25f);
+            redSafe.extent = new Vector2(grWest.size.x * 0.25f, grWest.size.z * 0.25f);
+            var blueSafe = CreateGarrison("BlueGR", grEast.center, (int)MatchTeam.Blue, 25f);
+            blueSafe.extent = new Vector2(grEast.size.x * 0.25f, grEast.size.z * 0.25f);
+            AttachDeployPointTemplate(redSafe.gameObject, 4,
+                Mathf.Min(redSafe.extent.x, redSafe.extent.y) * 0.8f);
+            AttachDeployPointTemplate(blueSafe.gameObject, 4,
+                Mathf.Min(blueSafe.extent.x, blueSafe.extent.y) * 0.8f);
 
             // --- 5) 据点 ×3 + StrategicZone 包装 ---
-            // 中心据点在 canyon_boulder 岩石上（骨架图红框）：半径/部署点避开
-            // 岩石本体（直径 ~43m）。
-            var zoneW = CreateCapturePoint("Zone_W", cpWest, 14f);
-            var zoneM = CreateCapturePoint("Zone_M", cpMid, 22f);
-            var zoneE = CreateCapturePoint("Zone_E", cpEast, 14f);
+            // W/E 矩形 = 庭院腔室一半；M 保持在 canyon_boulder 岩石上的圆形
+            // （半径避开岩石本体，直径 ~43m）。
+            var zoneW = CreateCapturePoint("Zone_W", cpWest.center, 14f);
+            zoneW.extent = new Vector2(cpWest.size.x * 0.25f, cpWest.size.z * 0.25f);
+            var zoneM = CreateCapturePoint("Zone_M", cpB.center, 22f);
+            var zoneE = CreateCapturePoint("Zone_E", cpEast.center, 14f);
+            zoneE.extent = new Vector2(cpEast.size.x * 0.25f, cpEast.size.z * 0.25f);
             zoneW.letter = "W"; zoneM.letter = "M"; zoneE.letter = "E";
-            AttachDeployPointTemplate(zoneW.gameObject, 2, 12f);
+            AttachDeployPointTemplate(zoneW.gameObject, 2,
+                Mathf.Min(zoneW.extent.x, zoneW.extent.y) * 0.8f);
             AttachDeployPointTemplate(zoneM.gameObject, 2, 26f);
-            AttachDeployPointTemplate(zoneE.gameObject, 2, 12f);
+            AttachDeployPointTemplate(zoneE.gameObject, 2,
+                Mathf.Min(zoneE.extent.x, zoneE.extent.y) * 0.8f);
             CreateStrategicZone("StrategicZone_W", zoneW);
             CreateStrategicZone("StrategicZone_M", zoneM);
             CreateStrategicZone("StrategicZone_E", zoneE);
@@ -719,11 +727,11 @@ namespace HagenDa.Networking.EditorTools
             var cmdGo = new GameObject("SquadCommander");
             cmdGo.AddComponent<SquadCommander>();
 
-            // --- 7) NetworkManager（全自动对局，Play 即 Host）---
+            // --- 7) NetworkManager（Play 即 Host；HGTR 有真人 → 自动生成玩家）---
             var nmGo = new GameObject("NetworkManager");
             var nm = nmGo.AddComponent<NetworkManager>();
             nm.playerPrefab = playerPrefab;
-            nm.autoCreatePlayer = false;
+            nm.autoCreatePlayer = true;   // 真人固定红队，红 AI 只生成 29 人留位
             var kcp = nmGo.AddComponent<kcp2k.KcpTransport>();
             nm.transport = kcp;
             nmGo.AddComponent<TrainingAutoHost>();
@@ -734,12 +742,25 @@ namespace HagenDa.Networking.EditorTools
             var empField = AssetDatabase.LoadAssetAtPath<GameObject>(EmpFieldPrefabPath);
             if (empField != null) RegisterSpawnPrefabs(empField);
 
-            // --- 8) 观战相机（Blender 地图 396×234，拉高拉远）---
+            // --- 8) 观战相机（机位/远裁剪面自适应地图 AABB）---
             var camGo = new GameObject("BattleCamera");
-            camGo.transform.position = new Vector3(0f, 120f, -200f);
-            camGo.transform.rotation = Quaternion.Euler(55f, 0f, 0f);
             var cam = camGo.AddComponent<Camera>();
             cam.farClipPlane = 800f;
+            if (MapLayers.TryGetMapBounds(out var mb))
+            {
+                // 55° 俯瞰全图：相机拉到地图中心后方、高度按长轴缩放。
+                camGo.transform.position = new Vector3(
+                    mb.center.x,
+                    Mathf.Max(mb.size.x, mb.size.z) * 0.8f,
+                    mb.center.z - mb.size.z * 0.7f);
+                camGo.transform.rotation = Quaternion.Euler(55f, 0f, 0f);
+                cam.farClipPlane = mb.size.magnitude * 2f;
+            }
+            else
+            {
+                camGo.transform.position = new Vector3(0f, 120f, -200f);
+                camGo.transform.rotation = Quaternion.Euler(55f, 0f, 0f);
+            }
 
             var freeCamGo = new GameObject("FreeCamera");
             freeCamGo.transform.position = new Vector3(0f, 80f, -110f);
@@ -748,10 +769,14 @@ namespace HagenDa.Networking.EditorTools
             freeCam.depth = 1f;
             freeCamGo.AddComponent<AudioListener>();
             freeCamGo.AddComponent<FreeCamera>();
-            // 俯视/穿墙观战需要看到建筑内部：屏蔽 ceiling 层。
+            // 俯视/穿墙观战需要看到建筑内部：屏蔽 ceiling 层；
+            // 区域填充盘（MapZone）只在地图视角可见，主视角只看描边。
             int ceilLayer = LayerMask.NameToLayer(MapLayers.CeilingName);
             if (ceilLayer >= 0)
                 freeCam.cullingMask &= ~(1 << ceilLayer);
+            int zoneLayer = LayerMask.NameToLayer(MapLayers.ZoneName);
+            if (zoneLayer >= 0)
+                freeCam.cullingMask &= ~(1 << zoneLayer);
 
             // HGTR 光照策略：只用地图自带灯（LGT_*），去除场景光照——
             // 关闭地图外的灯（遗留 Directional Light）、环境光置黑、天空盒置空。
@@ -791,8 +816,21 @@ namespace HagenDa.Networking.EditorTools
             BuildNavMeshForMapRoot(HGTRMapRootName);
 
             // --- 10) 30v30 FSM AI：红方驻西安全区，蓝方驻东安全区 ---
-            CreateFSMTeamAround(fsmPrefab, (int)MatchTeam.Red, 30, safeWest);
-            CreateFSMTeamAround(fsmPrefab, (int)MatchTeam.Blue, 30, safeEast);
+            // 真人固定红队（NetworkMatchManager.AssignCombatant），红 AI 只生成
+            // 29 人，第 30 个红名额留给 Host 玩家（autoCreatePlayer 自动生成）。
+            CreateFSMTeamAround(fsmPrefab, (int)MatchTeam.Red, 29, grWest.center);
+            CreateFSMTeamAround(fsmPrefab, (int)MatchTeam.Blue, 30, grEast.center);
+
+            // 玩家出生点：红 GR 内避开 AI 驻扎网格（AI z ≤ center.z-1），贴 NavMesh。
+            var spawnGo = new GameObject("PlayerStart");
+            spawnGo.transform.position = new Vector3(
+                grWest.center.x + 6f, 1.5f, grWest.center.z + 6f);
+            if (NavMesh.SamplePosition(spawnGo.transform.position, out NavMeshHit spawnHit, 6f, NavMesh.AllAreas))
+                spawnGo.transform.position = spawnHit.position + Vector3.up * 0.1f;
+            spawnGo.AddComponent<Mirror.NetworkStartPosition>();
+
+            // uGUI 点击（部署地图/装备栏）需要 EventSystem + Input System 模块。
+            EnsureEventSystem();
 
             // --- 11) 指挥官快照 rig（含 PHASE10 网格线/标尺/格子代号）---
             CommanderSetup.Setup();
@@ -808,6 +846,321 @@ namespace HagenDa.Networking.EditorTools
             AssetDatabase.SaveAssets();
             Debug.Log("[NetworkSetup] Done. HGTR battle scene ready: " +
                       "2 safe zones, 3 capture points, 30v30 FSM AI, commander rig, NavMesh (ceiling excluded).");
+        }
+
+        // ---------------------------------------------------------------
+        // Map_v1 (RPG_FPS industrial kit): 1 human + 59 AI (30v30) battle
+        // ---------------------------------------------------------------
+
+        /// <summary>
+        /// 在当前已打开的 Map_v1 场景上部署 30v30 对局（幂等，可重跑）：
+        ///   - 地图几何（Map_v1 / Map_v2 / GroundFloor_Grid 全部子物体）归入
+        ///     Ground 层（EntityQueryMask 排除静态几何，否则 1400+ 碰撞体
+        ///     灌满 OverlapNonAlloc 感知 buffer，据点/安全区漏计战斗员）
+        ///   - 矩形安全区：红GR(42, 0.04, 48) / 蓝GR 世界(48.14, 1.63, -269.57)，
+        ///     半宽/半深 24m（48×48m）；蓝GR 规格 (-36,10,-42) 为 Map_v2/Static
+        ///     组本地坐标，已换算世界坐标并吸附到高架路砖顶面
+        ///   - 矩形据点：A(22, 0.04, 3) / B(62, 0.04, -111) / C(-17, 0.04, -211)，
+        ///     半宽/半深 20m（40×40m）；B 原规格 (62,0,111) 在地面网格
+        ///     之外（用户已确认应为 -111）
+        ///   - 对局系统 + StrategicZoneRegistry + FSMBattleSystem + SquadCommander
+        ///   - NetworkManager(KCP, Play 即 Host, autoCreatePlayer 真人固定红队)
+        ///   - 29 红 AI + 30 蓝 AI（红队第 30 席留给真人）
+        ///   - NavMesh 全图烘焙（先于实体生成，避免胶囊在出生点打出洞）
+        /// </summary>
+        [MenuItem("HagenDa/Create Map_v1 Battle Scene (1 Human + 59 AI)")]
+        public static void CreateMapV1BattleScene()
+        {
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            if (!scene.name.StartsWith("Map_v1"))
+            {
+                Debug.LogError($"[NetworkSetup] Active scene '{scene.name}' is not Map_v1. Open Map_v1.unity first.");
+                return;
+            }
+
+            EnsureFolder("Assets/Scripts/Network", "Prefabs");
+            EnsureFolder("Assets/Scripts/Network", "Equipment");
+            EnsureMapLayers();
+            EnsureLayerNamed(MapLayers.GroundName);
+            int groundLayer = LayerMask.NameToLayer(MapLayers.GroundName);
+            if (groundLayer < 0)
+            {
+                Debug.LogError($"[NetworkSetup] Missing layer '{MapLayers.GroundName}'.");
+                return;
+            }
+
+            // --- 1) 地图层归类（幂等）：三个地图根的全部子物体 → Ground ---
+            int movedGround = 0;
+            foreach (var rootName in new[] { "Map_v1", "Map_v2", "GroundFloor_Grid" })
+            {
+                var mapRoot = GameObject.Find(rootName);
+                if (mapRoot == null)
+                {
+                    Debug.LogError($"[NetworkSetup] Map root '{rootName}' not found in scene.");
+                    return;
+                }
+                foreach (var t in mapRoot.GetComponentsInChildren<Transform>(true))
+                {
+                    if (t == mapRoot.transform) continue;
+                    if (t.gameObject.layer != groundLayer)
+                    {
+                        t.gameObject.layer = groundLayer;
+                        movedGround++;
+                    }
+                }
+            }
+            Debug.Log($"[NetworkSetup] Layers: {movedGround} map objects on '{MapLayers.GroundName}'.");
+
+            // --- 2) Prefabs / assets (idempotent) ---
+            List<EquipmentDefinition> equipmentList = BuildEquipmentAssets();
+            GameObject grenadePrefab = BuildGrenadePrefab();
+            GameObject smokePrefab = BuildSmokePrefab();
+            GameObject rescuePrefab = BuildRescuePrefab();
+            GameObject bulletPrefab = BuildBulletPrefab();
+            GameObject playerPrefab = BuildPlayerPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab, equipmentList);
+            GameObject aiPrefab = BuildAIEntityPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab, equipmentList);
+            GameObject fsmPrefab = BuildFSMAIPrefab(aiPrefab);
+
+            // --- 3) 幂等清理旧对局对象 ---
+            ClearOld("MatchManager", "NetworkMatchManager", "StrategicZoneRegistry", "FSMBattleSystem",
+                     "RedGR", "BlueGR", "Zone_A", "Zone_B", "Zone_C",
+                     "StrategicZone_A", "StrategicZone_B", "StrategicZone_C",
+                     "NetworkManager", "BattleCamera", "FreeCamera", "SquadCommander",
+                     "PlayerStart");
+            ClearAllFSMEntities();
+
+            // --- 4) 布局（用户指定；地面统一 y=0.04）---
+            const float groundY = 0.04f;
+            var redPos = new Vector3(42f, groundY, 48f);
+            // 蓝GR 规格 (-36,10,-42) 是 Map_v2/Static 组的本地坐标（该组带 270°
+            // 旋转与平移），换算世界 ≈ (48.14, ·, -269.57)，落在南区高架路砖
+            // 上（顶面 y=1.63）；红GR 规格与世界地面吻合，按世界坐标直用。
+            var bluePos = new Vector3(48.14f, 1.63f, -269.57f);
+            var posA = new Vector3(22f, groundY, 3f);
+            var posB = new Vector3(62f, groundY, -111f);
+            var posC = new Vector3(-17f, groundY, -211f);
+
+            // --- 5) 安全区 ×2（矩形，半宽/半深 24m = 48×48m）---
+            var redSafe = CreateGarrison("RedGR", redPos, (int)MatchTeam.Red, 24f);
+            redSafe.extent = new Vector2(24f, 24f);
+            var blueSafe = CreateGarrison("BlueGR", bluePos, (int)MatchTeam.Blue, 24f);
+            blueSafe.extent = new Vector2(24f, 24f);
+            AttachDeployPointTemplate(redSafe.gameObject, 4,
+                Mathf.Min(redSafe.extent.x, redSafe.extent.y) * 0.8f);
+            AttachDeployPointTemplate(blueSafe.gameObject, 4,
+                Mathf.Min(blueSafe.extent.x, blueSafe.extent.y) * 0.8f);
+
+            // --- 6) 据点 ×3（矩形，半宽/半深 20m = 40×40m）+ StrategicZone 包装 ---
+            var zoneA = CreateCapturePoint("Zone_A", posA, 20f);
+            zoneA.extent = new Vector2(20f, 20f);
+            var zoneB = CreateCapturePoint("Zone_B", posB, 20f);
+            zoneB.extent = new Vector2(20f, 20f);
+            var zoneC = CreateCapturePoint("Zone_C", posC, 20f);
+            zoneC.extent = new Vector2(20f, 20f);
+            zoneA.letter = "A"; zoneB.letter = "B"; zoneC.letter = "C";
+            AttachDeployPointTemplate(zoneA.gameObject, 2,
+                Mathf.Min(zoneA.extent.x, zoneA.extent.y) * 0.8f);
+            AttachDeployPointTemplate(zoneB.gameObject, 2,
+                Mathf.Min(zoneB.extent.x, zoneB.extent.y) * 0.8f);
+            AttachDeployPointTemplate(zoneC.gameObject, 2,
+                Mathf.Min(zoneC.extent.x, zoneC.extent.y) * 0.8f);
+            CreateStrategicZone("StrategicZone_A", zoneA);
+            CreateStrategicZone("StrategicZone_B", zoneB);
+            CreateStrategicZone("StrategicZone_C", zoneC);
+
+            // --- 7) 对局系统（持续战斗 30v30：6 小队 × 5 人）---
+            var mmGo = new GameObject("NetworkMatchManager");
+            var mm = mmGo.AddComponent<NetworkMatchManager>();
+            mm.winScore = 999999;
+            mm.squadsPerTeam = 6;
+            mm.squadSize = 5;
+            mm.redeployDelay = 10f;
+            mm.garrisons = new List<GarrisonZone> { redSafe, blueSafe };
+            mm.capturePoints = new List<CapturePoint> { zoneA, zoneB, zoneC };
+
+            var registryGo = new GameObject("StrategicZoneRegistry");
+            registryGo.AddComponent<StrategicZoneRegistry>();
+
+            var systemGo = new GameObject("FSMBattleSystem");
+            systemGo.AddComponent<FSMBattleSystem>();
+            systemGo.AddComponent<FSMStatsHud>();
+
+            var cmdGo = new GameObject("SquadCommander");
+            cmdGo.AddComponent<SquadCommander>();
+
+            // --- 8) NetworkManager（Play 即 Host；真人自动生成、固定红队）---
+            var nmGo = new GameObject("NetworkManager");
+            var nm = nmGo.AddComponent<NetworkManager>();
+            nm.playerPrefab = playerPrefab;
+            nm.autoCreatePlayer = true;   // 真人固定红队，红 AI 只生成 29 人留位
+            var kcp = nmGo.AddComponent<kcp2k.KcpTransport>();
+            nm.transport = kcp;
+            nmGo.AddComponent<TrainingAutoHost>();
+            RegisterSpawnPrefabs(grenadePrefab, smokePrefab, rescuePrefab, aiPrefab, fsmPrefab);
+            foreach (var def in equipmentList)
+                if (def != null && def.throwablePrefab != null)
+                    RegisterSpawnPrefabs(def.throwablePrefab);
+            var empField = AssetDatabase.LoadAssetAtPath<GameObject>(EmpFieldPrefabPath);
+            if (empField != null) RegisterSpawnPrefabs(empField);
+
+            // --- 9) 观战相机（机位/远裁剪面自适应全图 AABB）---
+            // BattleCamera 默认禁用：FreeCamera(depth=1) 每帧完整覆盖它，
+            // 双相机 = 每帧渲染场景两遍（严重浪费，低端卡直接掉帧）。
+            // 需要全景机位时手动启用本物体即可。
+            MapLayers.TryGetMapBounds(out var mb);
+            var camGo = new GameObject("BattleCamera");
+            var cam = camGo.AddComponent<Camera>();
+            camGo.SetActive(false);
+            if (mb.size != Vector3.zero)
+            {
+                camGo.transform.position = new Vector3(
+                    mb.center.x,
+                    Mathf.Max(mb.size.x, mb.size.z) * 0.8f,
+                    mb.center.z - mb.size.z * 0.7f);
+                camGo.transform.rotation = Quaternion.Euler(55f, 0f, 0f);
+                cam.farClipPlane = mb.size.magnitude * 2f;
+            }
+            else
+            {
+                camGo.transform.position = new Vector3(52f, 300f, -380f);
+                camGo.transform.rotation = Quaternion.Euler(55f, 0f, 0f);
+                cam.farClipPlane = 1200f;
+            }
+
+            var freeCamGo = new GameObject("FreeCamera");
+            freeCamGo.transform.position = mb.size != Vector3.zero
+                ? new Vector3(mb.center.x, 120f, mb.center.z)
+                : new Vector3(52f, 120f, -120f);
+            var freeCam = freeCamGo.AddComponent<Camera>();
+            freeCam.farClipPlane = 1200f;
+            freeCam.depth = 1f;
+            freeCamGo.AddComponent<AudioListener>();
+            freeCamGo.AddComponent<FreeCamera>();
+            // 区域填充盘（MapZone）只在地图视角可见，主视角只看描边。
+            int zoneLayer = LayerMask.NameToLayer(MapLayers.ZoneName);
+            if (zoneLayer >= 0)
+                freeCam.cullingMask &= ~(1 << zoneLayer);
+
+            // 灯光：保留场景自带光照（此图有烘焙 GI 与天空盒），仅关闭
+            // 非平行光的阴影（填充灯不需要阴影，防止 HDRP shadow request 超限）。
+            int shadowOff = 0;
+            foreach (var l in Object.FindObjectsOfType<Light>(true))
+            {
+                if (l.type == LightType.Directional) continue;
+                if (l.shadows != LightShadows.None)
+                {
+                    l.shadows = LightShadows.None;
+                    EditorUtility.SetDirty(l);
+                    shadowOff++;
+                }
+            }
+            if (shadowOff > 0)
+                Debug.Log($"[NetworkSetup] Disabled shadows on {shadowOff} fill lights (kept directional).");
+
+            // --- 10) NavMesh 全图烘焙（先于实体生成）---
+            BuildNavMeshForMapRoot("GroundFloor_Grid");
+
+            // --- 11) 59 FSM AI：红 29（真人占第 30 席）+ 蓝 30 ---
+            // 出生高度 = 各自安全区地面 + 1.5（蓝GR 在 1.63 高架路砖上）。
+            CreateFSMTeamAround(fsmPrefab, (int)MatchTeam.Red, 29, redPos, redPos.y + 1.5f);
+            CreateFSMTeamAround(fsmPrefab, (int)MatchTeam.Blue, 30, bluePos, bluePos.y + 1.5f);
+
+            // 玩家出生点：红 GR 内避开 AI 驻扎网格（AI z ≤ center.z-1），贴 NavMesh。
+            var spawnGo = new GameObject("PlayerStart");
+            spawnGo.transform.position = redPos + new Vector3(6f, 1.5f, 6f);
+            if (NavMesh.SamplePosition(spawnGo.transform.position, out NavMeshHit spawnHit, 6f, NavMesh.AllAreas))
+                spawnGo.transform.position = spawnHit.position + Vector3.up * 0.1f;
+            spawnGo.AddComponent<Mirror.NetworkStartPosition>();
+
+            // uGUI 点击（部署地图/装备栏）需要 EventSystem + Input System 模块。
+            EnsureEventSystem();
+
+            // --- 12) 指挥官 rig（红/蓝 LLM 指挥官 + 门控 + 状态 + HUD）---
+            CommanderSetup.Setup();
+
+            // CommanderSetup 从 "*wall*" 物体推导地图边界——本图墙体零散，
+            // 推导结果严重失真：用全图 AABB 修正红/蓝 Overlay（网格/标尺/
+            // 格子代号在运行时 Start 读取这些字段，编辑期修正即可生效）。
+            if (mb.size != Vector3.zero)
+            {
+                int fixedOverlays = 0;
+                foreach (var ov in Object.FindObjectsOfType<CommanderMapOverlay>(true))
+                {
+                    ov.mapMinWorld = new Vector2(mb.min.x, mb.min.z);
+                    ov.mapMaxWorld = new Vector2(mb.max.x, mb.max.z);
+                    EditorUtility.SetDirty(ov);
+                    fixedOverlays++;
+                }
+                Debug.Log($"[NetworkSetup] Commander overlays fixed to map AABB " +
+                          $"X[{mb.min.x:F0},{mb.max.x:F0}] Z[{mb.min.z:F0},{mb.max.z:F0}] ({fixedOverlays} overlays).");
+            }
+
+            // --- 13) 保存 ---
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+            AssetDatabase.SaveAssets();
+            Debug.Log("[NetworkSetup] Done. Map_v1 battle scene ready: " +
+                      "2 rect safe zones (red 42,48 / blue 48.14,-269.57), 3 rect capture points " +
+                      "A(22,3) B(62,-111) C(-17,-211), 1 human (red) + 59 FSM AI, " +
+                      "commander rig, NavMesh baked, BattleCamera disabled (FreeCamera only).");
+        }
+
+        /// <summary>确保指定名字的 layer 存在（Ground 等非 PHASE8 内置层）。幂等。</summary>
+        private static void EnsureLayerNamed(string layerName)
+        {
+            var tagManager = new SerializedObject(
+                AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+            var layersProp = tagManager.FindProperty("layers");
+            EnsureLayerAt(layersProp, layerName);
+            tagManager.ApplyModifiedProperties();
+        }
+
+        /// <summary>
+        /// HGTR 地图 (Blender 导出) 墙体网格面朝外（单面墙）：Physics 默认
+        /// queriesHitBackfaces=false，从室内对墙的 raycast/shapecast 全部
+        /// MISS（hitscan 打不中墙、部署点探测穿透）。全局开启背面查询命中
+        /// 并写入 ProjectSettings 持久化。幂等。
+        /// </summary>
+        private static void EnableBackfaceQueries()
+        {
+            if (!Physics.queriesHitBackfaces)
+                Physics.queriesHitBackfaces = true;
+
+            // 持久化到 PhysicsSettings（防止域重载/重启动回退到默认值）。
+            var physicsAsset = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/PhysicsSettings.asset");
+            var settings = physicsAsset != null && physicsAsset.Length > 0 ? physicsAsset[0] : null;
+            if (settings != null)
+            {
+                var so = new SerializedObject(settings);
+                var prop = so.FindProperty("m_QueriesHitBackfaces");
+                if (prop != null && !prop.boolValue)
+                {
+                    prop.boolValue = true;
+                    so.ApplyModifiedProperties();
+                    Debug.Log("[NetworkSetup] Physics: Queries Hit Backfaces ENABLED (single-sided Blender walls).");
+                }
+            }
+        }
+
+        /// <summary>
+        /// uGUI 点击依赖 EventSystem。项目用 Input System → 需要
+        /// InputSystemUIInputModule（StandaloneInputModule 不处理新版输入）。
+        /// 幂等：已存在（含模块）则跳过。
+        /// </summary>
+        private static void EnsureEventSystem()
+        {
+            var es = Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
+            if (es != null && es.GetComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>() != null)
+                return;
+
+            if (es == null)
+            {
+                var go = new GameObject("EventSystem");
+                es = go.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            }
+            if (es.GetComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>() == null)
+                es.gameObject.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
+            Debug.Log("[NetworkSetup] EventSystem + InputSystemUIInputModule ensured.");
         }
 
         /// <summary>
@@ -881,6 +1234,43 @@ namespace HagenDa.Networking.EditorTools
                 Object.DestroyImmediate(fsm.gameObject);
         }
 
+                /// <summary>
+        /// 腔室范围：名字前缀匹配的全部渲染器合并包围盒，返回 XZ 中心+全尺寸
+        /// （bounds.y 保留真实高度；size.x/z 为腔室全宽/全深）。
+        /// </summary>
+        private static Bounds ChamberRect(string namePrefix)
+        {
+            var mapRoot = GameObject.Find(HGTRMapRootName);
+            string lower = namePrefix.ToLowerInvariant();
+            Bounds? combined = null;
+            if (mapRoot != null)
+                foreach (var r in mapRoot.GetComponentsInChildren<Renderer>())
+                {
+                    if (!r.name.ToLowerInvariant().StartsWith(lower)) continue;
+                    combined = combined.HasValue
+                        ? EncapsulateXZ(combined.Value, r.bounds)
+                        : r.bounds;
+                }
+            if (combined.HasValue) return combined.Value;
+
+            Debug.LogWarning($"[NetworkSetup] ChamberRect '{namePrefix}' not found; fallback 20x20 at origin.");
+            return new Bounds(Vector3.zero, new Vector3(20f, 0f, 20f));
+        }
+
+        private static Bounds EncapsulateXZ(Bounds a, Bounds b)
+        {
+            float minX = Mathf.Min(a.min.x, b.min.x), maxX = Mathf.Max(a.max.x, b.max.x);
+            float minZ = Mathf.Min(a.min.z, b.min.z), maxZ = Mathf.Max(a.max.z, b.max.z);
+            float minY = Mathf.Min(a.min.y, b.min.y), maxY = Mathf.Max(a.max.y, b.max.y);
+            return new Bounds(
+                new Vector3((minX + maxX) * 0.5f, (minY + maxY) * 0.5f, (minZ + maxZ) * 0.5f),
+                new Vector3(maxX - minX, maxY - minY, maxZ - minZ));
+        }
+
+        /// <summary>平移包围盒中心（保持尺寸）。</summary>
+        private static Bounds ShiftBounds(Bounds b, Vector3 offset)
+            => new Bounds(b.center + offset, b.size);
+
         /// <summary>按名字前缀（忽略大小写）计算一组物体的合并 bounds 中心（XZ 为主）。</summary>
         private static Vector3 GroupCenter(string namePrefix)        {
             var mapRoot = GameObject.Find(HGTRMapRootName);
@@ -948,8 +1338,9 @@ namespace HagenDa.Networking.EditorTools
 
         /// <summary>
         /// 在安全区中心周围生成一支 30 人 FSM 队伍（6 小队 × 5 人，网格驻扎）。
+        /// spawnY：出生高度（安全区地面可能高于 1.5，如 Map_v2 高架路砖 1.63）。
         /// </summary>
-        private static void CreateFSMTeamAround(GameObject fsmPrefab, int team, int count, Vector3 center)
+        private static void CreateFSMTeamAround(GameObject fsmPrefab, int team, int count, Vector3 center, float spawnY = 1.5f)
         {
             string teamName = team == (int)MatchTeam.Red ? "Red" : "Blue";
             for (int i = 0; i < count; i++)
@@ -961,7 +1352,7 @@ namespace HagenDa.Networking.EditorTools
                 go.name = $"FSM_{teamName}_S{squadIndex}_{i}";
                 float x = center.x - 10f + inSquad * 4.5f + (squadIndex % 3) * 1.5f;
                 float z = center.z - 8f + (squadIndex / 3) * 5f + (squadIndex % 2) * 2f;
-                go.transform.position = new Vector3(x, 1.5f, z);
+                go.transform.position = new Vector3(x, spawnY, z);
 
                 var fsm = go.GetComponent<FSMAIController>();
                 if (fsm != null)
@@ -2851,6 +3242,8 @@ namespace HagenDa.Networking.EditorTools
             var layersProp = tagManager.FindProperty("layers");
             EnsureLayerAt(layersProp, MapLayers.IndicatorName);
             EnsureLayerAt(layersProp, MapLayers.HighlightName);
+            EnsureLayerAt(layersProp, MapLayers.ZoneName);
+            EnsureLayerAt(layersProp, MapLayers.ZoneOutlineName);
             tagManager.ApplyModifiedProperties();
         }
 

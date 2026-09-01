@@ -24,6 +24,9 @@ namespace HagenDa.Networking
         [Tooltip("单方开局 watchdog（秒）。")]
         public float perSideWatchdog = 330f;
 
+        [Tooltip("true = 跳过 LLM 开局部署，双方立即按退化处理（SquadCommander 桩接管）。避免 LM Studio 与游戏抢占 GPU/显存；恢复 LLM 时改回 false。")]
+        public bool directDegrade = true;
+
         private bool gateDone;
 
         public bool GateDone => gateDone;   // 调试可查
@@ -85,6 +88,14 @@ namespace HagenDa.Networking
 
         private IEnumerator RunSide(CommanderOrchestrator orch, float gateStart)
         {
+            // 直接退化模式：不发起任何 LLM 请求（LM Studio 不出场，GPU 全留给游戏）。
+            if (directDegrade)
+            {
+                Debug.Log($"[Gate] {orch.name} 直接退化（跳过 LLM 开局部署，桩接管）");
+                orch.ForceDegradeForGate();
+                yield break;
+            }
+
             bool settled = false;
             bool degraded = false;
 

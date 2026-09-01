@@ -148,8 +148,21 @@ namespace HagenDa.Networking
             }
             else
             {
-                // AI: assign by initial position — north half (z>0) = blue, south = red.
-                team = c.transform.position.z < 0f ? (int)MatchTeam.Red : (int)MatchTeam.Blue;
+                // AI: 归属最近安全区的队伍（兼容任意 GR 布局，例如双 GR 同在
+                // 地图北侧的 Map_v1）；无安全区时回退按 z 符号（南红 / 北蓝）。
+                team = -1;
+                float bestDist = float.MaxValue;
+                if (garrisons != null)
+                {
+                    foreach (var g in garrisons)
+                    {
+                        if (g == null) continue;
+                        float d = (g.transform.position - c.transform.position).sqrMagnitude;
+                        if (d < bestDist) { bestDist = d; team = g.teamId; }
+                    }
+                }
+                if (team < 0)
+                    team = c.transform.position.z < 0f ? (int)MatchTeam.Red : (int)MatchTeam.Blue;
             }
 
             int squad = nextSquad[team];

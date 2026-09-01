@@ -24,6 +24,11 @@ namespace HagenDa.Networking
         public float radius = 10f;
         public float captureRate = 1f;          // 每秒每人差值
 
+        [Tooltip("矩形半宽/半深 (XZ)。x,y > 0 时为矩形判定，忽略 radius。")]
+        public Vector2 extent = Vector2.zero;
+
+        public bool IsRect => extent.x > 0f && extent.y > 0f;
+
         [SyncVar] public float contention;       // -60..+60
         [SyncVar(hook = nameof(OnOwnerChanged))] public int ownerTeam = -1;     // -1 中立, 0 红, 1 蓝
 
@@ -100,7 +105,13 @@ namespace HagenDa.Networking
             blue = 0;
             inside.Clear();
 
-            int n = Physics.OverlapSphereNonAlloc(transform.position, radius, buffer);
+            int n = IsRect
+                ? Physics.OverlapBoxNonAlloc(
+                    transform.position + Vector3.up * 1.5f,
+                    new Vector3(extent.x, 1.5f, extent.y),
+                    buffer, Quaternion.identity, MapLayers.EntityQueryMask)
+                : Physics.OverlapSphereNonAlloc(transform.position, radius, buffer, MapLayers.EntityQueryMask);
+
             for (int i = 0; i < n; i++)
             {
                 var c = buffer[i].GetComponentInParent<NetworkCombatant>();
@@ -151,7 +162,9 @@ namespace HagenDa.Networking
         {
             // PHASE8: 纯色 + 中心字母标记（替换旧高亮环）。
             marker = gameObject.AddComponent<MapPointMarker>();
-            marker.Init(letter, Mathf.Max(10f, radius * 1.2f), new Color(0.8f, 0.75f, 0.2f));
+            float shapeSize = IsRect ? Mathf.Max(extent.x, extent.y) * 2f : radius * 2f;
+            marker.Init(letter, Mathf.Max(10f, shapeSize * 1.2f), new Color(0.8f, 0.75f, 0.2f),
+                        IsRect ? extent : default);
             UpdateVisualColor(ownerTeam);
         }
 
@@ -191,7 +204,7 @@ namespace HagenDa.Networking
         private List<NetworkCombatant> GetEnemiesWithin(Vector3 center, float r, MatchTeam team)
         {
             var result = new List<NetworkCombatant>();
-            var cols = Physics.OverlapSphere(center, r);
+            var cols = Physics.OverlapSphere(center, r, MapLayers.EntityQueryMask);
             foreach (var col in cols)
             {
                 var c = col.GetComponentInParent<NetworkCombatant>();

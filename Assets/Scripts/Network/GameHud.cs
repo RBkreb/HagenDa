@@ -41,8 +41,12 @@ namespace HagenDa.Networking
         private RawImage minimapRaw;
         private MinimapCamera minimapCam;
         private RenderTexture minimapRT;
+
         private MinimapCamera bigMapCam;
         private RenderTexture bigMapRT;
+
+        /// <summary>地图宽/高比（大地图 RT 与面板适配用）。</summary>
+        public float MapAspect { get; private set; } = 0.5f;
 
         // --- big map overlay (M key) ---
         private RawImage bigMapOverlay;
@@ -177,7 +181,18 @@ namespace HagenDa.Networking
             minimapRT.name = "MinimapRT";
             minimapRT.Create();
 
-            bigMapRT = new RenderTexture(512, 1024, 16);   // 100x200 地图 → 0.5 宽高比
+            // ML-branch: 大地图 RT/面板按地图 AABB 宽高比适配。RT 宽高比必须
+            // 精确等于地图宽高比（不用 POT 取整——否则相机画幅与地图不一致，
+            // UI 拉伸显示）。RT aspect = 地图 aspect ⇒ orthoSize = 地图长边/2
+            // 恰好满画幅，无留白无变形。
+            if (!MapLayers.TryGetMapBounds(out var mb))
+                mb = new Bounds(Vector3.zero, new Vector3(100f, 0f, 200f));
+            MapAspect = mb.size.x / Mathf.Max(1f, mb.size.z);   // 宽/高
+
+            int bigH = 1024;
+            int bigW = Mathf.RoundToInt(bigH * MapAspect);
+            bigW = Mathf.Clamp(bigW, 64, 4096);
+            bigMapRT = new RenderTexture(bigW, bigH, 16);
             bigMapRT.name = "BigMapRT";
             bigMapRT.Create();
 
@@ -248,7 +263,10 @@ namespace HagenDa.Networking
             bigMapOverlayRect.anchorMax = new Vector2(0.5f, 0.5f);
             bigMapOverlayRect.pivot = new Vector2(0.5f, 0.5f);
             bigMapOverlayRect.anchoredPosition = new Vector2(0f, 0f);
-            bigMapOverlayRect.sizeDelta = new Vector2(540f, 1080f);   // 0.5 宽高比
+            // ML-branch: 面板尺寸随地图宽高比，保比例适配（宽上限 1080）。
+            float w = 540f * MapAspect, h = 540f;
+            if (w > 1080f) { w = 1080f; h = 1080f / MapAspect; }
+            bigMapOverlayRect.sizeDelta = new Vector2(w, h);
 
             bigMapOverlay = go.GetComponent<RawImage>();
             bigMapOverlay.texture = bigMapRT;

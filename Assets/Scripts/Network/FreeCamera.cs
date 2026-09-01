@@ -23,11 +23,40 @@ namespace HagenDa.Networking
         {
             yaw = transform.eulerAngles.y;
             pitch = transform.eulerAngles.x;
-            transform.position = new Vector3(0f, 60f, -50f);
+
+            // ML-branch: 初始机位自适应地图 AABB（Ground 层）。非 HGTR 场景
+            // （无 Ground 层）保持旧默认位。
+            if (MapLayers.TryGetMapBounds(out var b))
+            {
+                transform.position = new Vector3(
+                    b.center.x,
+                    Mathf.Max(b.size.x, b.size.z) * 0.5f,
+                    b.center.z - b.size.z * 0.45f);
+                yaw = 0f;
+                pitch = 40f;
+                transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+
+                var cam = GetComponent<Camera>();
+                if (cam != null)
+                    cam.farClipPlane = Mathf.Max(cam.farClipPlane, b.size.magnitude * 1.5f);
+            }
+            else
+            {
+                transform.position = new Vector3(0f, 60f, -50f);
+            }
         }
 
         private void Update()
         {
+            // ML-branch: 人类玩家存在时自由观战相机退位（其自带第一人称相机
+            // + AudioListener；两台相机同时活跃会互相覆盖 + 双监听器警告）。
+            // 纯 AI 对局（无玩家）时保持观战。
+            if (NetworkClient.localPlayer != null)
+            {
+                gameObject.SetActive(false);
+                return;
+            }
+
             // 鼠标左键按住时锁定并旋转
             if (Input.GetMouseButtonDown(0))
             {

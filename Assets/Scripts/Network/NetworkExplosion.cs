@@ -24,7 +24,7 @@ namespace HagenDa.Networking
 
             var attackerCombatant = attacker != null ? attacker.GetComponent<NetworkCombatant>() : null;
 
-            var colliders = Physics.OverlapSphere(center, radius);
+            var colliders = Physics.OverlapSphere(center, radius, MapLayers.EntityQueryMask);
             var damaged = new HashSet<IDamageable>();
 
             foreach (var c in colliders)

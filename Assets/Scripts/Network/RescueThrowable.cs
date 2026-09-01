@@ -15,7 +15,7 @@ namespace HagenDa.Networking
 
         protected override void OnImpact()
         {
-            var colliders = Physics.OverlapSphere(transform.position, rescueRadius);
+            var colliders = Physics.OverlapSphere(transform.position, rescueRadius, MapLayers.EntityQueryMask);
             foreach (var c in colliders)
             {
                 var health = c.GetComponentInParent<NetworkPlayerHealth>();

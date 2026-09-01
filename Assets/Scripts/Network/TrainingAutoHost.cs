@@ -17,7 +17,8 @@ namespace HagenDa.Networking
             if (NetworkManager.singleton == null) return;
             if (NetworkServer.active) return;
 
-            NetworkManager.singleton.autoCreatePlayer = false;
+            // ML-branch: autoCreatePlayer 由各场景 builder 显式配置
+            // （纯 AI 战斗场景=false，HGTR 有真人=true），此处不再覆盖。
             NetworkManager.singleton.StartHost();
             Debug.Log("[Training] Host auto-started on Play");
         }

@@ -53,7 +53,7 @@ namespace HagenDa.Networking
 
             bool anyBeneficiary = false;
 
-            foreach (var c in Physics.OverlapSphere(transform.position, radius))
+            foreach (var c in Physics.OverlapSphere(transform.position, radius, MapLayers.EntityQueryMask))
             {
                 var health = c.GetComponentInParent<NetworkPlayerHealth>();
                 if (health == null || health.IsDead) continue;

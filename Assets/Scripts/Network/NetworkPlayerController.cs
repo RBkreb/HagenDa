@@ -285,10 +285,13 @@ namespace HagenDa.Networking
                 {
                     playerCamera.enabled = true;
                     baseFov = playerCamera.fieldOfView;
-                    // PHASE8: 主相机不渲染实体地图球体（MapIndicator），但保留
-                    // GR/HQ 地面高亮（MapHighlight）。
+                    // PHASE8: 主相机不渲染实体地图球体（MapIndicator）。
+                    // ML-branch: 主视角也不渲染据点/安全区填充盘（MapZone）——
+                    // 世界内只显示区域描边（MapZoneOutline，默认可见）。
                     if (MapLayers.Indicator >= 0)
                         playerCamera.cullingMask &= ~(1 << MapLayers.Indicator);
+                    if (MapLayers.Zone >= 0)
+                        playerCamera.cullingMask &= ~(1 << MapLayers.Zone);
                 }
                 if (visual != null) visual.SetActive(false);
                 cameraEyeHeight = GetEyeHeight(PlayerPosture.Stand);
