@@ -17,6 +17,7 @@ MiniCPM-V-4_6/
 *.cache
 *.DotSettings.user
 .codely-cli/
+.codely/
 .vscode/
 .agent/
 .dsh/

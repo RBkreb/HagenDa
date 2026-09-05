@@ -1,0 +1,622 @@
+fileFormatVersion: 2
+guid: Wy8e4y/8Win7pacxdnoEd6jfKfM6fWy2vbvjXPULXAvhdp53pOtR/n8=
+ModelImporter:
+  serializedVersion: 22361
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Fx05_grey
+    second: {fileID: 2800000, guid: 485605001f8e5d747961269d8cc26452, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: common_shadow
+    second: {fileID: 2800000, guid: b40ab6ad4ae50564a989d454b57cc34e, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: helmet_shadow
+    second: {fileID: 2800000, guid: e7fa160b44dc7e24b978543b36cceec6, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: lonsleeve_shadow
+    second: {fileID: 2800000, guid: 6f07e0551f9ddab49a34ceb177765aff, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: shortsleeve_shadow
+    second: {fileID: 2800000, guid: e092a4e70e473c04d968b1a17b0eb537, type: 3}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 3
+    aCLCompressionLevel: 3
+    aCLCurvePrecision: 0.01
+    aCLFastSampleMode: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+    tuanjieGIEnable: 0
+    tuanjieGIGenSDFFactor: 1
+    tuanjieGIGenSDFBias: 0.25
+    tuanjieGIDoubleSidedMode: 0
+    tuanjieGIGenFacetNums: 12
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    totalVerticesCount: 157150
+    totalTrianglesCount: 201449
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  virtualGeometry:
+    virtualGeometry: 0
+    useTransparent: 0
+    setVGForeachMesh: 0
+    isFirstUse: 1
+    virtualGeometrySettings:
+      generateGeometryBuffer: 0
+      surfaceCompensation: 0
+      allMeshUse: 1
+      ignoreSimpleMesh: 0
+      transformScaleState: 0
+      isPossibleOverflow: 0
+      hasBoneData: 0
+      isBoneCountOverflow: 0
+    virtualGeometryPlatformSettings:
+    - serializedVersion: 0
+      overridden: 0
+      ignorePlatformSupport: 0
+      buildTarget: DefaultVirtualGeometryPlatform
+      positionPrecision: -2147483648
+      normalPrecision: -2147483648
+      tangentPrecision: -2147483648
+      boneWeightPrecision: -2147483648
+      detailedTriangleCount: 0
+      detailedVertexCount: 0
+      rootPageSize: 0
+      streamablePageSize: 0
+      reserveTrianglePercent: 100
+      reserveDetailLevel: 0
+    - serializedVersion: 0
+      overridden: 0
+      ignorePlatformSupport: 0
+      buildTarget: Standalone
+      positionPrecision: -2147483648
+      normalPrecision: -2147483648
+      tangentPrecision: -2147483648
+      boneWeightPrecision: -2147483648
+      detailedTriangleCount: 0
+      detailedVertexCount: 0
+      rootPageSize: 0
+      streamablePageSize: 0
+      reserveTrianglePercent: 100
+      reserveDetailLevel: 0
+    - serializedVersion: 0
+      overridden: 0
+      ignorePlatformSupport: 0
+      buildTarget: iPhone
+      positionPrecision: -2147483648
+      normalPrecision: -2147483648
+      tangentPrecision: -2147483648
+      boneWeightPrecision: -2147483648
+      detailedTriangleCount: 0
+      detailedVertexCount: 0
+      rootPageSize: 0
+      streamablePageSize: 0
+      reserveTrianglePercent: 100
+      reserveDetailLevel: 0
+    - serializedVersion: 0
+      overridden: 0
+      ignorePlatformSupport: 0
+      buildTarget: Android
+      positionPrecision: -2147483648
+      normalPrecision: -2147483648
+      tangentPrecision: -2147483648
+      boneWeightPrecision: -2147483648
+      detailedTriangleCount: 0
+      detailedVertexCount: 0
+      rootPageSize: 0
+      streamablePageSize: 0
+      reserveTrianglePercent: 100
+      reserveDetailLevel: 0
+    selectedVGMeshes:
+    - index: 0
+      meshName: shirt_long high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 1
+      meshName: gloves_long high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 2
+      meshName: elbows_long high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 3
+      meshName: arms_short high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 4
+      meshName: shirt_short high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 5
+      meshName: gloves_short high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 6
+      meshName: watch_short high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 7
+      meshName: groin_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 8
+      meshName: front_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 9
+      meshName: back_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 10
+      meshName: side_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 11
+      meshName: shoulders_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 12
+      meshName: pants_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 13
+      meshName: arms_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 14
+      meshName: neck_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 15
+      meshName: pouch_1 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 16
+      meshName: pouch_2 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 17
+      meshName: pouch_3 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 18
+      meshName: pouch_4 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 19
+      meshName: pouch_back_2 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 20
+      meshName: pouch_back_1 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 21
+      meshName: holster high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 22
+      meshName: pourch_front high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 23
+      meshName: pouch_mags high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 24
+      meshName: pouch_5 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 25
+      meshName: pouch_6 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 26
+      meshName: pouch_7 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 27
+      meshName: pouch_8 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 28
+      meshName: pouch_talkie high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 29
+      meshName: pouch_9 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 30
+      meshName: pouch_10 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 31
+      meshName: pouch_11 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 32
+      meshName: tablet high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 33
+      meshName: tag_front high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 34
+      meshName: talkiewalkie high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 35
+      meshName: backpack high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 36
+      meshName: belt_low high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 37
+      meshName: buttons high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 38
+      meshName: scarf high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 39
+      meshName: holster_holder high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 40
+      meshName: pants_low high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 41
+      meshName: shoes_low high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 42
+      meshName: shoes_low.002 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 43
+      meshName: thigh_strap_low high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 44
+      meshName: neck high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 45
+      meshName: helmet high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 46
+      meshName: FX05 receiver.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 47
+      meshName: FX05 suppressor.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 48
+      meshName: FX05 grip.002
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 49
+      meshName: FX05 mag.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    supportVGMeshes:
+    - index: 0
+      meshName: shirt_long high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 1
+      meshName: gloves_long high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 2
+      meshName: elbows_long high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 3
+      meshName: arms_short high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 4
+      meshName: shirt_short high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 5
+      meshName: gloves_short high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 6
+      meshName: watch_short high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 7
+      meshName: groin_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 8
+      meshName: front_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 9
+      meshName: back_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 10
+      meshName: side_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 11
+      meshName: shoulders_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 12
+      meshName: pants_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 13
+      meshName: arms_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 14
+      meshName: neck_armor high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 15
+      meshName: pouch_1 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 16
+      meshName: pouch_2 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 17
+      meshName: pouch_3 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 18
+      meshName: pouch_4 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 19
+      meshName: pouch_back_2 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 20
+      meshName: pouch_back_1 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 21
+      meshName: holster high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 22
+      meshName: pourch_front high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 23
+      meshName: pouch_mags high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 24
+      meshName: pouch_5 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 25
+      meshName: pouch_6 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 26
+      meshName: pouch_7 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 27
+      meshName: pouch_8 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 28
+      meshName: pouch_talkie high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 29
+      meshName: pouch_9 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 30
+      meshName: pouch_10 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 31
+      meshName: pouch_11 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 32
+      meshName: tablet high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 33
+      meshName: tag_front high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 34
+      meshName: talkiewalkie high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 35
+      meshName: backpack high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 36
+      meshName: belt_low high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 37
+      meshName: buttons high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 38
+      meshName: scarf high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 39
+      meshName: holster_holder high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 40
+      meshName: pants_low high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 41
+      meshName: shoes_low high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 42
+      meshName: shoes_low.002 high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 43
+      meshName: thigh_strap_low high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 44
+      meshName: neck high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 45
+      meshName: helmet high poly.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 46
+      meshName: FX05 receiver.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 47
+      meshName: FX05 suppressor.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 48
+      meshName: FX05 grip.002
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 49
+      meshName: FX05 mag.001
+      lodLevel: 0
+      meshGeometryBuffer: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  overrideDefaultPose: 0
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    namedPoseList:
+    - name: Default
+      skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    defaultPoseIndex: -1
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 3
+  humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

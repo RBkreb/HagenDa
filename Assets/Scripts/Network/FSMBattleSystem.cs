@@ -11,9 +11,10 @@ namespace HagenDa.Networking
     /// 存活，不受 Mirror 场景网络对象启停影响）：以固定累积步长跑 10Hz 决策 tick。
     /// 每 tick：
     ///   1. 共享战斗员快照（一次/tick——替代每 agent 遍历注册表的 O(n²) 模式）；
-    ///   2. 感知批处理：全部 agent 的 48 根射线打包成一个
-    ///      RaycastCommand.ScheduleBatch（59 agent = 2832 根），同帧 Complete 后
-    ///      分发解析——这是 Job System 分摊计算的主战场；
+    ///   2. 感知批处理：目标发现由 AgentVisionSensor 前向方体 + 近距球 Overlap
+    ///      在主线程完成，其 LOS 遮挡射线（预算 24 根/agent，59 agent = 1416 根）
+    ///      打包成一个 RaycastCommand.ScheduleBatch，同帧 Complete 后分发解析
+    ///      ——这是 Job System 分摊计算的主战场；
     ///   3. 寻路错峰：每 tick 最多 pathBudgetPerTick 条 NavMesh.CalculatePath
     ///      （主线程，分散到不同 tick 避免尖峰）；
     ///   4. 逐 agent 调 FSMAIController.DecisionTick。
@@ -179,7 +180,7 @@ namespace HagenDa.Networking
         private void RunPerceptionBatch()
         {
             EnsureBatchCapacity(agents.Count);
-            int rays = AgentRaySensor.TotalRays;
+            int rays = AgentVisionSensor.MaxOcclusionRays;
 
             for (int i = 0; i < agents.Count; i++)
                 agents[i].BuildPerception(commands, i * rays);
@@ -197,7 +198,7 @@ namespace HagenDa.Networking
             if (commands.IsCreated && batchCapacityAgents >= agentCount) return;
 
             DisposeBatch();
-            int rays = agentCount * AgentRaySensor.TotalRays;
+            int rays = agentCount * AgentVisionSensor.MaxOcclusionRays;
             commands = new NativeArray<RaycastCommand>(
                 rays, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
             rayHits = new NativeArray<RaycastHit>(

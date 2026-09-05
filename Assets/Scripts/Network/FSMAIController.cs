@@ -20,7 +20,7 @@ namespace HagenDa.Networking
     /// 玩家/ML agent 完全同构的 intent 管线。
     /// </summary>
     [RequireComponent(typeof(NetworkAIController))]
-    [RequireComponent(typeof(AgentRaySensor))]
+    [RequireComponent(typeof(AgentVisionSensor))]
     public class FSMAIController : NetworkBehaviour
     {
         [Header("Identity")]
@@ -63,7 +63,7 @@ namespace HagenDa.Networking
         private NetworkPlayerHealth health;
         private NetworkGun gun;
         private NetworkEquipment equipment;
-        private AgentRaySensor sensor;
+        private AgentVisionSensor sensor;
         private FSMBattleSystem system;
 
         // ---- brain state ----
@@ -142,7 +142,7 @@ namespace HagenDa.Networking
         private float enemySpottedSuppressUntil;
 
         public FsmState State => state;
-        public AgentRaySensor Sensor => sensor;
+        public AgentVisionSensor Sensor => sensor;
 
         public override void OnStartServer()
         {
@@ -152,7 +152,9 @@ namespace HagenDa.Networking
             health = GetComponent<NetworkPlayerHealth>();
             gun = GetComponent<NetworkGun>();
             equipment = GetComponent<NetworkEquipment>();
-            sensor = GetComponent<AgentRaySensor>();
+            sensor = GetComponent<AgentVisionSensor>();
+            // 兼容旧场景实体：prefab 装配早于视觉重构时补挂（服务端组件，运行时添加安全）。
+            if (sensor == null) sensor = gameObject.AddComponent<AgentVisionSensor>();
             system = FSMBattleSystem.Instance;
 
             yaw = transform.rotation.eulerAngles.y;
@@ -176,13 +178,13 @@ namespace HagenDa.Networking
         public void BuildPerception(NativeArray<RaycastCommand> commands, int offset)
         {
             if (sensor == null) return;
-            sensor.BuildBatchCommands(transform.position, yaw,
+            sensor.BuildVision(transform.position, yaw,
                 combatant != null ? combatant.teamId : -1, commands, offset);
         }
 
         public void ParsePerception(NativeArray<RaycastHit> results, int offset)
         {
-            if (sensor != null) sensor.ParseBatchHits(results, offset);
+            if (sensor != null) sensor.ParseVision(results, offset);
         }
 
         public void ComputePath(Vector3 target)
@@ -390,7 +392,7 @@ namespace HagenDa.Networking
             // 索敌三级：①最近可见敌 → ②最近伤害来源 → ③被标记敌
             var targetOpt = SelectTarget(snapshot);
             bool hasVisible = targetOpt.HasValue;
-            VisibleTarget visible = hasVisible ? targetOpt.Value : default;
+            EngageTarget visible = hasVisible ? targetOpt.Value : default;
 
             if (hasVisible)
             {
@@ -426,7 +428,7 @@ namespace HagenDa.Networking
 
                 // PHASE9 "仅烟雾遮挡+被标记→向大致方向扫射"：
                 // 如果目标被烟雾遮挡但被标记，向大致方向扫射。
-                bool smokeOccluded = IsTargetSmokeOccluded(visible.position);
+                bool smokeOccluded = visible.los == AgentVisionSensor.VisionLos.SmokeBlocked;
                 bool targetMarked = visible.combatant.IsMarked;
 
                 if (smokeOccluded && targetMarked)
@@ -450,8 +452,8 @@ namespace HagenDa.Networking
                         nextGrenadeAt = Time.time + grenadeCooldown;
                     }
 
-                    // 榴弹炮：战斗&瞄准的敌军被遮挡（墙挡）&可用
-                    if (IsTargetWallOccluded(visible.position))
+                    // 榴弹炮：战斗&瞄准的敌军存在几何遮挡（墙挡/掩体后半遮挡）&可用
+                    if (visible.partialWallBlock)
                         TryUseGrenadeLauncher(visible.position);
                 }
                 else
@@ -475,34 +477,64 @@ namespace HagenDa.Networking
             }
         }
 
-        private struct VisibleTarget
+        private struct EngageTarget
         {
             public NetworkCombatant combatant;
             public Vector3 position;
+            public AgentVisionSensor.VisionLos los;
+            /// <summary>存在几何遮挡射线（掩体后半遮挡/全遮挡）→ 榴弹炮弧线射击。</summary>
+            public bool partialWallBlock;
+        }
+
+        /// <summary>查询目标在视觉记录中的 LOS 状态（无记录 = 视为其可见，与旧索敌 ②③ 一致）。</summary>
+        private AgentVisionSensor.VisionLos LosOf(NetworkCombatant c, out bool partialWallBlock)
+        {
+            partialWallBlock = false;
+            if (sensor == null) return AgentVisionSensor.VisionLos.Clear;
+            var targets = sensor.Targets;
+            for (int i = 0; i < targets.Count; i++)
+            {
+                if (targets[i].combatant != c) continue;
+                partialWallBlock = targets[i].geometryBlockedRays > 0;
+                return targets[i].los;
+            }
+            return AgentVisionSensor.VisionLos.Clear;
         }
 
         /// <summary>索敌三级优先级：最近可见敌 → 最近伤害来源 → 被标记敌。</summary>
-        private VisibleTarget? SelectTarget(List<FSMBattleSystem.CombatantView> snapshot)
+        private EngageTarget? SelectTarget(List<FSMBattleSystem.CombatantView> snapshot)
         {
             int myTeam = combatant != null ? combatant.teamId : -1;
             if (myTeam < 0) return null;
 
-            // ① 射线感知到的可见敌
+            // ① 视觉感知到的可见敌（方体查询 + LOS 遮挡射线）
             if (sensor != null)
             {
-                NetworkCombatant best = null;
+                var targets = sensor.Targets;
+                AgentVisionSensor.VisionTarget best = default;
                 float bestD = detectRange;
-                for (int i = 0; i < sensor.Latest.Length; i++)
+                bool found = false;
+                for (int i = 0; i < targets.Count; i++)
                 {
-                    var h = sensor.Latest[i];
-                    if (h.kind == RayHitKind.Enemy && h.combatant != null && !h.combatant.IsDead)
+                    var t = targets[i];
+                    if (t.kind != RayHitKind.Enemy || t.combatant == null || t.combatant.IsDead)
+                        continue;
+                    if (t.los != AgentVisionSensor.VisionLos.Clear) continue;
+                    if (t.distance < bestD)
                     {
-                        float d = h.distance;
-                        if (d < bestD) { bestD = d; best = h.combatant; }
+                        bestD = t.distance;
+                        best = t;
+                        found = true;
                     }
                 }
-                if (best != null)
-                    return new VisibleTarget { combatant = best, position = best.transform.position };
+                if (found)
+                    return new EngageTarget
+                    {
+                        combatant = best.combatant,
+                        position = best.position,
+                        los = AgentVisionSensor.VisionLos.Clear,
+                        partialWallBlock = best.geometryBlockedRays > 0,
+                    };
             }
 
             // ② 最近伤害来源（不可见用最后已知位）
@@ -513,7 +545,17 @@ namespace HagenDa.Networking
                 {
                     float d = FlatDistance(transform.position, attacker.transform.position);
                     if (d <= detectRange)
-                        return new VisibleTarget { combatant = attacker, position = attacker.transform.position };
+                    {
+                        bool partial;
+                        var los = LosOf(attacker, out partial);
+                        return new EngageTarget
+                        {
+                            combatant = attacker,
+                            position = attacker.transform.position,
+                            los = los,
+                            partialWallBlock = partial,
+                        };
+                    }
                     // 不可见但记住位置
                     lastKnownTargetPos = attacker.transform.position;
                     hasLastKnownPos = true;
@@ -534,7 +576,17 @@ namespace HagenDa.Networking
                 }
             }
             if (marked != null)
-                return new VisibleTarget { combatant = marked, position = marked.transform.position };
+            {
+                bool partial;
+                var los = LosOf(marked, out partial);
+                return new EngageTarget
+                {
+                    combatant = marked,
+                    position = marked.transform.position,
+                    los = los,
+                    partialWallBlock = partial,
+                };
+            }
 
             return null;
         }
@@ -923,80 +975,6 @@ namespace HagenDa.Networking
         // 装备触发（12 种配备全接线）
         // ---------------------------------------------------------------
 
-        /// <summary>检查目标是否被烟雾遮挡（射线扇中有 Smoke 类且方向接近目标）。</summary>
-        private bool IsTargetSmokeOccluded(Vector3 targetPos)
-        {
-            if (sensor == null) return false;
-            Vector3 toTarget = targetPos - transform.position;
-            toTarget.y = 0f;
-            if (toTarget.sqrMagnitude < 0.01f) return false;
-            toTarget.Normalize();
-
-            for (int i = 0; i < sensor.Latest.Length; i++)
-            {
-                var h = sensor.Latest[i];
-                if (h.kind != RayHitKind.Smoke) continue;
-
-                // 检查这条烟雾射线是否在目标方向附近（前向扇形 120° 内）
-                // 简化：前向射线 (idx < 32) 检查角度差 < 15°
-                if (i < AgentRaySensor.ForwardRays * 2)
-                {
-                    // 计算这根射线的角度
-                    float rayAngle = GetRayAngle(i);
-                    Vector3 rayDir = new Vector3(Mathf.Sin(rayAngle * Mathf.Deg2Rad), 0f,
-                                                  Mathf.Cos(rayAngle * Mathf.Deg2Rad));
-                    if (Vector3.Dot(rayDir, toTarget) > 0.966f)   // cos(15°) ≈ 0.966
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>检查目标是否被墙遮挡（有 Wall 类射线在目标方向附近且更近）。</summary>
-        private bool IsTargetWallOccluded(Vector3 targetPos)
-        {
-            if (sensor == null) return false;
-            float targetDist = FlatDistance(transform.position, targetPos);
-            Vector3 toTarget = targetPos - transform.position;
-            toTarget.y = 0f;
-            if (toTarget.sqrMagnitude < 0.01f) return false;
-            toTarget.Normalize();
-
-            for (int i = 0; i < sensor.Latest.Length; i++)
-            {
-                var h = sensor.Latest[i];
-                if (h.kind != RayHitKind.Wall) continue;
-                if (h.distance >= targetDist) continue;   // 墙比目标远 = 不挡
-
-                if (i < AgentRaySensor.ForwardRays * 2)
-                {
-                    float rayAngle = GetRayAngle(i);
-                    Vector3 rayDir = new Vector3(Mathf.Sin(rayAngle * Mathf.Deg2Rad), 0f,
-                                                  Mathf.Cos(rayAngle * Mathf.Deg2Rad));
-                    if (Vector3.Dot(rayDir, toTarget) > 0.966f)
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        private float GetRayAngle(int idx)
-        {
-            if (idx < AgentRaySensor.ForwardRays * 2)
-            {
-                float half = AgentRaySensor.ForwardFovDeg * 0.5f;
-                int i = idx % AgentRaySensor.ForwardRays;
-                float t = AgentRaySensor.ForwardRays == 1 ? 0.5f : i / (float)(AgentRaySensor.ForwardRays - 1);
-                return yaw + Mathf.Lerp(-half, half, t);
-            }
-            else
-            {
-                int j = idx - AgentRaySensor.ForwardRays * 2;
-                int i = j % AgentRaySensor.RingRays;
-                return yaw + (360f / AgentRaySensor.RingRays) * i;
-            }
-        }
-
         /// <summary>烟雾弹：进攻&发现敌人→向敌方向 / 生存→向脚下 / 支援→向广播源。</summary>
         private void TryThrowSmoke(Vector3 targetPos)
         {
@@ -1073,13 +1051,14 @@ namespace HagenDa.Networking
             var def = equipment.GetSlotDefinition(3);
             if (def == null || def.type != EquipmentType.EmpGrenade) return;
 
-            // 射线检测敌方部署物
+            // 视觉检测敌方部署物
             if (sensor == null) return;
-            for (int i = 0; i < sensor.Latest.Length; i++)
+            for (int i = 0; i < sensor.Targets.Count; i++)
             {
-                var h = sensor.Latest[i];
-                if (h.kind == RayHitKind.Beacon || h.kind == RayHitKind.Sensor ||
-                    h.kind == RayHitKind.Interceptor)
+                var t = sensor.Targets[i];
+                if (t.los != AgentVisionSensor.VisionLos.Clear) continue;
+                if (t.kind == RayHitKind.Beacon || t.kind == RayHitKind.Sensor ||
+                    t.kind == RayHitKind.Interceptor)
                 {
                     edgeSlotThrowable = true;
                     return;
@@ -1096,13 +1075,14 @@ namespace HagenDa.Networking
             if (sensor == null || combatant == null) return;
             if (Time.time < enemySpottedSuppressUntil) return;
 
-            for (int i = 0; i < sensor.Latest.Length; i++)
+            for (int i = 0; i < sensor.Targets.Count; i++)
             {
-                var h = sensor.Latest[i];
-                if (h.kind == RayHitKind.Enemy && h.combatant != null)
+                var t = sensor.Targets[i];
+                if (t.kind == RayHitKind.Enemy && t.combatant != null &&
+                    t.los == AgentVisionSensor.VisionLos.Clear)
                 {
                     TeamIntel.Broadcast(combatant.teamId, IntelEvent.EnemySpotted,
-                        h.combatant.transform.position, combatant.squadId, GetInstanceID());
+                        t.position, combatant.squadId, GetInstanceID());
                     enemySpottedSuppressUntil = Time.time + 10f;  // 接收方 10s 压制
                     return;
                 }
@@ -1136,11 +1116,13 @@ namespace HagenDa.Networking
         private bool HasVisibleEnemy(List<FSMBattleSystem.CombatantView> snapshot)
         {
             if (sensor == null) return false;
-            for (int i = 0; i < sensor.Latest.Length; i++)
+            for (int i = 0; i < sensor.Targets.Count; i++)
             {
-                if (sensor.Latest[i].kind == RayHitKind.Enemy &&
-                    sensor.Latest[i].combatant != null &&
-                    !sensor.Latest[i].combatant.IsDead)
+                var t = sensor.Targets[i];
+                if (t.kind == RayHitKind.Enemy &&
+                    t.combatant != null &&
+                    !t.combatant.IsDead &&
+                    t.los == AgentVisionSensor.VisionLos.Clear)
                     return true;
             }
             return false;

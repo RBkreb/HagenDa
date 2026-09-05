@@ -1,0 +1,8 @@
+newmtl BlackMetal
+Kd 0.015 0.015 0.018
+Ks 0.10 0.10 0.10
+d 1
+newmtl WhiteLine
+Kd 0.75 0.78 0.82
+Ks 0.20 0.20 0.20
+d 1

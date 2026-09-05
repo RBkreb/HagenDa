@@ -13,14 +13,13 @@
       }
     },
     "cn.tuanjie.codely.bridge": {
-      "version": "1.0.78",
+      "version": "file:D:/HagenTa/cn.tuanjie.codely.bridge@1.0.78",
       "depth": 0,
-      "source": "registry",
+      "source": "local",
       "dependencies": {
         "com.unity.ext.nunit": "1.0.6",
         "com.unity.ugui": "1.0.0"
-      },
-      "url": "https://packages.tuanjie.cn"
+      }
     },
     "com.crashkonijn.goap": {
       "version": "3.1.2",
@@ -72,12 +71,15 @@
       "url": "https://packages.tuanjie.cn"
     },
     "com.unity.collections": {
-      "version": "1.2.4",
+      "version": "2.5.7",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.burst": "1.6.6",
-        "com.unity.test-framework": "1.1.31"
+        "com.unity.burst": "1.8.19",
+        "com.unity.mathematics": "1.3.2",
+        "com.unity.nuget.mono-cecil": "1.11.5",
+        "com.unity.test-framework": "1.4.6",
+        "com.unity.test-framework.performance": "3.0.3"
       },
       "url": "https://packages.tuanjie.cn"
     },
@@ -88,9 +90,42 @@
       "dependencies": {},
       "url": "https://packages.tuanjie.cn"
     },
+    "com.unity.entities": {
+      "version": "1.3.15",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.burst": "1.8.19",
+        "com.unity.collections": "2.5.7",
+        "com.unity.mathematics": "1.3.2",
+        "com.unity.modules.audio": "1.0.0",
+        "com.unity.serialization": "3.1.2",
+        "com.unity.profiling.core": "1.0.2",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.nuget.mono-cecil": "1.11.5",
+        "com.unity.modules.uielements": "1.0.0",
+        "com.unity.modules.assetbundle": "1.0.0",
+        "com.unity.modules.unityanalytics": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.scriptablebuildpipeline": "1.21.25",
+        "com.unity.test-framework.performance": "3.0.3"
+      },
+      "url": "https://packages.tuanjie.cn"
+    },
+    "com.unity.entities.graphics": {
+      "version": "1.3.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.entities": "1.3.2",
+        "com.unity.modules.particlesystem": "1.0.0",
+        "com.unity.render-pipelines.core": "14.0.9"
+      },
+      "url": "https://packages.tuanjie.cn"
+    },
     "com.unity.ext.nunit": {
-      "version": "1.0.6",
-      "depth": 1,
+      "version": "2.0.3",
+      "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.tuanjie.cn"
@@ -169,6 +204,13 @@
         "com.unity.modules.physics": "1.0.0"
       }
     },
+    "com.unity.nuget.mono-cecil": {
+      "version": "1.11.5",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.tuanjie.cn"
+    },
     "com.unity.nuget.newtonsoft-json": {
       "version": "3.2.1",
       "depth": 0,
@@ -178,6 +220,39 @@
     },
     "com.unity.performance.profile-analyzer": {
       "version": "1.2.3",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.tuanjie.cn"
+    },
+    "com.unity.physics": {
+      "version": "1.3.15",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.burst": "1.8.19",
+        "com.unity.entities": "1.3.15",
+        "com.unity.collections": "2.5.7",
+        "com.unity.mathematics": "1.3.2",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.test-framework": "1.4.6",
+        "com.unity.modules.jsonserialize": "1.0.0"
+      },
+      "url": "https://packages.tuanjie.cn"
+    },
+    "com.unity.probuilder": {
+      "version": "5.2.4",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.settings-manager": "1.0.3"
+      },
+      "url": "https://packages.tuanjie.cn"
+    },
+    "com.unity.profiling.core": {
+      "version": "1.0.2",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
@@ -219,6 +294,13 @@
         "com.unity.render-pipelines.core": "14.2.0-t1"
       }
     },
+    "com.unity.scriptablebuildpipeline": {
+      "version": "1.21.25",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.tuanjie.cn"
+    },
     "com.unity.searcher": {
       "version": "4.9.2",
       "depth": 2,
@@ -226,9 +308,19 @@
       "dependencies": {},
       "url": "https://packages.tuanjie.cn"
     },
+    "com.unity.serialization": {
+      "version": "3.1.2",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.collections": "2.4.2",
+        "com.unity.burst": "1.7.2"
+      },
+      "url": "https://packages.tuanjie.cn"
+    },
     "com.unity.settings-manager": {
       "version": "2.1.0",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.tuanjie.cn"
@@ -243,12 +335,22 @@
       }
     },
     "com.unity.test-framework": {
-      "version": "1.1.33",
+      "version": "1.4.6",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.ext.nunit": "1.0.6",
+        "com.unity.ext.nunit": "2.0.3",
         "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.jsonserialize": "1.0.0"
+      },
+      "url": "https://packages.tuanjie.cn"
+    },
+    "com.unity.test-framework.performance": {
+      "version": "3.0.3",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.31",
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.tuanjie.cn"

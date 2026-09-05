@@ -551,7 +551,7 @@ namespace HagenDa.Networking.EditorTools
         }
 
         /// <summary>FSM AI prefab：ML AI prefab 克隆 - MLAgentBridge + FSMAIController。</summary>
-        private static GameObject BuildFSMAIPrefab(GameObject aiPrefab)
+        internal static GameObject BuildFSMAIPrefab(GameObject aiPrefab)
         {
             EnsureFolder("Assets/Scripts/Network", "Prefabs");
 
@@ -565,6 +565,12 @@ namespace HagenDa.Networking.EditorTools
             var bridge = root.GetComponent<MLAgentBridge>();
             if (bridge != null) Object.DestroyImmediate(bridge);
 
+            // 视觉重构：FSM 用方体查询 + 遮挡射线传感器，替换 ML 专用射线扇传感器。
+            if (root.GetComponent<AgentVisionSensor>() == null)
+                root.AddComponent<AgentVisionSensor>();
+            var raySensor = root.GetComponent<AgentRaySensor>();
+            if (raySensor != null) Object.DestroyImmediate(raySensor);
+
             if (root.GetComponent<FSMAIController>() == null)
                 root.AddComponent<FSMAIController>();
 
@@ -574,7 +580,7 @@ namespace HagenDa.Networking.EditorTools
         }
 
         /// <summary>把一个 CapturePoint 包装成 StrategicZone（AI 只见抽象要地）。</summary>
-        private static void CreateStrategicZone(string name, CapturePoint cp)
+        internal static void CreateStrategicZone(string name, CapturePoint cp)
         {
             var go = new GameObject(name);
             go.transform.position = cp.transform.position;
@@ -1106,7 +1112,7 @@ namespace HagenDa.Networking.EditorTools
         }
 
         /// <summary>确保指定名字的 layer 存在（Ground 等非 PHASE8 内置层）。幂等。</summary>
-        private static void EnsureLayerNamed(string layerName)
+        internal static void EnsureLayerNamed(string layerName)
         {
             var tagManager = new SerializedObject(
                 AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
@@ -1121,7 +1127,7 @@ namespace HagenDa.Networking.EditorTools
         /// MISS（hitscan 打不中墙、部署点探测穿透）。全局开启背面查询命中
         /// 并写入 ProjectSettings 持久化。幂等。
         /// </summary>
-        private static void EnableBackfaceQueries()
+        internal static void EnableBackfaceQueries()
         {
             if (!Physics.queriesHitBackfaces)
                 Physics.queriesHitBackfaces = true;
@@ -1147,7 +1153,7 @@ namespace HagenDa.Networking.EditorTools
         /// InputSystemUIInputModule（StandaloneInputModule 不处理新版输入）。
         /// 幂等：已存在（含模块）则跳过。
         /// </summary>
-        private static void EnsureEventSystem()
+        internal static void EnsureEventSystem()
         {
             var es = Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
             if (es != null && es.GetComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>() != null)
@@ -1168,7 +1174,7 @@ namespace HagenDa.Networking.EditorTools
         /// 给全部带网格的地图物体补 MeshCollider 并标记 static（静态几何利于
         /// 物理/光照优化）。幂等；FBX 重导入后重跑本菜单即可恢复。
         /// </summary>
-        private static void EnsureMapColliders()
+        internal static void EnsureMapColliders()
         {
             var mapRoot = GameObject.Find(HGTRMapRootName);
             if (mapRoot == null) return;
@@ -1200,7 +1206,7 @@ namespace HagenDa.Networking.EditorTools
         /// 看不可见。FBX 内嵌材质全部启用 HDRP 双面渲染（Flip 法线照明），
         /// 内外面都渲染且光照正确。幂等；FBX 重导入后重跑本菜单即可恢复。
         /// </summary>
-        private static void EnableMapMaterialsDoubleSided()
+        internal static void EnableMapMaterialsDoubleSided()
         {
             const string fbxPath = "Assets/Map/HGTR_map.fbx";
             int fixedCount = 0;
@@ -1228,7 +1234,7 @@ namespace HagenDa.Networking.EditorTools
         private static Vector3 MaxX(Vector3 a, Vector3 b, Vector3 c)
             => a.x >= b.x && a.x >= c.x ? a : (b.x >= c.x ? b : c);
 
-        private static void ClearAllFSMEntities()
+        internal static void ClearAllFSMEntities()
         {
             foreach (var fsm in Object.FindObjectsOfType<FSMAIController>(true))
                 Object.DestroyImmediate(fsm.gameObject);
@@ -1295,7 +1301,7 @@ namespace HagenDa.Networking.EditorTools
         }
 
         /// <summary>清除同名旧对象（幂等重跑）。</summary>
-        private static void ClearOld(params string[] names)
+        internal static void ClearOld(params string[] names)
         {
             foreach (var n in names)
             {
@@ -1308,7 +1314,7 @@ namespace HagenDa.Networking.EditorTools
         /// 在安全区/据点上挂重新部署点模板（DeployPointSet prefab 实例）：
         /// count 个点位绕中心均匀分布 radius 半径。
         /// </summary>
-        private static void AttachDeployPointTemplate(GameObject owner, int count, float radius)
+        internal static void AttachDeployPointTemplate(GameObject owner, int count, float radius)
         {
             // 清掉旧模板（幂等）。
             foreach (Transform child in owner.transform)
@@ -1340,7 +1346,7 @@ namespace HagenDa.Networking.EditorTools
         /// 在安全区中心周围生成一支 30 人 FSM 队伍（6 小队 × 5 人，网格驻扎）。
         /// spawnY：出生高度（安全区地面可能高于 1.5，如 Map_v2 高架路砖 1.63）。
         /// </summary>
-        private static void CreateFSMTeamAround(GameObject fsmPrefab, int team, int count, Vector3 center, float spawnY = 1.5f)
+        internal static void CreateFSMTeamAround(GameObject fsmPrefab, int team, int count, Vector3 center, float spawnY = 1.5f)
         {
             string teamName = team == (int)MatchTeam.Red ? "Red" : "Blue";
             for (int i = 0; i < count; i++)
@@ -1747,7 +1753,7 @@ namespace HagenDa.Networking.EditorTools
             Debug.Log($"[NetworkSetup] Done. Created {scenePath} with match system, HQ, garrisons, and teams.");
         }
 
-        private static GarrisonZone CreateGarrison(string name, Vector3 pos, int teamId, float radius)
+        internal static GarrisonZone CreateGarrison(string name, Vector3 pos, int teamId, float radius)
         {
             var go = new GameObject(name);
             go.transform.position = pos;
@@ -1785,7 +1791,7 @@ namespace HagenDa.Networking.EditorTools
             return gz;
         }
 
-        private static CapturePoint CreateCapturePoint(string name, Vector3 pos, float radius)
+        internal static CapturePoint CreateCapturePoint(string name, Vector3 pos, float radius)
         {
             var go = new GameObject(name);
             go.transform.position = pos;
@@ -1826,12 +1832,12 @@ namespace HagenDa.Networking.EditorTools
         // ---------------------------------------------------------------
         // PREFAB
         // ---------------------------------------------------------------
-        private static GameObject BuildPlayerPrefab()
+        internal static GameObject BuildPlayerPrefab()
         {
             return BuildPlayerPrefab(null, null, null, null);
         }
 
-        private static GameObject BuildPlayerPrefab(GameObject grenadePrefab, GameObject smokePrefab, GameObject rescuePrefab, GameObject bulletPrefab, List<EquipmentDefinition> equipmentList = null)
+        internal static GameObject BuildPlayerPrefab(GameObject grenadePrefab, GameObject smokePrefab, GameObject rescuePrefab, GameObject bulletPrefab, List<EquipmentDefinition> equipmentList = null)
         {
             var root = new GameObject("NetworkPlayer");
 
@@ -2041,7 +2047,7 @@ namespace HagenDa.Networking.EditorTools
             return mat;
         }
 
-        private static GameObject BuildGrenadePrefab()
+        internal static GameObject BuildGrenadePrefab()
         {
             var root = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             root.name = "GrenadeThrowable";
@@ -2079,7 +2085,7 @@ namespace HagenDa.Networking.EditorTools
             return prefab;
         }
 
-        private static GameObject BuildSmokePrefab()
+        internal static GameObject BuildSmokePrefab()
         {
             var root = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             root.name = "SmokeThrowable";
@@ -2108,7 +2114,7 @@ namespace HagenDa.Networking.EditorTools
             return prefab;
         }
 
-        private static GameObject BuildRescuePrefab()
+        internal static GameObject BuildRescuePrefab()
         {
             var root = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             root.name = "RescueThrowable";
@@ -2572,7 +2578,7 @@ namespace HagenDa.Networking.EditorTools
             return def;
         }
 
-        private static List<EquipmentDefinition> BuildEquipmentAssets()
+        internal static List<EquipmentDefinition> BuildEquipmentAssets()
         {
             // Build throwable prefabs first (idempotent), so equipment defs can
             // reference them.
@@ -2850,7 +2856,7 @@ namespace HagenDa.Networking.EditorTools
             return list;
         }
 
-        private static GameObject BuildBulletPrefab()
+        internal static GameObject BuildBulletPrefab()
         {
             var root = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             root.name = "Bullet";
@@ -2880,7 +2886,7 @@ namespace HagenDa.Networking.EditorTools
         /// into <see cref="WeaponDefinition"/> field initializers (900 RPM, 30/150,
         /// 800 m/s + 300 m/s^2 decay, spread/recoil, etc.).
         /// </summary>
-        private static WeaponDefinition BuildM4Definition()
+        internal static WeaponDefinition BuildM4Definition()
         {
             EnsureFolder("Assets/Scripts/Network", "Weapons");
 
@@ -2902,7 +2908,7 @@ namespace HagenDa.Networking.EditorTools
         /// assigns it, so AddComponent throws a harmless NullReferenceException in the
         /// editor. The component is still added; we re-fetch it and assign the target.
         /// </summary>
-        private static NetworkTransformReliable AddNetworkTransform(GameObject go, SyncDirection direction, bool syncRotation)
+        internal static NetworkTransformReliable AddNetworkTransform(GameObject go, SyncDirection direction, bool syncRotation)
         {
             NetworkTransformReliable nt = null;
             try
@@ -2925,7 +2931,7 @@ namespace HagenDa.Networking.EditorTools
             return nt;
         }
 
-        private static GameObject BuildAIEntityPrefab(GameObject grenadePrefab, GameObject smokePrefab, GameObject rescuePrefab, GameObject bulletPrefab, List<EquipmentDefinition> equipmentList = null)
+        internal static GameObject BuildAIEntityPrefab(GameObject grenadePrefab, GameObject smokePrefab, GameObject rescuePrefab, GameObject bulletPrefab, List<EquipmentDefinition> equipmentList = null)
         {
             var root = new GameObject("AIEntity");
 
@@ -3144,7 +3150,7 @@ namespace HagenDa.Networking.EditorTools
             go.transform.position = pos;
         }
 
-        private static void RegisterSpawnPrefabs(params GameObject[] prefabs)
+        internal static void RegisterSpawnPrefabs(params GameObject[] prefabs)
         {
             var nm = Object.FindObjectOfType<NetworkManager>();
             if (nm == null) return;
@@ -3163,7 +3169,7 @@ namespace HagenDa.Networking.EditorTools
             EditorUtility.SetDirty(nm);
         }
 
-        private static void BuildNavMeshForFloor()
+        internal static void BuildNavMeshForFloor()
         {
             var floor = GameObject.Find("Floor");
             if (floor == null)
@@ -3188,7 +3194,7 @@ namespace HagenDa.Networking.EditorTools
         /// map root. Ceiling objects are temporarily deactivated so the bake cannot
         /// produce a walkable roof layer above the playable space.
         /// </summary>
-        private static void BuildNavMeshForMapRoot(string mapRootName)
+        internal static void BuildNavMeshForMapRoot(string mapRootName)
         {
             var mapRoot = GameObject.Find(mapRootName);
             if (mapRoot == null)
@@ -3222,7 +3228,7 @@ namespace HagenDa.Networking.EditorTools
             }
         }
 
-        private static void EnsureFolder(string parent, string folder)
+        internal static void EnsureFolder(string parent, string folder)
         {
             string full = parent + "/" + folder;
             if (!AssetDatabase.IsValidFolder(full))
@@ -3234,7 +3240,7 @@ namespace HagenDa.Networking.EditorTools
         /// TagManager (idempotent). Called by every scene builder so freshly built
         /// scenes reference valid layers.
         /// </summary>
-        private static void EnsureMapLayers()
+        internal static void EnsureMapLayers()
         {
             var tagManager = new SerializedObject(
                 AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
@@ -3279,13 +3285,13 @@ namespace HagenDa.Networking.EditorTools
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
         }
 
-        private static void SaveActiveScene()
+        internal static void SaveActiveScene()
         {
             var scene = SceneManager.GetActiveScene();
             UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
         }
 
-        private static void CreateWall(Vector3 pos, Vector3 scale)
+        internal static void CreateWall(Vector3 pos, Vector3 scale)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.name = "Wall";
@@ -3296,7 +3302,7 @@ namespace HagenDa.Networking.EditorTools
         // Adds a directional light so the freshly created (empty) scene is visible.
         // Intensity is chosen for the active render pipeline; HDRP needs its
         // additional light data component attached for correct rendering.
-        private static void EnsureLighting()
+        internal static void EnsureLighting()
         {
             if (Object.FindObjectOfType<Light>() != null) return;
 

@@ -1,0 +1,402 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 855d56290c2f605479577a5c3f9d937c, type: 3}
+  m_Name: VegetationDataSet
+  m_EditorClassIdentifier: 
+  variants:
+  - name: Stump_01
+    lod0Mesh: {fileID: 8351151019764689191, guid: 768be665aba8b4e4aae7a973ae9616cf,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 435781722881279002, guid: 768be665aba8b4e4aae7a973ae9616cf,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 0
+    colliderRadius: 0.25
+    colliderHeight: 0.748099
+    colliderCenterY: 0.37404945
+    boundsExtents: {x: 0.3296724, y: 0.40657556, z: 0.28548342}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 88
+    count: 1178
+  - name: Tree_01
+    lod0Mesh: {fileID: 811424468950150501, guid: 6c7eaede4efc960409fb9ef2dfb77f29,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 4313033963400421524, guid: 6c7eaede4efc960409fb9ef2dfb77f29,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 0
+    colliderRadius: 0.3337079
+    colliderHeight: 5.1168547
+    colliderCenterY: 2.5584388
+    boundsExtents: {x: 1.3655257, y: 2.7808993, z: 1.2501118}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 16580
+    count: 1126
+  - name: Tree_02
+    lod0Mesh: {fileID: -8135553595718028330, guid: 4471b1f7f824e4d44887e1364c6fc61a,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 5885204079855296585, guid: 4471b1f7f824e4d44887e1364c6fc61a,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 0
+    colliderRadius: 0.25308433
+    colliderHeight: 3.8806267
+    colliderCenterY: 1.923398
+    boundsExtents: {x: 0.8502352, y: 2.1090362, z: 0.8490801}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 32344
+    count: 1151
+  - name: Tree_03
+    lod0Mesh: {fileID: 2478876932983402796, guid: 69f0af3a0a6c73b4ab4b89eb82cdc488,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: -944959908092971740, guid: 69f0af3a0a6c73b4ab4b89eb82cdc488,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 0
+    colliderRadius: 0.29909503
+    colliderHeight: 4.586124
+    colliderCenterY: 2.2933147
+    boundsExtents: {x: 1.8939619, y: 2.4924586, z: 1.5905137}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 48458
+    count: 1144
+  - name: Tree_04
+    lod0Mesh: {fileID: 7607211279866533359, guid: 83e8d2542718a2e49a73d71c3a5fc685,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: -6183812469518319871, guid: 83e8d2542718a2e49a73d71c3a5fc685,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 0
+    colliderRadius: 0.40141952
+    colliderHeight: 6.1551
+    colliderCenterY: 3.0702
+    boundsExtents: {x: 1.3512436, y: 3.3451629, z: 1.1213212}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 64474
+    count: 1193
+  - name: Tree_05
+    lod0Mesh: {fileID: -5773737330183453750, guid: 603970f97e50c56488ec3c5a6febd940,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 1888538026527166770, guid: 603970f97e50c56488ec3c5a6febd940,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 0
+    colliderRadius: 0.25
+    colliderHeight: 3.3778288
+    colliderCenterY: 1.6786636
+    boundsExtents: {x: 1.0643544, y: 1.8357764, z: 1.0965945}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 81176
+    count: 1200
+  - name: Rock_01
+    lod0Mesh: {fileID: 4300000, guid: e9089b1db16b58f4282a94e020b9c0e8, type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 4300000, guid: e9089b1db16b58f4282a94e020b9c0e8, type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 1
+    colliderRadius: 0.3493633
+    colliderHeight: 0.5345735
+    colliderCenterY: 0.028850526
+    boundsExtents: {x: 0.42778292, y: 0.26728675, z: 0.4367041}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 97976
+    count: 4165
+  - name: Rock_02
+    lod0Mesh: {fileID: 4300000, guid: 3a775dc2c1a334b45a5667a56fe92c23, type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 4300000, guid: 3a775dc2c1a334b45a5667a56fe92c23, type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 1
+    colliderRadius: 0.06998404
+    colliderHeight: 0.093803614
+    colliderCenterY: 0
+    boundsExtents: {x: 0.08748005, y: 0.046901807, z: 0.08150991}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 156286
+    count: 4255
+  - name: Rock_03
+    lod0Mesh: {fileID: 4300000, guid: 14125b656fb71fd4d9d65bfe344107ad, type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 4300000, guid: 14125b656fb71fd4d9d65bfe344107ad, type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 1
+    colliderRadius: 0.12369299
+    colliderHeight: 0.15019415
+    colliderCenterY: 0.011773393
+    boundsExtents: {x: 0.1543726, y: 0.07509708, z: 0.15461624}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 215856
+    count: 4307
+  - name: Rock_04
+    lod0Mesh: {fileID: 4300000, guid: 33ebf3440b12ec245bd008cd464f8d9a, type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 4300000, guid: 33ebf3440b12ec245bd008cd464f8d9a, type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 1
+    colliderRadius: 0.4212837
+    colliderHeight: 1.125648
+    colliderCenterY: 0.557436
+    boundsExtents: {x: 0.5266046, y: 0.562824, z: 0.477389}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 276154
+    count: 4225
+  - name: Rock_05
+    lod0Mesh: {fileID: 4300000, guid: fa2e670bb3648a84b9df8d16da25b85e, type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 4300000, guid: fa2e670bb3648a84b9df8d16da25b85e, type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 1
+    colliderType: 1
+    colliderRadius: 1.1722754
+    colliderHeight: 1.9458139
+    colliderCenterY: 0.03584683
+    boundsExtents: {x: 1.4653442, y: 0.97290695, z: 1.0964334}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 335304
+    count: 4312
+  - name: Branch_01
+    lod0Mesh: {fileID: 4300000, guid: 5528351815fd4c04abf537f22c7e18f1, type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 4300000, guid: 5528351815fd4c04abf537f22c7e18f1, type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 0
+    colliderType: 1
+    colliderRadius: 0
+    colliderHeight: 0
+    colliderCenterY: 0
+    boundsExtents: {x: 0.40700024, y: 0.10531988, z: 0.07470212}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 395672
+    count: 4134
+  - name: Bush_01
+    lod0Mesh: {fileID: 8739603187252021473, guid: d8ea93d2d4757e444a5349f4bc849128,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: -6522949633345540850, guid: d8ea93d2d4757e444a5349f4bc849128,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 0
+    colliderType: 1
+    colliderRadius: 0
+    colliderHeight: 0
+    colliderCenterY: 0
+    boundsExtents: {x: 0.39952952, y: 0.41463777, z: 0.41314238}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 453548
+    count: 4181
+  - name: Bush_02
+    lod0Mesh: {fileID: -8384901269118361933, guid: ba52853a69186a841a52a9cc2e9b77fa,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: -224552697089988692, guid: ba52853a69186a841a52a9cc2e9b77fa,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 0
+    colliderType: 1
+    colliderRadius: 0
+    colliderHeight: 0
+    colliderCenterY: 0
+    boundsExtents: {x: 0.2943171, y: 0.24736868, z: 0.30420214}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 512082
+    count: 4184
+  - name: Bush_03
+    lod0Mesh: {fileID: -2898334459140654917, guid: 7b5a098d913a3c74692a2a9963dbd3ba,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: -6151712962983573105, guid: 7b5a098d913a3c74692a2a9963dbd3ba,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 0
+    colliderType: 1
+    colliderRadius: 0
+    colliderHeight: 0
+    colliderCenterY: 0
+    boundsExtents: {x: 0.7513466, y: 0.26603276, z: 0.7573637}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 570658
+    count: 4089
+  - name: Flowers_01
+    lod0Mesh: {fileID: -4391918325660058233, guid: b5a80b3e2a089b841b155d7c7f461e7c,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: -8083763932631721022, guid: b5a80b3e2a089b841b155d7c7f461e7c,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 0
+    colliderType: 1
+    colliderRadius: 0
+    colliderHeight: 0
+    colliderCenterY: 0
+    boundsExtents: {x: 0.15572861, y: 0.1914189, z: 0.15864408}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 627904
+    count: 4253
+  - name: Flowers_02
+    lod0Mesh: {fileID: 7872939578723279912, guid: 8ea980fdc4aa5e749b000c1a0d4b9bbc,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: -4255492669519475704, guid: 8ea980fdc4aa5e749b000c1a0d4b9bbc,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 0
+    colliderType: 1
+    colliderRadius: 0
+    colliderHeight: 0
+    colliderCenterY: 0
+    boundsExtents: {x: 0.15820286, y: 0.18119882, z: 0.120626}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 687446
+    count: 4110
+  - name: Grass_01
+    lod0Mesh: {fileID: -4550125092169740112, guid: ad3119cbd6dce024e8460ef32dec49df,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: -4278032891772840327, guid: ad3119cbd6dce024e8460ef32dec49df,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 0
+    colliderType: 1
+    colliderRadius: 0
+    colliderHeight: 0
+    colliderCenterY: 0
+    boundsExtents: {x: 0.14443612, y: 0.18953025, z: 0.14564013}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 744986
+    count: 4164
+  - name: Grass_02
+    lod0Mesh: {fileID: 7855247728046881105, guid: 638dc165572d2a84081d13ce1afb4d52,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: -5887197880629875785, guid: 638dc165572d2a84081d13ce1afb4d52,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 0
+    colliderType: 1
+    colliderRadius: 0
+    colliderHeight: 0
+    colliderCenterY: 0
+    boundsExtents: {x: 0.085168675, y: 0.09854747, z: 0.095665924}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 803282
+    count: 4207
+  - name: Mushroom_01
+    lod0Mesh: {fileID: -7818595843673011575, guid: d062f5c56ffb55c4f832432ada269abe,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: -8122157385885059148, guid: d062f5c56ffb55c4f832432ada269abe,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 0
+    colliderType: 1
+    colliderRadius: 0
+    colliderHeight: 0
+    colliderCenterY: 0
+    boundsExtents: {x: 0.114204556, y: 0.17033716, z: 0.111170456}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 862180
+    count: 4091
+  - name: Mushroom_02
+    lod0Mesh: {fileID: -6106420856457805189, guid: 6c890c97a154a474082af84a379dffce,
+      type: 3}
+    lod0Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Mesh: {fileID: 7852103032475761981, guid: 6c890c97a154a474082af84a379dffce,
+      type: 3}
+    lod1Material: {fileID: 2100000, guid: 93caadf4359ae8143aad35b3145d31af, type: 2}
+    lod1Screen: 0.25
+    lod2Screen: 0.1
+    lod3Screen: 0.03
+    physics: 0
+    colliderType: 1
+    colliderRadius: 0
+    colliderHeight: 0
+    colliderCenterY: 0
+    boundsExtents: {x: 0.08307061, y: 0.11494863, z: 0.08497344}
+    instanceData: {fileID: 4900000, guid: b78e8118a9eef4b489f7ed5eaaecd7b2, type: 3}
+    dataOffset: 919454
+    count: 4224

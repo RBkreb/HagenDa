@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5389c69776d69ce4480dc0a1d3ad438e, type: 3}
+  m_Name: FSMBattle59_Moving_Map
+  m_EditorClassIdentifier: 
+  kind: 0
+  sizeX: 120
+  sizeZ: 220
+  wallHeight: 6
+  coverCount: 64
+  coverSeed: 20260825
+  coverMinGap: 5
+  mapRootNames: []
+  ceilingKeyword: ceiling
+  doubleSidedMaterials: 1
+  anchorResolve: 1
+  anchors:
+  - role: 0
+    letter: R
+    markerName: 
+    position: {x: 0, y: 0, z: -92.4}
+    radius: 20
+    extent: {x: 0, y: 0}
+    deployPointCount: 4
+    moving: 1
+    waypoints:
+    - {x: 0, y: 0, z: -92.4}
+    - {x: 25, y: 0, z: -50}
+    - {x: 0, y: 0, z: -20}
+    moveSpeed: 5
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 1
+    letter: B
+    markerName: 
+    position: {x: 0, y: 0, z: 92.4}
+    radius: 20
+    extent: {x: 0, y: 0}
+    deployPointCount: 4
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 2
+    letter: A
+    markerName: 
+    position: {x: -18, y: 0, z: -45}
+    radius: 12
+    extent: {x: 0, y: 0}
+    deployPointCount: 2
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 2
+    letter: C
+    markerName: 
+    position: {x: 18, y: 0, z: 45}
+    radius: 12
+    extent: {x: 0, y: 0}
+    deployPointCount: 2
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 2
+    letter: B
+    markerName: 
+    position: {x: 0, y: 0, z: 0}
+    radius: 12
+    extent: {x: 0, y: 0}
+    deployPointCount: 2
+    moving: 1
+    waypoints:
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 60}
+    - {x: 40, y: 0, z: 30}
+    moveSpeed: 5
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5

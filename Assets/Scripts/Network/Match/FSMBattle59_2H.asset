@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2f1efd08e76c7c4d98cbd54d2f33db5, type: 3}
+  m_Name: FSMBattle59_2H
+  m_EditorClassIdentifier: 
+  map: {fileID: 11400000, guid: 8987f78b4a8b8134991c14554eb50dc3, type: 2}
+  winScore: 999999
+  squadsPerTeam: 6
+  squadSize: 5
+  redeployDelay: 10
+  autoDeployTimeout: 10
+  brain: 0
+  redAiCount: 29
+  blueAiCount: 30
+  mixedClassComposition: 1
+  aiClassOverride: 0
+  humanTeamPolicy: 2
+  redHumanSlots: 1
+  blueHumanSlots: 1
+  commander: 1
+  spawnFsmStatsHud: 1
+  spawnFreeCamera: 1
+  spawnBattleCamera: 0

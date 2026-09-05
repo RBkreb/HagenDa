@@ -37,9 +37,9 @@ TagManager:
   - MapIndicator
   - MapHighlight
   - CommanderMap
-  - 
-  - 
-  - 
+  - MapZone
+  - MapZoneOutline
+  - ceiling
   - 
   - 
   - 

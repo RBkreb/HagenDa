@@ -16,7 +16,7 @@ namespace HagenDa.Networking
     /// Server-authoritative match state (PHASE7). A single scene object that:
     ///
     ///  - registers every <see cref="NetworkCombatant"/> (player + AI) and assigns
-    ///    them a team / squad (human player fixed to red),
+    ///    them a team / squad (humans follow <see cref="humanTeamPolicy"/>),
     ///  - tracks team scores, awards kills / captures / hold ticks, and ends the
     ///    match at <see cref="winScore"/> (freezing combat),
     ///  - answers deploy-point queries for garrison / HQ / squad redeployment.
@@ -44,6 +44,14 @@ namespace HagenDa.Networking
         public int squadsPerTeam = 2;
         public int squadSize = 5;
 
+        [Header("Humans (MATCH-LAYER)")]
+        [Tooltip("真人分队策略:AllRed=全红(历史行为) / Balance=进人少的队 / FixedSlots=先填满红队席位。")]
+        public HumanTeamPolicy humanTeamPolicy = HumanTeamPolicy.AllRed;
+        [Tooltip("FixedSlots:红队真人席位数。")]
+        public int redHumanSlots = 1;
+        [Tooltip("FixedSlots:蓝队真人席位数。")]
+        public int blueHumanSlots = 0;
+
         [Header("Redeploy")]
         [Tooltip("死亡后到可重新部署的秒数.")]
         public float redeployDelay = 10f;
@@ -57,6 +65,7 @@ namespace HagenDa.Networking
         // ---- server-only registry ----
         private readonly List<NetworkCombatant> combatants = new List<NetworkCombatant>();
         private readonly int[] nextSquad = new int[2];
+        private readonly int[] humanCount = new int[2];   // 已分配真人数(按队)
 
         // Combatants whose OnStartServer ran before this manager's (registered
         // statically, drained once the manager starts).
@@ -75,6 +84,8 @@ namespace HagenDa.Networking
             matchOver = false;
             redScore = 0;
             blueScore = 0;
+            humanCount[0] = 0;
+            humanCount[1] = 0;
 
             if (capturePoints == null) capturePoints = new List<CapturePoint>();
             if (garrisons == null) garrisons = new List<GarrisonZone>();
@@ -139,12 +150,27 @@ namespace HagenDa.Networking
         {
             if (c.teamId >= 0) return;   // already assigned
 
-            // Human player (has a client connection) is fixed to red (confirmed).
+            // Human player (has a client connection) follows the configured
+            // team policy (MATCH-LAYER multi-human support).
             bool isHuman = c.connectionToClient != null;
             int team;
             if (isHuman)
             {
-                team = (int)MatchTeam.Red;
+                switch (humanTeamPolicy)
+                {
+                    case HumanTeamPolicy.Balance:
+                        team = humanCount[(int)MatchTeam.Red] <= humanCount[(int)MatchTeam.Blue]
+                            ? (int)MatchTeam.Red : (int)MatchTeam.Blue;
+                        break;
+                    case HumanTeamPolicy.FixedSlots:
+                        team = humanCount[(int)MatchTeam.Red] < Mathf.Max(0, redHumanSlots)
+                            ? (int)MatchTeam.Red : (int)MatchTeam.Blue;
+                        break;
+                    default:   // AllRed
+                        team = (int)MatchTeam.Red;
+                        break;
+                }
+                humanCount[team]++;
             }
             else
             {

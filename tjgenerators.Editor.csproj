@@ -104,8 +104,8 @@
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\AssetSearch\AssetDownloadEventDiagnostics.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Generators\DynamicRequestModels.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\AssetSearch\AssetSearchModels.cs" />
-    <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\SessionJsonStore.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Services\CustomToolDomainReloadRecovery.cs" />
+    <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\SessionJsonStore.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Utils\TJGeneratorsPromptDisplay.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\AssetSearch\AssetDownloadPipeline.cs" />
     <Compile Include=".codely-cli\extensions\TJGenerators\Packages\cn.tuanjie.ai.generators\Editor\Scripts\Windows\TJGeneratorsWorldWindow.cs" />
@@ -597,11 +597,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>Library\PackageCache\com.unity.ext.nunit@1.0.6\net35\unity-custom\nunit.framework.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.ext.nunit@2.0.3\net40\unity-custom\nunit.framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Codely.Newtonsoft.Json">
-      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.78\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
+      <HintPath>D:\HagenTa\cn.tuanjie.codely.bridge@1.0.78\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="mscorlib">
