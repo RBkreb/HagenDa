@@ -105,7 +105,7 @@ namespace HagenDa.Networking
             }
         }
 
-        /// <summary>CommanderMap overlay layer name (CommanderMapOverlay owns it).</summary>
+        /// <summary>CommanderMap layer name（PHASE10 快照遗留；PHASE11 起无消费者，仅为旧场景兼容保留）。</summary>
         public const string CommanderMapName = "CommanderMap";
 
         /// <summary>

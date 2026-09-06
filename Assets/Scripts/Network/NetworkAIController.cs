@@ -30,6 +30,7 @@ namespace HagenDa.Networking
         // cleared afterwards — same contract as the human input path.
         private NetworkInputState intent;
         private bool dead;
+        private NetworkSoldierAnimator soldierAnimator;   // PHASE12: 存在时跳过胶囊姿态模仿
 
         public override void OnStartServer()
         {
@@ -86,6 +87,11 @@ namespace HagenDa.Networking
         private void UpdateVisualPosture()
         {
             if (visual == null || controller == null) return;
+
+            // PHASE12: 士兵模型存在时，姿态动画由 NetworkSoldierAnimator 驱动，
+            // 不再对胶囊网格做旋转/缩放模仿（模型是根的子对象，动了会错位）。
+            if (soldierAnimator == null) soldierAnimator = GetComponent<NetworkSoldierAnimator>();
+            if (soldierAnimator != null) return;
 
             switch (controller.posture)
             {

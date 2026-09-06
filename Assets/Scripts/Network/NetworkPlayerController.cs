@@ -125,6 +125,7 @@ namespace HagenDa.Networking
         [SyncVar] public PlayerPosture posture = PlayerPosture.Stand;
         [SyncVar] public bool sliding;
         [SyncVar] public int activeSlot = -1;   // -1 = 主武器(gun)，0..N-1 = 装备索引
+        [SyncVar] public uint jumpCount;        // PHASE12: 跳跃计数（NetworkSoldierAnimator 播 Jump）
 
         private float yaw;
         private float slideCooldownEnd;
@@ -879,6 +880,7 @@ namespace HagenDa.Networking
             rb.AddForce(Vector3.up * jumpVelocity, ForceMode.Impulse);
             grounded = false;
             jumpedOrDived = true;
+            jumpCount++;   // PHASE12: 动画同步（服务端权威计数）
             RpcCameraShake(jumpShakeIntensity, jumpShakeDuration, true);
         }
 

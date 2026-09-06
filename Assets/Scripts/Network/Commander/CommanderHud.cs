@@ -121,7 +121,7 @@ namespace HagenDa.Networking
             foreach (var o in st.objectives)
             {
                 if (o.team == ls.Value.team && o.squad == ls.Value.squad)
-                    return $"小队{o.squad + 1} → ({o.gx:F0},{o.gz:F0})";
+                    return $"小队{o.squad + 1} → 格#{o.cellId}";
             }
             return "(小队暂无指令)";
         }
@@ -139,24 +139,14 @@ namespace HagenDa.Networking
             // 有本地玩家：仅己方小队目标上小地图/大地图，避免敌方情报泄露。
             bool spectator = LocalSquad() == null;
 
-            // 变更签名：数量 + 各条目坐标 → 坐标更新也触发重建。
+            // 变更签名：数量 + 各条目内容 → 更新也触发重建。
             int sig = st.objectives.Count * 7919;
             foreach (var o in st.objectives)
-                sig = sig * 31 ^ ((int)(o.gx * 2) * 1013 + (int)(o.gz * 2) * 31 +
-                                  o.team * 7 + o.squad);
+                sig = sig * 31 ^ (o.cellId * 1013 + (int)(o.wx * 2) * 31 +
+                                  (int)(o.wz * 2) * 7 + o.team * 7 + o.squad);
             if (sig == signature) return;
             signature = sig;
             ClearDiamonds();
-
-            // 单源换算：与快照网格/标尺、AssignObjective 完全同源的 Overlay 坐标。
-            // （此前 Hud 自带 Floor-bounds 归一化换算，双源导致标记位置偏移，实测踩坑。）
-            var ov = OverlayRef;
-            if (ov == null)
-            {
-                ClearDiamonds();
-                signature = -1;
-                return;
-            }
 
             foreach (var o in st.objectives)
             {
@@ -168,24 +158,12 @@ namespace HagenDa.Networking
                     ? new Color(1f, 0.45f, 0.25f)     // 红-亮橙
                     : new Color(0.35f, 0.85f, 1f);    // 蓝-亮青
 
-                Vector3 world = ov.GridToWorld(o.gx, o.gz);
-                world.y = MapLayers.IndicatorWorldY;
+                // PHASE11：世界坐标随 objectives 同步，客户端无需本地换算。
+                Vector3 world = new Vector3(o.wx, MapLayers.IndicatorWorldY, o.wz);
 
                 string label = $"{(o.team == (int)MatchTeam.Red ? "R" : "B")}{o.squad + 1}";
                 AddDiamond(world, MapLayers.Indicator, 5f, col, label);       // 小地图
                 AddDiamond(world, MapLayers.Highlight, 8f, col, label, true); // 大地图/自由相机
-            }
-        }
-
-        private CommanderMapOverlay overlayRef;
-
-        private CommanderMapOverlay OverlayRef
-        {
-            get
-            {
-                if (overlayRef == null)
-                    overlayRef = FindObjectOfType<CommanderMapOverlay>();
-                return overlayRef;
             }
         }
 

@@ -9,15 +9,16 @@ using UnityEngine;
 namespace HagenDa.Networking
 {
     /// <summary>
-    /// PHASE10 多模态 LLM 指挥官（每阵营一个实例，纯服务端）。
+    /// PHASE11 符号化 LLM 指挥官（每阵营一个实例，纯服务端，无图像输入）。
     ///
-    /// 单飞轮次循环：触发原因入队 → 取最新快照（相机协程桥接为 Task）→ 组装
-    /// 多模态消息（历史=文本压缩滚动窗口 20 轮；本轮=user 文本头+PNG 图）→
-    /// 原生 tool_calls 循环（≤8 次，get_snapshot 特殊处理回图）→ 记录/记忆/清理。
+    /// 单飞轮次循环：触发原因入队 → 组装结构化态势文本（历史=压缩滚动窗口；
+    /// 本轮=全局态势/POI状态/小队状态/侦测敌情/事件流）→ 原生 tool_calls 循环
+    /// （≤8 次）→ 记录/记忆/清理。空间编码由 CommanderHexGrid 提供
+    /// （格#N + 整数中心），态势排版由 CommanderSituationText 提供。
     ///
     /// 退化语义（Q6/Q13）：传输错误/超时 → 休眠（SquadCommander 桩接管）+
-    /// 每 probeInterval 探活（GET /v1/models）；成功立即拍快照重启指挥并禁用桩。
-    ///桩为场景共享 → 由 Coordinator 统一重算（任一方休眠即启用）。
+    /// 每 probeInterval 探活（GET /v1/models）；成功立即重启指挥并禁用桩。
+    /// 桩为场景共享 → 由 Coordinator 统一重算（任一方休眠即启用）。
     /// </summary>
     public class CommanderOrchestrator : MonoBehaviour
     {
@@ -29,15 +30,13 @@ namespace HagenDa.Networking
 
         [SerializeField] private int team = -1;
         [SerializeField] private CommanderConfig config;
-        [SerializeField] private CommanderMapOverlay overlay;
-        [SerializeField] private CommanderMapCamera cam;
+        [SerializeField] private CommanderHexGrid hexGrid;
         [SerializeField] private CommanderWeaponSystem weapons;
         [SerializeField] private NetworkCommanderState state;
 
         public int Team => team;
         public CommanderConfig Config => config;
-        public CommanderMapOverlay Overlay => overlay;
-        public CommanderMapCamera Cam => cam;
+        public CommanderHexGrid HexGrid => hexGrid;
         public CommanderWeaponSystem Weapons => weapons;
         public NetworkCommanderState State => state;
 
@@ -61,6 +60,9 @@ namespace HagenDa.Networking
         private bool manualTriggerPending;
         private string manualTriggerReason;
         private readonly List<string> infoBuffer = new List<string>();   // ≤100 行
+
+        // 小队最近一次被下令时刻（0 基索引）→ 态势文本"上次指令 T 秒前"。
+        private readonly Dictionary<int, float> lastOrderTime = new Dictionary<int, float>();
 
         // 记忆滚动窗口
         private sealed class RoundRec { public string Input, Output; }
@@ -88,13 +90,12 @@ namespace HagenDa.Networking
 
         /// <summary>编辑期装配：只写序列化字段（能在域重载后存活）。</summary>
         public void Init(int team, CommanderConfig config,
-                         CommanderMapOverlay overlay, CommanderMapCamera cam,
+                         CommanderHexGrid hexGrid,
                          CommanderWeaponSystem weapons, NetworkCommanderState state)
         {
             this.team = team;
             this.config = config;
-            this.overlay = overlay;
-            this.cam = cam;
+            this.hexGrid = hexGrid;
             this.weapons = weapons;
             this.state = state;
 
@@ -114,8 +115,7 @@ namespace HagenDa.Networking
             if (runtimeReady) return;
             if (!NetworkServer.active) return;
 
-            if (team < 0 || config == null || overlay == null || cam == null ||
-                weapons == null)
+            if (team < 0 || config == null || hexGrid == null || weapons == null)
             {
                 Debug.LogError($"[{name}] 注入不完整（team={team}），指挥官禁用");
                 enabled = false;
@@ -127,7 +127,7 @@ namespace HagenDa.Networking
             tools = new CommanderToolContext(this);
             logger = CommanderRoundLogger.Create(TeamLabelCn(team));
 
-            weapons.Init(config, team, overlay);
+            weapons.Init(config, team);
             weapons.Deployed += (num, txt) => PushEvent(txt);
             weapons.RadarFinalScan += OnRadarFinalScan;
 
@@ -156,6 +156,21 @@ namespace HagenDa.Networking
             if (!runtimeReady) return;
             if (CurrentPhase is not (Phase.Opening or Phase.Active)) return;
             if (busy) return;
+
+            // 门控冻结期间，已落定方（Active）不跑空闲轮：态势完全静态，且空闲
+            // 请求会与另一方的开局请求在 LM Studio 排队互卡，把对方思考拖到
+            // 超时退化（实测）。事件/探活恢复触发仍放行（恢复方可补部署）。
+            if (NetworkCommanderState.GateActive && CurrentPhase == Phase.Active &&
+                !manualTriggerPending)
+            {
+                if (!gateIdleSuppressLogged)
+                {
+                    gateIdleSuppressLogged = true;
+                    Debug.Log($"[{Label}] 门控冻结期间抑制空闲轮（等待双方部署完成/门控解除）");
+                }
+                return;
+            }
+
             if (!IsDue()) return;
             if (Time.time < minGapUntil) return;
 
@@ -224,33 +239,38 @@ namespace HagenDa.Networking
         {
             toolResultLog.Clear();
             squadsOrderedThisRound.Clear();
+            waitUsedThisRound = false;
 
             bool isOpening = CurrentPhase == Phase.Opening;
 
-            // ---- 快照 ----
-            byte[] png = await CapturePngAsync();
+            // ---- 本轮输入：结构化态势文本（触发/全局态势/POI/小队/侦测/事件）----
+            string header = CommanderSituationText.RoundInput(
+                Team, reason, hexGrid, Config, lastOrderTime, infoBuffer, isOpening);
 
-            // ---- 本轮输入文本头 ----
-            string header = BuildHeaderText(reason);
-            if (isOpening)
-                header += "\n【要求】请在本次回复中一次性给出全部小队的指令，只调用工具、无需确认。";
-
-            // ---- 组装消息：历史(压缩文本窗口) + 本轮 ----
+            // ---- 组装消息：系统提示词(含可派驻格表) + 历史(压缩文本窗口) + 本轮 ----
             var messages = new List<LlmMessage>
             {
-                LlmMessage.System(CommanderPrompts.SystemPrompt(Config, Team, openingPhase: isOpening)),
+                LlmMessage.System(CommanderSituationText.SystemPrompt(
+                    Config, Team, hexGrid, isOpening)),
             };
             foreach (var rec in memory)
             {
                 messages.Add(LlmMessage.User(rec.Input));
                 messages.Add(LlmMessage.Assistant(rec.Output));
             }
-            var currentInputForLog = header + "\n[附全局地图快照]";
-            messages.Add(LlmMessage.UserImage(png, header));
+            var currentInputForLog = header;
+            messages.Add(LlmMessage.User(header));
 
             // ---- 请求 ----
             float timeout = isOpening ? Config.openingTimeout : Config.roundTimeout;
-            var req = new LlmChatRequest { messages = messages, timeoutSeconds = timeout };
+            var req = new LlmChatRequest
+            {
+                messages = messages,
+                timeoutSeconds = timeout,
+                // 单发制无反馈轮 → 强制工具调用（auto 下模型曾把 tool_calls 写成
+                // 纯文本 JSON，实测覆盖 0/6；Active 轮保持 auto 允许"不动"）。
+                toolChoice = isOpening ? "required" : "auto",
+            };
             // 双套工具集：门控阶段仅 squad_order，对局阶段全量。
             var schemas = CommanderToolContext.BuildSchemas(openingPhase: isOpening);
             req.tools = schemas;
@@ -343,15 +363,6 @@ namespace HagenDa.Networking
                     string cid = call["id"]?.ToString() ?? "";
 
                     executedToolLines.Add($"{cname}({call["arguments_raw"]})");
-
-                    if (cname == "get_snapshot")
-                    {
-                        messages.Add(LlmMessage.ToolResult(cid,
-                            "{\"result\":\"新快照已附加\"}"));
-                        byte[] png2 = await CapturePngAsync();
-                        messages.Add(LlmMessage.UserImage(png2, "（主动获取的新快照）"));
-                        continue;
-                    }
 
                     string text = ExecuteToolTracked(cname, cargs);
                     messages.Add(LlmMessage.ToolResult(cid, text));
@@ -454,7 +465,7 @@ namespace HagenDa.Networking
                 yield return ProbeOnce(v => ok = v);
                 if (ok)
                 {
-                    Debug.Log($"[{Label}] 探活成功，立即恢复指挥并重新快照");
+                    Debug.Log($"[{Label}] 探活成功，立即恢复指挥");
                     CurrentPhase = Phase.Active;
                     lastOutputAt = -999f;             // 立即可跑
                     manualTriggerPending = true;
@@ -563,8 +574,7 @@ namespace HagenDa.Networking
                 if (kv.Value && nowAlive == 0)
                 {
                     int num = kv.Key.Item2 + 1;
-                    var g = SquadAvgGrid(buf, kv.Key.Item2);
-                    PushEvent($"小队{num} 全歼警报 @({g.x:F0},{g.y:F0})");
+                    PushEvent($"小队{num} 全歼警报 @{SquadCellText(buf, kv.Key.Item2)}");
                     wipeArmed[kv.Key] = false;
                     manualTriggerPending = true;
                     manualTriggerReason = "小队全歼";
@@ -586,7 +596,8 @@ namespace HagenDa.Networking
             }
         }
 
-        private Vector2 SquadAvgGrid(List<NetworkCombatant> buf, int squadId)
+        /// <summary>小队存活成员质心所在格的显示文本（全灭/无格时回退米坐标）。</summary>
+        private string SquadCellText(List<NetworkCombatant> buf, int squadId)
         {
             Vector3 sum = Vector3.zero; int n = 0;
             foreach (var c in buf)
@@ -594,12 +605,16 @@ namespace HagenDa.Networking
                 if (c == null || c.teamId != Team || c.squadId != squadId) continue;
                 sum += c.transform.position; n++;
             }
-            return n > 0 ? Overlay.WorldToGrid(sum / n) : Vector2.zero;
+            if (n == 0) return "(?)";
+            Vector3 centroid = sum / n;
+            int id = hexGrid != null ? hexGrid.NearestCellId(centroid) : 0;
+            return id > 0 ? hexGrid.CellDisplay(id)
+                          : $"({centroid.x:F0},{centroid.z:F0})";
         }
 
         private void OnRadarFinalScan()
         {
-            // 侦测结果报文（含瞬时报点坐标——Q23:b 的唯一空间例外）
+            // 侦测结果报文（格编码；POI 附近的聚合威胁随下轮态势文本给出）。
             var buf = new List<NetworkCombatant>();
             NetworkMatchManager.GetAllCombatants(buf);
             var marks = new List<string>();
@@ -607,8 +622,9 @@ namespace HagenDa.Networking
             {
                 if (c == null || c.IsDead || c.teamId == Team) continue;
                 if (!c.IsMarked || c.markedByTeam != Team) continue;
-                var g = Overlay.WorldToGrid(c.transform.position);
-                marks.Add($"({g.x:F0},{g.y:F0})");
+                int id = hexGrid != null ? hexGrid.NearestCellId(c.transform.position) : 0;
+                marks.Add(id > 0 ? hexGrid.CellDisplay(id)
+                                 : $"({c.transform.position.x:F0},{c.transform.position.z:F0})");
             }
             PushEvent(marks.Count > 0
                 ? $"侦测完成：标记敌军{marks.Count}名 {string.Join(" ", marks)}"
@@ -652,6 +668,12 @@ namespace HagenDa.Networking
         // 本回合已成功下令的小队（防同回合反复对同一队打转，PHASE10 v3）。
         private readonly HashSet<int> squadsOrderedThisRound = new HashSet<int>();
 
+        // 本回合 wait 是否已使用（每回合限一次，防模型连发 wait 空耗工具迭代）。
+        private bool waitUsedThisRound;
+
+        // 门控期间空闲轮抑制的日志旗标（每方每次门控只记一条）。
+        private bool gateIdleSuppressLogged;
+
         /// <summary>同一轮内二次下令返回 true（首次登记 false 并放行）。由 ToolContext 调用。</summary>
         public bool TryMarkSquadOrderedThisRound(int squadId)
         {
@@ -660,53 +682,26 @@ namespace HagenDa.Networking
             return false;
         }
 
+        /// <summary>同一回合内二次 wait 返回 true（首次登记 false 并放行）。由 ToolContext 调用。</summary>
+        public bool TryMarkWaitUsedThisRound()
+        {
+            if (waitUsedThisRound) return true;
+            waitUsedThisRound = true;
+            return false;
+        }
+
         private string ExecuteToolTracked(string name, JToken args)
         {
             string raw = args is JObject jo ? jo.ToString(Newtonsoft.Json.Formatting.None) : args?.ToString();
             string result = tools.Execute(name, args);
 
+            // 成功 squad_order 的簿记（再主张缓存/下令时刻/客户端同步）由
+            // ToolContext 回调 NoteSquadOrder 完成，此处只做可观测性记录。
             toolResultLog.Add($"{name}({raw}) → {CmdTrunc(result.Replace("\n", " "), 80)}");
             Debug.Log($"[{Label}] 工具 {name}({CmdTrunc(raw, 50)}) → {CmdTrunc(result, 70)}");
 
-            if (name == "squad_order")
-            {
-                // 仅成功结果入库（再主张缓存 + 客户端同步）。
-                bool ok = result.Contains("\"result\":\"完成");
-                if (ok)
-                {
-                    try
-                    {
-                        int sn = -1; float gx = 0f, gz = 0f;
-
-                        var cellTok = args?["cell"];
-                        var sNum = args?["squadNumber"]?.ToString();
-                        if (!int.TryParse(sNum, out sn)) sn = -1;
-
-                        if (!string.IsNullOrEmpty(cellTxtOf(args)))
-                        {
-                            // cell 形态：由 Overlay 解析格中心。
-                            string c = cellTxtOf(args);
-                            if (overlay.TryCellToGrid(c, out gx, out gz)) { /* ok */ }
-                            else { gx = gz = 0f; }
-                        }
-                        else
-                        {
-                            var v = CommanderToolContext.ResolveArgs(args, "x", "z");
-                            gx = Mathf.Clamp(v[0], 0f, overlay.MapWidth);
-                            gz = Mathf.Clamp(v[1], 0f, overlay.MapLength);
-                        }
-
-                        StoreLastOrder(sn, gx, gz);
-                        State?.SetSquadObjective(Team, sn - 1, gx, gz);
-                    }
-                    catch { /* 参数异常时由 ToolContext 已回传错误，本轮跳过缓存 */ }
-                }
-            }
             return result;
         }
-
-        private static string cellTxtOf(JToken args) =>
-            args?["cell"]?.ToString()?.Trim();
 
         // ================================================================
         // 信息缓冲 / 文本构建
@@ -729,61 +724,6 @@ namespace HagenDa.Networking
             infoBuffer.Clear();
             manualTriggerPending = false;
             manualTriggerReason = null;
-        }
-
-        private string BuildHeaderText(string reason)
-        {
-            var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"【触发】{reason}");
-
-            double dur = 0;
-            if (NetworkCommanderState.Instance != null &&
-                NetworkCommanderState.Instance.matchStarted)
-                dur = NetworkTime.time - NetworkCommanderState.MatchStartedAt;
-            sb.AppendLine($"【对局时长】{FmtDur(dur)}");
-
-            // 小队名册（非空间兜底 Q23:b）
-            var buf = new List<NetworkCombatant>();
-            NetworkMatchManager.GetAllCombatants(buf);
-            var aliveCnt = new Dictionary<int, int>();
-            foreach (var c in buf)
-            {
-                if (c == null || c.teamId != Team || c.squadId < 0) continue;
-                if (!c.IsDead) aliveCnt[c.squadId] =
-                    (aliveCnt.TryGetValue(c.squadId, out int n) ? n : 0) + 1;
-            }
-            var roster = new List<string>();
-            for (int s = 0; s < Config.squadsPerTeam; s++)
-            {
-                int n = aliveCnt.TryGetValue(s, out int c) ? c : 0;
-                roster.Add($"小队{s + 1}:{n}/5人");
-            }
-            sb.AppendLine($"【小队】{string.Join("; ", roster)}");
-
-            // HQ 归属与争夺值
-            var mm = NetworkMatchManager.Instance;
-            if (mm != null)
-            {
-                var hqs = new List<string>();
-                foreach (var cp in mm.capturePoints)
-                {
-                    if (cp == null) continue;
-                    string owner = cp.ownerTeam == (int)MatchTeam.Red ? "红方"
-                                 : cp.ownerTeam == (int)MatchTeam.Blue ? "蓝方" : "中立";
-                    hqs.Add($"HQ-{cp.letter}{owner}{cp.contention:+0;-0;0}");
-                }
-                sb.AppendLine($"【据点】{string.Join("; ", hqs)}");
-            }
-
-            // 事件流
-            sb.AppendLine(infoBuffer.Count > 0
-                ? "【上轮以来事件】\n" + string.Join("\n", infoBuffer)
-                : "【上轮以来事件】(无)");
-
-            if (reason == "开局部署")
-                sb.AppendLine("【任务】请在本次回复中一次性给出全部小队的部署指令。");
-
-            return sb.ToString().TrimEnd();
         }
 
         private static string BuildOutputSummary(string analysis, List<string> toolLines)
@@ -809,7 +749,7 @@ namespace HagenDa.Networking
         // 把该小队最近一次指令重新下发，避免空窗期被自动选点吞没（实测踩坑）。
         // ================================================================
 
-        private readonly Dictionary<int, (float gx, float gz)> lastOrders = new();
+        private readonly Dictionary<int, (float wx, float wz)> lastOrders = new();
         private float nextReassert;
         private bool importedStateObjectives;
 
@@ -820,7 +760,7 @@ namespace HagenDa.Networking
                 importedStateObjectives = true;
                 if (State != null)
                     foreach (var o in State.objectives)
-                        if (o.team == Team) lastOrders[o.squad] = (o.gx, o.gz);
+                        if (o.team == Team) lastOrders[o.squad] = (o.wx, o.wz);
             }
 
             if (Time.time < nextReassert) return;
@@ -835,22 +775,22 @@ namespace HagenDa.Networking
                 if (fsm == null || fsm.commanderObjective) continue;
                 if (!lastOrders.TryGetValue(c.squadId, out var g)) continue;
 
-                // 单源换算（西南原点笛卡尔式，与快照标尺/HUD 一致）。
-                var world = overlay.GridToWorld(g.gx, g.gz);
-                world.y = c.transform.position.y;
+                var world = new Vector3(g.wx, c.transform.position.y, g.wz);
                 fsm.AssignObjective(world);   // 恢复 commanderObjective 权威标记
             }
         }
 
-        private void StoreLastOrder(int squadNumber, float gx, float gz)
+        /// <summary>
+        /// ToolContext 成功 squad_order 时回调：记录最近指令（重部署后再主张用）、
+        /// 下令时刻（小队状态"上次指令 T 秒前"）、同步客户端 HUD/地图标记。
+        /// </summary>
+        public void NoteSquadOrder(int squadNumber, int cellId, float wx, float wz)
         {
-            if (squadNumber >= 1 && squadNumber <= Config.squadsPerTeam)
-                lastOrders[squadNumber - 1] = (gx, gz);
+            if (squadNumber < 1 || squadNumber > Config.squadsPerTeam) return;
+            lastOrders[squadNumber - 1] = (wx, wz);
+            lastOrderTime[squadNumber - 1] = Time.time;
+            State?.SetSquadObjective(Team, squadNumber - 1, cellId, wx, wz);
         }
-
-        /// <summary>ToolContext 成功 squad_order 时回调（公共入口）。</summary>
-        public void StoreLastOrderPublic(int squadNumber, float gx, float gz) =>
-            StoreLastOrder(squadNumber, gx, gz);
 
         // ================================================================
         // 日志
@@ -885,22 +825,6 @@ namespace HagenDa.Networking
         }
 
         // ================================================================
-        // 快照桥接
-        // ================================================================
-
-        private Task<byte[]> CapturePngAsync()
-        {
-            var tcs = new TaskCompletionSource<byte[]>(TaskCreationOptions.RunContinuationsAsynchronously);
-            StartCoroutine(Cam.CaptureRoutine(Team, bytes =>
-            {
-                if (bytes != null && Config.saveSnapshotPng && logger != null)
-                    logger.WriteSnapshot(bytes, $"{DateTime.Now:HHmmss}");
-                tcs.TrySetResult(bytes);
-            }));
-            return tcs.Task;
-        }
-
-        // ================================================================
         // 多实例协调（stub 共享）— 静态注册表
         // ================================================================
 
@@ -920,6 +844,7 @@ namespace HagenDa.Networking
                 if (o == null) continue;
                 o.lastOutputAt = Time.time;
                 o.minGapUntil = Time.time + o.Config.minRoundGap;
+                o.gateIdleSuppressLogged = false;   // 下次门控重新记一条抑制日志
             }
         }
 

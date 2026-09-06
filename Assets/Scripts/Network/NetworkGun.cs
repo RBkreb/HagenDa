@@ -43,6 +43,7 @@ namespace HagenDa.Networking
         [SyncVar] public float aimAmount;           // 0 = hip, 1 = fully aimed
         [SyncVar] public bool reloading;
         [SyncVar] public bool reloadPaused;
+        [SyncVar] public uint shotCount;   // PHASE12: 开枪计数（NetworkSoldierAnimator 检测增量播 Shoot01）
 
         private enum ReloadState { Idle, Reloading, Paused }
 
@@ -311,6 +312,7 @@ namespace HagenDa.Networking
 
             Vector3 dir = ComputeFireDirection(aimForward, recoil, bloom);
             SpawnBullet(aimOrigin, dir);
+            shotCount++;   // PHASE12: 动画同步（服务端权威计数）
 
             // S1 评估统计（服务器端，评估场景中才有）。
             if (NetworkServer.active)

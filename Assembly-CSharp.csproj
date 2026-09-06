@@ -60,6 +60,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Analyzer Include="C:\Users\m1806\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.3.1\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="D:\HagenTa\HagenDa\Library\PackageCache\cn.tuanjie.infinity@1.5.0\CodeGen\ECS\Tuanjie.Mosaic.SourceGenerator.dll" />
     <Analyzer Include="E:\Unity3D\2022.3.62t12\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="E:\Unity3D\2022.3.62t12\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="D:\HagenTa\HagenDa\Library\PackageCache\com.unity.entities@1.3.15\Unity.Entities\SourceGenerators\AspectGenerator.dll" />
@@ -81,10 +82,9 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
     <Compile Include="Assets\Scripts\Network\Match\MapDefinition.cs" />
-    <Compile Include="Assets\Scripts\Network\Commander\CommanderPrompts.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderSituationText.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
     <Compile Include="Assets\Scripts\Network\DeployableSlot.cs" />
-    <Compile Include="Assets\Scripts\Network\Commander\CommanderMapCamera.cs" />
     <Compile Include="Assets\Scripts\Network\CapturePoint.cs" />
     <Compile Include="Assets\Scripts\Network\DeployBeacon.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
@@ -114,6 +114,7 @@
     <Compile Include="Assets\Scripts\Network\NetworkBullet.cs" />
     <Compile Include="Assets\Scripts\Network\IDamageable.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkHitbox.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkThrowable.cs" />
     <Compile Include="Assets\Scripts\Network\MinimapCamera.cs" />
     <Compile Include="Assets\Scripts\Network\TrainingSessionManager.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Assets\Scripts\Network\NetworkPlayerController.cs" />
     <Compile Include="Assets\Scripts\Network\MovingZone.cs" />
     <Compile Include="Assets\Scripts\Network\Match\MatchConfig.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderHexGrid.cs" />
     <Compile Include="Assets\Scripts\Network\FSMStatsHud.cs" />
     <Compile Include="Assets\Scripts\Network\BlastShield.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\NetworkCommanderState.cs" />
@@ -152,6 +154,7 @@
     <Compile Include="Assets\Scripts\Network\AgentVisionSensor.cs" />
     <Compile Include="Assets\Scripts\Network\EquipmentDefinition.cs" />
     <Compile Include="Assets\Scripts\Network\TrainingArena.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkSoldierAnimator.cs" />
     <Compile Include="Assets\Scripts\Showcase\ShowcaseLoopState.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\CommanderConfig.cs" />
     <Compile Include="Assets\Scripts\Network\ScriptedAIController.cs" />
@@ -197,7 +200,6 @@
     <Compile Include="Assets\Scripts\Network\HeadMarker.cs" />
     <Compile Include="Assets\Scripts\Network\S1EvaluationStats.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkCombatant.cs" />
-    <Compile Include="Assets\Scripts\Network\Commander\CommanderMapOverlay.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets\Kevin Iglesias\Human Animations\Unity Demo Scenes\Human Soldier Animations\Scripts\HumanSoldierChangeWeaponSMB.cs" />
   </ItemGroup>
@@ -1315,6 +1317,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Barracuda.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Tuanjie.Infinity.Editor">
+      <HintPath>Library\ScriptAssemblies\Tuanjie.Infinity.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Scenes">
       <HintPath>Library\ScriptAssemblies\Unity.Scenes.dll</HintPath>
       <Private>False</Private>
@@ -1347,6 +1353,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Animation.Rigging.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Infinity.Mathematics">
+      <HintPath>Library\ScriptAssemblies\Infinity.Mathematics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Entities">
       <HintPath>Library\ScriptAssemblies\Unity.Entities.dll</HintPath>
       <Private>False</Private>
@@ -1371,12 +1381,20 @@
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Tuanjie.Infinity">
+      <HintPath>Library\ScriptAssemblies\Tuanjie.Infinity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Physics">
       <HintPath>Library\ScriptAssemblies\Unity.Physics.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Performance.Profile-Analyzer.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Performance.Profile-Analyzer.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Tuanjie.InfinityBake">
+      <HintPath>Library\ScriptAssemblies\Tuanjie.InfinityBake.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Collections.Editor">

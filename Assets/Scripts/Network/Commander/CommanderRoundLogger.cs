@@ -58,24 +58,6 @@ namespace HagenDa.Networking
             }
         }
 
-        /// <summary>调试快照 PNG 落盘，返回文件路径（失败返回 null）。</summary>
-        public string WriteSnapshot(byte[] pngBytes, string tag)
-        {
-            if (pngBytes == null || pngBytes.Length == 0) return null;
-            try
-            {
-                var dir = Path.Combine(RootDir, "snapshots");
-                Directory.CreateDirectory(dir);
-                var p = Path.Combine(dir, $"{teamLabel}_{tag}_{DateTime.Now:HHmmss_fff}.png");
-                File.WriteAllBytes(p, pngBytes);
-                return p;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
         public string FilePath => filePath;
 
         private sealed class CommanderRoundLoggerDisabled : CommanderRoundLogger

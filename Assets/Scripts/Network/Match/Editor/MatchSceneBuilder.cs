@@ -228,15 +228,7 @@ namespace HagenDa.Networking.EditorTools
 
             // ---- LLM 指挥官(依赖场景对象,最后装配) ----
             if (commander == CommanderMode.LlmCommander)
-            {
-                CommanderSetup.Setup();
-                foreach (var ov in Object.FindObjectsOfType<CommanderMapOverlay>(true))
-                {
-                    ov.mapMinWorld = new Vector2(mapBounds.min.x, mapBounds.min.z);
-                    ov.mapMaxWorld = new Vector2(mapBounds.max.x, mapBounds.max.z);
-                    EditorUtility.SetDirty(ov);
-                }
-            }
+                CommanderSetup.Setup(mapBounds);   // PHASE11：HexGrid 边界用构建器精确 AABB
 
             // ---- NavMesh(必须先于 AI 生成) ----
             if (procedural) NetworkSetup.BuildNavMeshForFloor();

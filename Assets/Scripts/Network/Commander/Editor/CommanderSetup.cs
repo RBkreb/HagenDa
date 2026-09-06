@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using Mirror;
 using UnityEditor;
@@ -8,18 +7,19 @@ using UnityEngine.SceneManagement;
 namespace HagenDa.Networking.EditorTools
 {
     /// <summary>
-    /// PHASE10 场景装配：HagenDa/Setup Commander System
+    /// PHASE11 场景装配：HagenDa/Setup Commander System
     ///
     /// 在当前场景（预期 FSMBattle.scene）注入：
     ///   LLMCommander (root)
-    ///     ├─ Red   : CommanderOrchestrator(team=0) + Overlay + Camera + Weapons
-    ///     ├─ Blue  : 同上 team=1
-    ///     └─ Gate  : CommanderGateController
+    ///     ├─ HexGrid : CommanderHexGrid（六边形空间编码，红蓝共享）
+    ///     ├─ Red     : CommanderOrchestrator(team=0) + Weapons
+    ///     ├─ Blue    : 同上 team=1
+    ///     └─ Gate    : CommanderGateController
     ///   NetworkCommanderState (独立 NetworkIdentity 对象，matchStarted 门控/目标同步)
     ///   LLMCommanderHud       (客户端遮罩/目标标记)
     ///
-    /// 同时：确保 CommanderMap layer、创建 Assets/Settings/CommanderConfig.asset、
-    /// 从场景 Wall 推导地图边界写入两个 Overlay。
+    /// 同时：创建 Assets/Settings/CommanderConfig.asset、把地图 AABB 写入
+    /// HexGrid（可由 Match 构建器/NetworkSetup 传入精确边界覆盖）。
     /// </summary>
     public static class CommanderSetup
     {
@@ -27,9 +27,15 @@ namespace HagenDa.Networking.EditorTools
         private const string RootName = "LLMCommander";
 
         [MenuItem("HagenDa/Setup Commander System")]
-        public static void Setup()
+        public static void Setup() => Setup(null);
+
+        /// <summary>
+        /// 装配指挥官 rig。mapBoundsOverride：Match 场景构建器 / NetworkSetup 传入
+        /// 的精确地图 AABB（FBX 图的 "*wall*" 名字推导会失真，优先用调用方边界）；
+        /// 空 = 用 ComputeMapBounds（Wall/Floor 名字推导）。
+        /// </summary>
+        public static void Setup(Bounds? mapBoundsOverride)
         {
-            EnsureLayer("CommanderMap");
             var cfg = EnsureConfig();
 
             // 幂等：清旧装新。
@@ -40,8 +46,8 @@ namespace HagenDa.Networking.EditorTools
             var oldHud = GameObject.Find("LLMCommanderHud");
             if (oldHud != null) Object.DestroyImmediate(oldHud);
 
-            // ---- 地图边界（Wall 组合包围盒；兜底 Floor）----
-            Bounds mapBounds = ComputeMapBounds();
+            // ---- 地图边界 ----
+            Bounds mapBounds = mapBoundsOverride ?? ComputeMapBounds();
             Debug.Log($"[CmdSetup] 地图边界 X[{mapBounds.min.x:F0},{mapBounds.max.x:F0}] " +
                       $"Z[{mapBounds.min.z:F0},{mapBounds.max.z:F0}]");
 
@@ -49,13 +55,19 @@ namespace HagenDa.Networking.EditorTools
             var stateGo = new GameObject("NetworkCommanderState",
                 typeof(NetworkIdentity), typeof(NetworkCommanderState));
 
-            // ---- 红蓝双份 Rig ----
+            // ---- 共享六边形空间编码（红蓝共用一个实例）----
             var root = new GameObject(RootName);
+            var hexGo = new GameObject("HexGrid");
+            hexGo.transform.SetParent(root.transform, false);
+            var hex = hexGo.AddComponent<CommanderHexGrid>();
+            hex.targetCells = Mathf.Max(16, cfg.hexTargetCells);
+            hex.boundsOverride = mapBounds;
 
-            var redOrch = BuildRig(root, "Red", (int)MatchTeam.Red, cfg,
-                                   mapBounds, stateGo.GetComponent<NetworkCommanderState>());
-            var blueOrch = BuildRig(root, "Blue", (int)MatchTeam.Blue, cfg,
-                                    mapBounds, stateGo.GetComponent<NetworkCommanderState>());
+            // ---- 红蓝双份 Rig ----
+            BuildRig(root, "Red", (int)MatchTeam.Red, cfg, hex,
+                     stateGo.GetComponent<NetworkCommanderState>());
+            BuildRig(root, "Blue", (int)MatchTeam.Blue, cfg, hex,
+                     stateGo.GetComponent<NetworkCommanderState>());
 
             // ---- 门控 ----
             root.AddComponent<CommanderGateController>();
@@ -64,36 +76,22 @@ namespace HagenDa.Networking.EditorTools
             new GameObject("LLMCommanderHud").AddComponent<CommanderHud>();
 
             MarkAndSave();
-            Debug.Log("[CmdSetup] 完成：红/蓝指挥官 + 门控 + 状态对象 + HUD 已注入。" +
+            Debug.Log("[CmdSetup] 完成：共享 HexGrid + 红/蓝指挥官 + 门控 + 状态对象 + HUD 已注入。" +
                       " Play 即自动 Host 并进入开局部署门控。");
         }
 
         private static CommanderOrchestrator BuildRig(GameObject parent, string label,
-            int team, CommanderConfig cfg, Bounds mapBounds, NetworkCommanderState state)
+            int team, CommanderConfig cfg, CommanderHexGrid hex, NetworkCommanderState state)
         {
             var rigGo = new GameObject(label);
             rigGo.transform.SetParent(parent.transform, false);
-
-            var overlayGo = new GameObject($"Overlay_{label}");
-            overlayGo.transform.SetParent(rigGo.transform, false);
-            var overlay = overlayGo.AddComponent<CommanderMapOverlay>();
-            overlay.mapMinWorld = new Vector2(mapBounds.min.x, mapBounds.min.z);
-            overlay.mapMaxWorld = new Vector2(mapBounds.max.x, mapBounds.max.z);
-            overlay.gridSize = cfg.gridSizeMeters;
-            overlay.markerY = MapLayers.IndicatorWorldY + 1f;   // 12m
-
-            var camGo = new GameObject($"Cam_{label}");
-            camGo.transform.SetParent(rigGo.transform, false);
-            var cam = camGo.AddComponent<CommanderMapCamera>();
-            cam.overlay = overlay;
-            cam.longSidePixels = cfg.snapshotLongSide;
 
             var weaponsGo = new GameObject($"Weapons_{label}");
             weaponsGo.transform.SetParent(rigGo.transform, false);
             var weapons = weaponsGo.AddComponent<CommanderWeaponSystem>();
 
             var orch = rigGo.AddComponent<CommanderOrchestrator>();
-            orch.Init(team, cfg, overlay, cam, weapons, state);
+            orch.Init(team, cfg, hex, weapons, state);
             return orch;
         }
 
@@ -147,26 +145,6 @@ namespace HagenDa.Networking.EditorTools
             var min = Vector3.Min(a.min, b.min);
             var max = Vector3.Max(a.max, b.max);
             return new Bounds((min + max) * 0.5f, max - min);
-        }
-
-        private static void EnsureLayer(string name)
-        {
-            var tagManager = new SerializedObject(
-                AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
-            var layersProp = tagManager.FindProperty("layers");
-            for (int i = 8; i < layersProp.arraySize; i++)
-            {
-                var slot = layersProp.GetArrayElementAtIndex(i);
-                if (slot.stringValue == name) return;
-                if (string.IsNullOrEmpty(slot.stringValue))
-                {
-                    slot.stringValue = name;
-                    tagManager.ApplyModifiedProperties();
-                    Debug.Log($"[CmdSetup] 已注册 layer '{name}' (slot {i})");
-                    return;
-                }
-            }
-            Debug.LogWarning("[CmdSetup] TagManager 无空闲 layer 槽位！");
         }
 
         private static void EnsureFolder(string parent, string folder)

@@ -4,6 +4,7 @@ using Mirror;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem.UI;
 using Unity.AI.Navigation;
@@ -28,6 +29,10 @@ namespace HagenDa.Networking.EditorTools
         private const string WeaponFolder = "Assets/Scripts/Network/Weapons";
         private const string M4DefinitionPath = "Assets/Scripts/Network/Weapons/M4Definition.asset";
         private const string M4PrefabPath = "Assets/Low Poly Weapons VOL.1/Prefabs/M4_8.prefab";
+
+        // PHASE12: 队伍士兵模型（红 = Natlan Soldier，蓝 = Fatui Bodyguard）。
+        private const string NatlanSoldierPath = "Assets/Model/natlan/Natlan Soldier FBX with collider.prefab";
+        private const string FatuiSoldierPath = "Assets/Model/Fatui/Fatui Bodyguard FBX.prefab";
 
         private const string EquipmentFolder = "Assets/Scripts/Network/Equipment";
         private const string EmpFieldPrefabPath = "Assets/Scripts/Network/Prefabs/EmpField.prefab";
@@ -99,6 +104,318 @@ namespace HagenDa.Networking.EditorTools
             BuildPlayerPrefab();
             AssetDatabase.SaveAssets();
             Debug.Log("[NetworkSetup] Done. Rebuilt " + PrefabPath);
+        }
+
+        // ---------------------------------------------------------------
+        // PHASE12: SOLDIER MODELS (红 Natlan / 蓝 Fatui，hitbox + 手部 IK)
+        // ---------------------------------------------------------------
+
+        /// <summary>
+        /// One-shot soldier model wiring (idempotent, rerunnable):
+        ///  1. Natlan prefab — tag the 5 bone hitbox colliders with NetworkHitbox parts.
+        ///  2. Fatui prefab — mirror the same hitbox structure (armature-scale
+        ///     compensated) + the M4 hand-IK rig copied from Natlan.
+        ///  3. Rebuild NetworkPlayer / AIEntity / FSMAIEntity / ScriptedAIEntity
+        ///     prefabs with both models attached + NetworkSoldierAnimator driver.
+        /// </summary>
+        [MenuItem("HagenDa/Setup Soldier Models")]
+        public static void SetupSoldierModels()
+        {
+            EnsureSoldierHitboxParts(NatlanSoldierPath);
+            BuildFatuiCombatRig();
+
+            // Rebuild every entity prefab so the models propagate to all scenes
+            // (FSM/Scripted prefabs are saved copies, not variants — rebuild them too).
+            GameObject grenadePrefab = BuildGrenadePrefab();
+            GameObject smokePrefab = BuildSmokePrefab();
+            GameObject rescuePrefab = BuildRescuePrefab();
+            GameObject bulletPrefab = BuildBulletPrefab();
+            List<EquipmentDefinition> equipmentList = BuildEquipmentAssets();
+
+            BuildPlayerPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab, equipmentList);
+            GameObject aiPrefab = BuildAIEntityPrefab(grenadePrefab, smokePrefab, rescuePrefab, bulletPrefab, equipmentList);
+            BuildFSMAIPrefab(aiPrefab);
+            BuildScriptedAIPrefab(aiPrefab);
+
+            AssetDatabase.SaveAssets();
+            Debug.Log("[NetworkSetup] Soldier models wired: Natlan hitbox parts, Fatui rig, entity prefabs rebuilt.");
+        }
+
+        /// <summary>Add NetworkHitbox part markers to the bone-attached hitbox colliders (idempotent).</summary>
+        private static void EnsureSoldierHitboxParts(string prefabPath)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[NetworkSetup] Soldier prefab not found at {prefabPath}");
+                return;
+            }
+
+            bool changed = false;
+            foreach (var col in prefab.GetComponentsInChildren<Collider>(true))
+            {
+                var part = PartFromName(col.gameObject.name);
+                if (part == null) continue;
+
+                var marker = col.GetComponent<NetworkHitbox>();
+                if (marker == null)
+                {
+                    marker = col.gameObject.AddComponent<NetworkHitbox>();
+                    changed = true;
+                }
+                if (marker.part != part.Value)
+                {
+                    marker.part = part.Value;
+                    changed = true;
+                }
+            }
+            if (changed) EditorUtility.SetDirty(prefab);
+        }
+
+        /// <summary>headcollider -> Head, *armcapsule/*legcapsule -> Limb, bodycapsule -> Body.</summary>
+        private static HitboxPart? PartFromName(string name)
+        {
+            string n = name.ToLowerInvariant();
+            if (n.Contains("head")) return HitboxPart.Head;
+            if (n.Contains("arm") || n.Contains("leg")) return HitboxPart.Limb;
+            if (n.Contains("body")) return HitboxPart.Body;
+            return null;
+        }
+
+        /// <summary>
+        /// Mirror Natlan's hitbox structure onto the Fatui Bodyguard prefab:
+        ///  - the two rigs share identical Blender DEF-* bone names, so colliders
+        ///    are re-created under the same-named bones with the same local values,
+        ///    scaled by (Natlan armature 100 / Fatui armature 70) × height ratio —
+        ///    otherwise blue hitboxes end up 70% of red size.
+        ///  - the M4 + two-hand IK rig (handlers on the gun, hints on the chest)
+        ///    is copied with the same local transforms (position scaled by height).
+        /// </summary>
+        private static void BuildFatuiCombatRig()
+        {
+            var fatui = AssetDatabase.LoadAssetAtPath<GameObject>(FatuiSoldierPath);
+            var natlan = AssetDatabase.LoadAssetAtPath<GameObject>(NatlanSoldierPath);
+            if (fatui == null || natlan == null)
+            {
+                Debug.LogWarning("[NetworkSetup] Soldier prefab missing; skip Fatui rig build.");
+                return;
+            }
+
+            // Idempotent: already rigged.
+            if (fatui.GetComponentInChildren<NetworkHitbox>(true) != null &&
+                fatui.GetComponentInChildren<TwoBoneIKConstraint>(true) != null)
+                return;
+
+            var contents = PrefabUtility.LoadPrefabContents(FatuiSoldierPath);
+            try
+            {
+                float natlanHeight, fatuiHeight;
+                RenderHeight(natlan, out natlanHeight);
+                RenderHeight(contents, out fatuiHeight);
+                float heightRatio = natlanHeight > 0.01f ? fatuiHeight / natlanHeight : 1f;
+                float scaleComp = (100f / 70f) * heightRatio;
+
+                // 1) Hitboxes.
+                int made = 0;
+                foreach (var col in natlan.GetComponentsInChildren<Collider>(true))
+                {
+                    var part = PartFromName(col.gameObject.name);
+                    if (part == null) continue;
+
+                    var bone = FindChildByName(contents.transform, col.transform.parent.name);
+                    if (bone == null)
+                    {
+                        Debug.LogWarning($"[NetworkSetup] Fatui bone '{col.transform.parent.name}' not found for {col.name}.");
+                        continue;
+                    }
+
+                    var go = new GameObject(col.gameObject.name);
+                    go.transform.SetParent(bone, false);
+                    go.transform.localPosition = col.transform.localPosition;
+                    go.transform.localRotation = col.transform.localRotation;
+                    go.transform.localScale = col.transform.localScale * scaleComp;
+
+                    Collider dst;
+                    var sphere = col as SphereCollider;
+                    if (sphere != null)
+                    {
+                        var s = go.AddComponent<SphereCollider>();
+                        s.center = sphere.center;
+                        s.radius = sphere.radius;
+                        dst = s;
+                    }
+                    else
+                    {
+                        var srcC = (CapsuleCollider)col;
+                        var c = go.AddComponent<CapsuleCollider>();
+                        c.center = srcC.center;
+                        c.radius = srcC.radius;
+                        c.height = srcC.height;
+                        c.direction = srcC.direction;
+                        dst = c;
+                    }
+                    dst.isTrigger = true;
+                    go.AddComponent<NetworkHitbox>().part = part.Value;
+                    made++;
+                }
+
+                // 2) Weapon + hand IK (same rig as Natlan: handlers on the gun).
+                var nM4 = FindChildByName(natlan.transform, "M4_8");
+                if (nM4 != null)
+                {
+                    var m4Prefab = AssetDatabase.LoadAssetAtPath<GameObject>(M4PrefabPath);
+                    GameObject m4 = null;
+                    if (m4Prefab != null)
+                    {
+                        m4 = (GameObject)PrefabUtility.InstantiatePrefab(m4Prefab);
+                        m4.name = "M4_8";
+                        m4.transform.SetParent(contents.transform, false);
+                        m4.transform.localPosition = nM4.localPosition * heightRatio;
+                        m4.transform.localRotation = nM4.localRotation;
+                        m4.transform.localScale = Vector3.one;
+                    }
+
+                    if (m4 != null)
+                    {
+                        AttachCopy(m4.transform, nM4.transform, "RightHandler");
+                        AttachCopy(m4.transform, nM4.transform, "LeftHandler");
+                    }
+
+                    AttachCopy(contents.transform, natlan.transform, "RightHint", heightRatio);
+                    AttachCopy(contents.transform, natlan.transform, "LeftHint", heightRatio);
+
+                    var twoHandRig = new GameObject("TwoHandRig");
+                    twoHandRig.transform.SetParent(contents.transform, false);
+                    var rigComponent = twoHandRig.AddComponent<Rig>();
+                    rigComponent.weight = 1f;
+
+                    BuildHandIK(twoHandRig, contents.transform, "RightHandRig",
+                        m4 != null ? m4.transform.Find("RightHandler") : null,
+                        FindChildByName(contents.transform, "RightHint"),
+                        "DEF-upper_arm.R", "DEF-forearm.R", "DEF-hand.R", 1f);
+                    BuildHandIK(twoHandRig, contents.transform, "LeftHandRig",
+                        m4 != null ? m4.transform.Find("LeftHandler") : null,
+                        FindChildByName(contents.transform, "LeftHint"),
+                        "DEF-upper_arm.L", "DEF-forearm.L", "DEF-hand.L", 0.9f);
+
+                    var rigBuilder = contents.GetComponent<RigBuilder>();
+                    if (rigBuilder == null) rigBuilder = contents.AddComponent<RigBuilder>();
+                    rigBuilder.layers.Add(new RigLayer(rigComponent));
+                }
+
+                PrefabUtility.SaveAsPrefabAsset(contents, FatuiSoldierPath);
+                Debug.Log($"[NetworkSetup] Fatui rig built: {made} hitboxes + M4 hand IK (scale comp x{scaleComp:F2}).");
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(contents);
+            }
+        }
+
+        private static void BuildHandIK(GameObject parent, Transform modelRoot, string rigName,
+                                         Transform target, Transform hint,
+                                         string rootBone, string midBone, string tipBone, float hintWeight)
+        {
+            var rigGo = new GameObject(rigName);
+            rigGo.transform.SetParent(parent.transform, false);
+            var ik = rigGo.AddComponent<TwoBoneIKConstraint>();
+            var d = ik.data;
+            d.root = FindChildByName(modelRoot, rootBone);
+            d.mid = FindChildByName(modelRoot, midBone);
+            d.tip = FindChildByName(modelRoot, tipBone);
+            d.target = target;
+            d.hint = hint;
+            d.targetRotationWeight = 1f;
+            d.targetPositionWeight = 1f;
+            d.hintWeight = hintWeight;
+            ik.data = d;
+        }
+
+        /// <summary>Create a copy of a named child transform (empty GO, same local TRS) under a new parent.</summary>
+        private static void AttachCopy(Transform newParent, Transform sourceRoot, string childName, float posScale = 1f)
+        {
+            var src = FindChildByName(sourceRoot, childName);
+            if (src == null)
+            {
+                Debug.LogWarning($"[NetworkSetup] Source transform '{childName}' not found.");
+                return;
+            }
+            var go = new GameObject(childName);
+            go.transform.SetParent(newParent, false);
+            go.transform.localPosition = src.localPosition * posScale;
+            go.transform.localRotation = src.localRotation;
+            go.transform.localScale = src.localScale;
+        }
+
+        private static void RenderHeight(GameObject prefab, out float height)
+        {
+            bool has = false;
+            Bounds all = default;
+            foreach (var r in prefab.GetComponentsInChildren<Renderer>(true))
+            {
+                if (!has) { all = r.bounds; has = true; }
+                else all.Encapsulate(r.bounds);
+            }
+            height = has ? all.size.y : 0f;
+        }
+
+        private static Transform FindChildByName(Transform root, string name)
+        {
+            if (root.name == name) return root;
+            foreach (Transform c in root)
+            {
+                var r = FindChildByName(c, name);
+                if (r != null) return r;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// PHASE12: attach the team soldier models (red = Natlan Soldier, blue =
+        /// Fatui Bodyguard) as children of an entity prefab root and wire the
+        /// NetworkSoldierAnimator driver. The legacy capsule "Body" renderer is
+        /// disabled — the models are the remote body now.
+        /// </summary>
+        private static void AttachSoldierModels(GameObject root)
+        {
+            var soldierAnimator = root.GetComponent<NetworkSoldierAnimator>();
+            if (soldierAnimator == null) soldierAnimator = root.AddComponent<NetworkSoldierAnimator>();
+
+            soldierAnimator.redModel = AttachTeamModel(root, NatlanSoldierPath, "RedSoldierModel", 0f);
+            soldierAnimator.blueModel = AttachTeamModel(root, FatuiSoldierPath, "BlueSoldierModel", 0.08f);
+
+            // Default to the red model; NetworkSoldierAnimator switches by teamId
+            // (SyncVar) on the first update. Avoids a one-frame double-model overlap.
+            if (soldierAnimator.blueModel != null) soldierAnimator.blueModel.SetActive(false);
+
+            // Editor-only bone gizmos: off on the spawned instances.
+            foreach (var br in root.GetComponentsInChildren<BoneRenderer>(true))
+                br.enabled = false;
+
+            var body = root.transform.Find("Body");
+            if (body != null)
+            {
+                var r = body.GetComponent<Renderer>();
+                if (r != null) r.enabled = false;
+            }
+        }
+
+        private static GameObject AttachTeamModel(GameObject root, string prefabPath, string name, float yOffset)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[NetworkSetup] Soldier model not found at {prefabPath}");
+                return null;
+            }
+
+            var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            inst.name = name;
+            inst.transform.SetParent(root.transform, false);
+            inst.transform.localPosition = new Vector3(0f, yOffset, 0f);
+            inst.transform.localRotation = Quaternion.identity;
+            inst.transform.localScale = Vector3.one;
+            return inst;
         }
 
         // ---------------------------------------------------------------
@@ -838,8 +1155,10 @@ namespace HagenDa.Networking.EditorTools
             // uGUI 点击（部署地图/装备栏）需要 EventSystem + Input System 模块。
             EnsureEventSystem();
 
-            // --- 11) 指挥官快照 rig（含 PHASE10 网格线/标尺/格子代号）---
-            CommanderSetup.Setup();
+            // --- 11) 指挥官 rig（PHASE11 符号化：共享 HexGrid，边界用全图 AABB）---
+            CommanderSetup.Setup(MapLayers.TryGetMapBounds(out var cmdB) &&
+                                 cmdB.size.x > 0.01f
+                ? (Bounds?)cmdB : null);
 
             // --- 12) 保障 ceiling 处于激活（NavMesh 烘焙会临时隐藏它）---
             foreach (var r in mapRoot.GetComponentsInChildren<Renderer>(true))
@@ -1081,25 +1400,9 @@ namespace HagenDa.Networking.EditorTools
             // uGUI 点击（部署地图/装备栏）需要 EventSystem + Input System 模块。
             EnsureEventSystem();
 
-            // --- 12) 指挥官 rig（红/蓝 LLM 指挥官 + 门控 + 状态 + HUD）---
-            CommanderSetup.Setup();
-
-            // CommanderSetup 从 "*wall*" 物体推导地图边界——本图墙体零散，
-            // 推导结果严重失真：用全图 AABB 修正红/蓝 Overlay（网格/标尺/
-            // 格子代号在运行时 Start 读取这些字段，编辑期修正即可生效）。
-            if (mb.size != Vector3.zero)
-            {
-                int fixedOverlays = 0;
-                foreach (var ov in Object.FindObjectsOfType<CommanderMapOverlay>(true))
-                {
-                    ov.mapMinWorld = new Vector2(mb.min.x, mb.min.z);
-                    ov.mapMaxWorld = new Vector2(mb.max.x, mb.max.z);
-                    EditorUtility.SetDirty(ov);
-                    fixedOverlays++;
-                }
-                Debug.Log($"[NetworkSetup] Commander overlays fixed to map AABB " +
-                          $"X[{mb.min.x:F0},{mb.max.x:F0}] Z[{mb.min.z:F0},{mb.max.z:F0}] ({fixedOverlays} overlays).");
-            }
+            // --- 12) 指挥官 rig（PHASE11 符号化：HexGrid 边界直接用全图 AABB——
+            // 本图墙体零散，"*wall*" 名字推导严重失真）---
+            CommanderSetup.Setup(mb.size != Vector3.zero ? (Bounds?)mb : null);
 
             // --- 13) 保存 ---
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
@@ -1984,6 +2287,9 @@ namespace HagenDa.Networking.EditorTools
                 if (rend != null) rend.sharedMaterial = playerBodyMat;
             }
             controller.visual = body;
+
+            // PHASE12: team soldier models (red Natlan / blue Fatui) + animator driver.
+            AttachSoldierModels(root);
 
             // Save
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
@@ -3044,6 +3350,9 @@ namespace HagenDa.Networking.EditorTools
             // AI controller colours it per team.
             ai.visual = body;
             aiController.visual = body;
+
+            // PHASE12: team soldier models (red Natlan / blue Fatui) + animator driver.
+            AttachSoldierModels(root);
 
             EnsureFolder("Assets/Scripts/Network", "Prefabs");
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, AIPrefabPath);

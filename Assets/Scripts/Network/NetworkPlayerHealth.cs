@@ -115,13 +115,16 @@ namespace HagenDa.Networking
             TakeDamageInternal(damage * explosionDamageMultiplier, 1f);
         }
 
-        /// <summary>Hitbox-aware bullet damage (PHASE7 击杀归属 + 部位倍率).</summary>
+        /// <summary>
+        /// Hitbox-aware bullet damage (PHASE7 击杀归属). PHASE12: the part
+        /// multiplier is applied ONCE by <see cref="NetworkBullet"/> (from the
+        /// NetworkHitbox that was hit) — do not re-apply it here.
+        /// </summary>
         [Server]
         public void TakeBulletDamage(float damage, Vector3 hitPoint, Vector3 bulletDir, NetworkCombatant attacker)
         {
             lastAttacker = attacker;
-            float mult = HitboxUtility.GetMultiplier(GetActiveCapsule(), hitPoint);
-            TakeDamageInternal(damage, mult);
+            TakeDamageInternal(damage, 1f);
         }
 
         /// <summary>Explosion damage (PHASE7 击杀归属).</summary>
@@ -177,8 +180,24 @@ namespace HagenDa.Networking
             if (connectionToClient != null && amount > 0f)
                 TargetRpcDamageFeedback(amount);
 
+            // PHASE12: 受击动画广播（0.4s 节流，连发不反复打断）。
+            if (amount > 0f && Time.time - lastDamageAnimTime >= 0.4f)
+            {
+                lastDamageAnimTime = Time.time;
+                RpcDamageReaction();
+            }
+
             if (health <= 0f)
                 Die();
+        }
+
+        private float lastDamageAnimTime;
+
+        [ClientRpc]
+        private void RpcDamageReaction()
+        {
+            var soldier = GetComponent<NetworkSoldierAnimator>();
+            if (soldier != null) soldier.PlayDamage();
         }
 
         [TargetRpc]
@@ -564,6 +583,23 @@ namespace HagenDa.Networking
             foreach (var c in colliders)
                 if (c.enabled) return c;
             return colliders.Length > 0 ? colliders[0] : null;
+        }
+
+        private bool? hasHitboxesCache;
+
+        /// <summary>
+        /// True when this entity carries NetworkHitbox parts (soldier model). Bullets
+        /// then ignore its movement capsules entirely — the bone hitboxes consume
+        /// them instead. Legacy entities without hitboxes keep the capsule rules.
+        /// </summary>
+        public bool HasHitboxes
+        {
+            get
+            {
+                if (hasHitboxesCache == null)
+                    hasHitboxesCache = GetComponentsInChildren<NetworkHitbox>(true).Length > 0;
+                return hasHitboxesCache.Value;
+            }
         }
 
         // ---------------------------------------------------------------

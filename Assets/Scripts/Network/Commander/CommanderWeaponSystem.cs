@@ -7,18 +7,18 @@ using Mirror;
 namespace HagenDa.Networking
 {
     /// <summary>
-    /// PHASE10 指挥官武器系统（服务端权威）。三种武器共用"冷却 + 至多一条待投放
+    /// PHASE11 指挥官武器系统（服务端权威）。三种武器共用"冷却 + 至多一条待投放
     /// 指令"的骨架：冷却中下达 → 排队（可重复下达更新坐标）；就绪瞬间自动投放。
     ///
     ///  1 广域侦测：半径50m 圆柱，持续20s，每5s 对范围内敌军标记1s；最后一次扫描
-    ///    触发快照事件；冷却120s。
+    ///    触发侦测完成事件；冷却120s。
     ///  2 广域电磁干扰：生成 NetworkEmpField(radius40/lifetime10/interfere10)；冷却180s。
     ///  3 炮击支援：半径30m 区域持续30s 每2s 随机上表面爆炸（中心150、半径8m），
     ///    只伤害敌方阵营（PHASE10 定案：对友军无伤害），击杀敌军 → 己方 +1 分；
     ///    冷却300s。
     ///
-    /// 炮击伤害采用本类局部实现（线性衰减 + 遮挡射线 + 特殊掩体穿透），不改动
-    /// ExplosionUtility 默认路径。武器编号 LLM 口径 1..3。
+    /// PHASE11：坐标由 ToolContext 解析（格#N/据点编号 → 世界点）后传入，
+    /// 本类不再持有任何空间换算引用。武器编号 LLM 口径 1..3。
     /// </summary>
     public class CommanderWeaponSystem : MonoBehaviour
     {
@@ -27,12 +27,12 @@ namespace HagenDa.Networking
 
         private CommanderConfig cfg;
         private int team;
-        private CommanderMapOverlay overlay;          // 坐标换算/边界校验
 
         // 三武器统一状态。
         private readonly float[] readyAt = { 0f, 0f, 0f };
         private readonly bool[] hasPending = new bool[3];
-        private readonly Vector2[] pendingGrid = new Vector2[3];
+        private readonly Vector3[] pendingWorld = new Vector3[3];
+        private readonly string[] pendingDisplay = new string[3];
         private Coroutine[] running = new Coroutine[3];
 
         /// <summary>投放成功/自动投放事件（weaponNumber, 描述文本）→ 信息缓冲。</summary>
@@ -41,11 +41,10 @@ namespace HagenDa.Networking
         /// <summary>广域侦测最后一次扫描完成（weaponNumber=1）。</summary>
         public event Action RadarFinalScan;
 
-        public void Init(CommanderConfig cfg, int team, CommanderMapOverlay overlay)
+        public void Init(CommanderConfig cfg, int team)
         {
             this.cfg = cfg;
             this.team = team;
-            this.overlay = overlay;
             for (int i = 0; i < 3; i++) readyAt[i] = Time.time;
         }
 
@@ -63,10 +62,9 @@ namespace HagenDa.Networking
                 string tail;
                 if (hasPending[i])
                 {
-                    var g = pendingGrid[i];
                     tail = remain > 0f
-                        ? $"冷却{remain:F0}秒后自动投放 @({g.x:F0},{g.y:F0})"
-                        : $"投放中 @({g.x:F0},{g.y:F0})";
+                        ? $"冷却{remain:F0}秒后自动投放 @{pendingDisplay[i]}"
+                        : $"投放中 @{pendingDisplay[i]}";
                 }
                 else
                 {
@@ -77,9 +75,8 @@ namespace HagenDa.Networking
             return string.Join(";", lines);
         }
 
-        /// <summary>commander_weapon 工具入口。返回给 LLM 的结果文本。</summary>
-        /// <summary>commander_weapon 工具入口（PHASE10 v3：cell=快照网格代号）。</summary>
-        public string TryOrder(int weaponNumber, string cell, float gx, float gz)
+        /// <summary>commander_weapon 工具入口（PHASE11：目标已由 ToolContext 解析为世界点）。</summary>
+        public string TryOrder(int weaponNumber, Vector3 world, string display)
         {
             // 硬闸：门控阶段无论调用来源（LLM/脚本）一律拒绝。
             if (NetworkCommanderState.GateActive)
@@ -89,20 +86,13 @@ namespace HagenDa.Networking
             if (idx < 0 || idx >= 3)
                 return $"错误:未知武器编号 {weaponNumber}（可用 1-3）";
 
-            // cell 优先；无 cell 时退回米制坐标。两者都会夹取到图内。
-            bool hasCell = !string.IsNullOrEmpty(cell);
-            if (hasCell)
-            {
-                if (!overlay.TryCellToGrid(cell, out gx, out gz))
-                    return $"错误:非法网格代号 '{cell}'（列 A-{(char)('A' + overlay.Cols - 1)}，行 1-{overlay.Rows}）";
-            }
-            gx = Mathf.Clamp(gx, 0f, overlay.MapWidth);
-            gz = Mathf.Clamp(gz, 0f, overlay.MapLength);
-
             float remain = Mathf.Max(0f, readyAt[idx] - Time.time);
-            pendingGrid[idx] = new Vector2(gx, gz);
+            pendingWorld[idx] = world;
+            pendingDisplay[idx] = string.IsNullOrEmpty(display)
+                ? $"({world.x:F0},{world.z:F0})"
+                : display;
 
-            string at = hasCell ? cell.ToUpperInvariant() : $"({gx:F0},{gz:F0})";
+            string at = pendingDisplay[idx];
             if (remain <= 0f)
             {
                 Execute(idx);
@@ -132,8 +122,8 @@ namespace HagenDa.Networking
             // 启动冷却（此前缺失：导致武器永远"可用"，WTest 实测暴露）
             readyAt[idx] = Time.time + CooldownOf(idx);
 
-            var world = overlay.GridToWorld(pendingGrid[idx].x, pendingGrid[idx].y);
-            var gridTxt = $"@({pendingGrid[idx].x:F0},{pendingGrid[idx].y:F0})";
+            var world = pendingWorld[idx];
+            var gridTxt = $"@{pendingDisplay[idx]}";
 
             switch (idx)
             {

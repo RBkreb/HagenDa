@@ -10,8 +10,9 @@ using UnityEngine;
 namespace HagenDa.Networking.EditorTools
 {
     /// <summary>
-    /// PHASE10 编辑器冒烟测试：验证 LM Studio 端点连通性（/v1/models）与
-    /// 视觉+工具调用一次到位（8×8 红色测试图 + report_color 工具）。
+    /// PHASE11 编辑器冒烟测试：验证 LM Studio 端点连通性（/v1/models）与
+    /// 文本+工具调用一次到位（算术探针 + report_result 工具；PHASE11 起
+    /// 指挥官无图像输入）。
     ///
     /// 阻塞编辑器主线程是禁忌 → Task.Run 发请求（纯 .NET HttpClient，不碰
     /// UnityWebRequest），Debug.Log 线程安全，结果回主线程仅打日志。
@@ -23,9 +24,6 @@ namespace HagenDa.Networking.EditorTools
         {
             var cfg = LoadConfigOrLog();
             if (cfg == null) return;
-
-            // 视觉编码必须在主线程完成（Texture2D / EncodeToPNG）。
-            byte[] probePng = CreateProbePng();
 
             Debug.Log($"[CommanderSmoke] 开始探测 {cfg.baseUrl} (model={cfg.model})…");
             Task.Run(async () =>
@@ -39,11 +37,11 @@ namespace HagenDa.Networking.EditorTools
                             cfg.baseUrl.TrimEnd('/') + "/v1/models");
                         Debug.Log($"[CommanderSmoke] 探活: HTTP {(int)modelsResp.StatusCode}");
 
-                        // 2) 视觉 + 工具调用组合冒烟
+                        // 2) 文本 + 工具调用组合冒烟
                         var body = LlmRestClient.BuildChatBody(cfg,
                             new System.Collections.Generic.List<LlmMessage>
                             {
-                                LlmMessage.UserImage(probePng, "图中是什么颜色？必须调用工具报告。"),
+                                LlmMessage.User("1+1等于几？必须调用工具报告结果。"),
                             },
                             new System.Collections.Generic.List<JObject>
                             {
@@ -52,16 +50,16 @@ namespace HagenDa.Networking.EditorTools
                                     ["type"] = "function",
                                     ["function"] = new JObject
                                     {
-                                        ["name"] = "report_color",
-                                        ["description"] = "报告看到的颜色",
+                                        ["name"] = "report_result",
+                                        ["description"] = "报告算术结果",
                                         ["parameters"] = new JObject
                                         {
                                             ["type"] = "object",
                                             ["properties"] = new JObject
                                             {
-                                                ["color"] = new JObject { ["type"] = "string" }
+                                                ["result"] = new JObject { ["type"] = "string" }
                                             },
-                                            ["required"] = new JArray("color"),
+                                            ["required"] = new JArray("result"),
                                         }
                                     }
                                 }
@@ -113,20 +111,6 @@ namespace HagenDa.Networking.EditorTools
             }
             // 未找到资产：内存默认值。
             return ScriptableObject.CreateInstance<CommanderConfig>();
-        }
-
-        /// <summary>8×8 红色 PNG（视觉通路探针），须在主线程调用。</summary>
-        private static byte[] CreateProbePng()
-        {
-            var tex = new Texture2D(8, 8, TextureFormat.RGB24, false);
-            var pixels = new Color32[64];
-            for (int i = 0; i < pixels.Length; i++)
-                pixels[i] = new Color32(220, 30, 30, 255);
-            tex.SetPixels32(pixels);
-            tex.Apply(false);
-            byte[] png = tex.EncodeToPNG();
-            UnityEngine.Object.DestroyImmediate(tex);
-            return png;
         }
 
         private static string Truncate(string s, int max) =>

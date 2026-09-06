@@ -574,6 +574,9 @@ MonoBehaviour:
   - {fileID: 5618308817723720086, guid: f8492bd32540f38419c8d1854790070d, type: 3}
   - {fileID: 2033534740386646126, guid: a71b5efb948a6994cb201844257bac2c, type: 3}
   - {fileID: 3433312561705145169, guid: 477445035a5cabe41a1df9782413153f, type: 3}
+  - {fileID: 543077640700298910, guid: 99591076f30fa324794ed51122a18715, type: 3}
+  - {fileID: 8831424450114823038, guid: 6c43827ad1dab5b4da78ac58396cb958, type: 3}
+  - {fileID: 6756912964744156956, guid: 90c879dc86dd1ef488e2358b97220993, type: 3}
   snapshotSettings:
     bufferTimeMultiplier: 2
     bufferLimit: 32
@@ -1262,7 +1265,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 10000
+  m_Intensity: 0
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208

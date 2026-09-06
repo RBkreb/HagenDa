@@ -10,15 +10,14 @@ using UnityEngine;
 namespace HagenDa.Networking
 {
     // ---------------------------------------------------------------
-    // 消息模型（OpenAI /v1/chat/completions 形状的多模态子集）
+    // 消息模型（OpenAI /v1/chat/completions 形状的文本子集；PHASE11 起无图像）
     // ---------------------------------------------------------------
 
-    /// <summary>一条对话消息。文本与 PNG 图片可同时存在（content 拆成 parts）。</summary>
+    /// <summary>一条对话消息（纯文本；PHASE11 指挥官无图像输入）。</summary>
     public sealed class LlmMessage
     {
         public string role;          // system | user | assistant | tool
         public string text;          // 纯文本 content（可空）
-        public byte[] imagePng;      // base64 后以 image_url data URI 附带（仅 user）
         public JArray toolCalls;     // assistant 原样 tool_calls 透传（role=assistant 时）
 
         public string toolCallId;    // role=tool 必填
@@ -26,9 +25,6 @@ namespace HagenDa.Networking
         public static LlmMessage System(string t) => new LlmMessage { role = "system", text = t };
         public static LlmMessage User(string t) => new LlmMessage { role = "user", text = t };
         public static LlmMessage Assistant(string t) => new LlmMessage { role = "assistant", text = t };
-
-        public static LlmMessage UserImage(byte[] png, string caption = null) =>
-            new LlmMessage { role = "user", text = caption, imagePng = png };
 
         /// <summary>assistant 工具调用回合（LM Studio 要求原样回传 tool_calls + 空/短 content）。</summary>
         public static LlmMessage AssistantToolCalls(JArray calls, string content = null) =>
@@ -44,6 +40,14 @@ namespace HagenDa.Networking
         public List<LlmMessage> messages = new List<LlmMessage>();
         public List<JObject> tools;              // 可空：不带工具
         public float timeoutSeconds = 120f;
+
+        /// <summary>
+        /// tool_choice：auto（默认，允许"不调用"）/ required（强制工具调用）。
+        /// LM Studio 仅支持 none/auto/required（实测）。开局部署用 required——
+        /// 单发制没有反馈轮，qwen3.8-4b 在 auto 下曾把 tool_calls 写成纯文本
+        /// JSON 导致覆盖 0/6（实测踩坑）。
+        /// </summary>
+        public string toolChoice = "auto";
     }
 
     /// <summary>一次对话结果（含 token/耗时统计，JSONL 记录用）。</summary>
@@ -67,18 +71,16 @@ namespace HagenDa.Networking
     // ---------------------------------------------------------------
 
     /// <summary>
-    /// PHASE10 薄 REST 客户端：直连 LM Studio 的 OpenAI 兼容端点。
+    /// PHASE11 薄 REST 客户端：直连 LM Studio 的 OpenAI 兼容端点（纯文本协议）。
     ///
     /// 传输层走【纯 .NET HttpClient + 后台线程】而非 UnityWebRequest：
-    /// 实测 Play 模式下 UnityWebRequest 的上传被编辑器主循环泵制约束，
-    /// 多 MB 的 base64 图片迟迟发不完整，LM Studio 端停在 0%；
-    /// 停止 Play 后台线程独占后瞬间送达。冒烟测试的后台路径从未复现该问题，
-    /// 故统一迁移。协议组装/解析仍为本类静态方法（与编辑器工具共用）。
+    /// 实测 Play 模式下 UnityWebRequest 的上传被编辑器主循环泵制约束
+    /// （PHASE10 大体积 base64 图片时代的问题；文本协议下保留后台线程路径，
+    /// 避免 Play 主循环泵制带来的时延抖动）。协议组装/解析为本类静态方法
+    /// （与编辑器工具共用）。
     ///
     /// 已实测事实驱动的设计：
-    ///  - 视觉输入走 user 消息 parts 的 image_url(data:image/png;base64,...)
     ///  - 原生 tools / tool_calls 可用；tool_choice 仅 none/auto/required
-    ///  - 工具结果内嵌图片被 400 拒绝 → get_snapshot 用回执文本+追加 user 图
     ///  - 思考型模型 reasoning_content 单列，max_tokens 需覆盖推理消耗
     /// </summary>
     public sealed class LlmRestClient
@@ -108,7 +110,8 @@ namespace HagenDa.Networking
         /// <summary>发起一次对话。调用方可位于任意线程；返回在原上下文继续。</summary>
         public async Task<LlmChatResult> ChatAsync(LlmChatRequest request)
         {
-            var body = BuildChatBody(config, request.messages, request.tools);
+            var body = BuildChatBody(config, request.messages, request.tools,
+                                     request.toolChoice);
             var json = body.ToString();
             var sw = System.Diagnostics.Stopwatch.StartNew();
 
@@ -170,7 +173,8 @@ namespace HagenDa.Networking
 
         public static JObject BuildChatBody(CommanderConfig cfg,
                                             List<LlmMessage> messages,
-                                            List<JObject> tools)
+                                            List<JObject> tools,
+                                            string toolChoice = "auto")
         {
             var msgs = new JArray();
             foreach (var m in messages)
@@ -186,21 +190,6 @@ namespace HagenDa.Networking
                 {
                     mo["tool_call_id"] = m.toolCallId ?? "";
                     mo["content"] = m.text ?? "";
-                }
-                else if (m.imagePng != null && m.imagePng.Length > 0)
-                {
-                    var parts = new JArray();
-                    if (!string.IsNullOrEmpty(m.text))
-                        parts.Add(new JObject { ["type"] = "text", ["text"] = m.text });
-                    parts.Add(new JObject
-                    {
-                        ["type"] = "image_url",
-                        ["image_url"] = new JObject
-                        {
-                            ["url"] = "data:image/png;base64," + Convert.ToBase64String(m.imagePng)
-                        }
-                    });
-                    mo["content"] = parts;
                 }
                 else
                 {
@@ -222,7 +211,8 @@ namespace HagenDa.Networking
                 var toolArray = new JArray();
                 foreach (var t in tools) toolArray.Add(t.DeepClone());
                 body["tools"] = toolArray;
-                body["tool_choice"] = "auto";   // 实测仅 none/auto/required 受支持
+                // 实测仅 none/auto/required 受支持；开局部署传 required 强制工具调用。
+                body["tool_choice"] = string.IsNullOrEmpty(toolChoice) ? "auto" : toolChoice;
             }
             return body;
         }

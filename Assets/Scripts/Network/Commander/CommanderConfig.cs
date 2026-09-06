@@ -3,8 +3,8 @@ using UnityEngine;
 namespace HagenDa.Networking
 {
     /// <summary>
-    /// PHASE10 多模态 LLM 指挥官系统配置。红蓝两个指挥官实例共享同一份资产；
-    /// 数值与 PHASE10.md 对齐（超时/间隔/记忆窗口/快照/武器）。
+    /// PHASE11 LLM 指挥官系统配置。红蓝两个指挥官实例共享同一份资产；
+    /// 数值与 PHASE11.md 对齐（超时/间隔/记忆窗口/六边形编码/威胁度/武器）。
     /// </summary>
     [CreateAssetMenu(fileName = "CommanderConfig", menuName = "HagenDa/Commander Config")]
     public class CommanderConfig : ScriptableObject
@@ -13,8 +13,8 @@ namespace HagenDa.Networking
         [Tooltip("推理服务基址。PHASE10 定案：仅 LM Studio 路径，LLM for Unity 不使用。")]
         public string baseUrl = "http://localhost:1234";
 
-        [Tooltip("LM Studio 中的模型 id（/v1/models 列表中的名称）。")]
-        public string model = "minicpm-v-4_6";
+        [Tooltip("LM Studio 中的模型 id（/v1/models 列表中的名称）。PHASE11 起纯文本协议，无需多模态模型。")]
+        public string model = "qwen3.8-4b";
 
         [Tooltip("可选 Bearer Token。LM Studio 默认留空。")]
         public string apiKey = "";
@@ -53,17 +53,24 @@ namespace HagenDa.Networking
 
         [Header("快速记忆")]
         [Tooltip("上下文保留的最近轮次数（滚动窗口）；被丢弃的轮次仍完整写入 JSONL。")]
-        public int memoryRounds = 10;
+        public int memoryRounds = 5;
 
-        [Header("快照")]
-        [Tooltip("快照长边像素（短边按地图比例自适应）。")]
-        public int snapshotLongSide = 2048;
+        [Header("六边形空间编码")]
+        [Tooltip("目标有效格数（格尺寸随地图 AABB 自动缩放逼近）。")]
+        public int hexTargetCells = 64;
 
-        [Tooltip("网格间距（米），也是 LLM 坐标系的标尺步长。")]
-        public float gridSizeMeters = 20f;
+        [Header("侦测威胁度（按最近 POI 聚合的模糊档位）")]
+        [Tooltip("大幅威胁：该据点附近被标记敌军 ≥ 此值。")]
+        public int threatLargeEnemies = 20;
 
-        [Tooltip("调试：快照 PNG 落盘到 Logs/Commander/snapshots/。")]
-        public bool saveSnapshotPng = true;
+        [Tooltip("中度威胁：该据点附近被标记敌军 ≥ 此值。")]
+        public int threatMediumEnemies = 10;
+
+        [Tooltip("小幅威胁：该据点附近被标记敌军 ≥ 此值（低于则只报人数）。")]
+        public int threatSmallEnemies = 5;
+
+        [Tooltip("归入某据点\"附近\"的最大距离（米），超出归入游散。")]
+        public float threatPoiRadius = 60f;
 
         [Header("指挥官武器 — 广域侦测")]
         public float radarRadius = 50f;

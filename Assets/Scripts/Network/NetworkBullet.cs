@@ -79,22 +79,56 @@ namespace HagenDa.Networking
 
             Vector3 end = start + dir * step;
 
+            // PHASE12: QueryTriggerInteraction.Collide — the soldier hitboxes are
+            // trigger colliders attached to bones; they must be raycast targets.
             int n = Physics.RaycastNonAlloc(start, dir, hitBuffer, step,
                                             Physics.DefaultRaycastLayers,
-                                            QueryTriggerInteraction.Ignore);
+                                            QueryTriggerInteraction.Collide);
 
-            // RaycastNonAlloc order is not guaranteed — find the nearest valid hit.
+            // RaycastNonAlloc order is not guaranteed — find the nearest VALID hit.
+            // Validity rules:
+            //   - NetworkHitbox trigger                -> part hitbox (head/body/limb)
+            //   - any other trigger                    -> world zone, fly through
+            //   - movement capsule of a hitbox entity  -> fly through (PHASE12)
+            //   - movement capsule of a legacy entity  -> body hit (old capsule rules)
+            //   - anything else                        -> static geometry (body)
             bool found = false;
             RaycastHit best = default;
             float bestDist = step;
+            NetworkPlayerHealth bestHealth = null;
+            float bestPart = HitboxUtility.BodyMultiplier;
 
             for (int i = 0; i < n; i++)
             {
                 if (IsOwnerCollider(hitBuffer[i].collider)) continue;
+
+                var hitbox = hitBuffer[i].collider.GetComponent<NetworkHitbox>();
+                float part;
+                NetworkPlayerHealth targetHealth;
+
+                if (hitbox != null)
+                {
+                    part = NetworkHitbox.GetMultiplier(hitbox.part);
+                    targetHealth = hitBuffer[i].collider.GetComponentInParent<NetworkPlayerHealth>();
+                }
+                else if (hitBuffer[i].collider.isTrigger)
+                {
+                    continue;   // non-hitbox trigger: bullets fly through
+                }
+                else
+                {
+                    targetHealth = hitBuffer[i].collider.GetComponentInParent<NetworkPlayerHealth>();
+                    if (targetHealth != null && targetHealth.HasHitboxes)
+                        continue;   // movement capsule: the hitboxes consume bullets instead
+                    part = HitboxUtility.BodyMultiplier;
+                }
+
                 if (hitBuffer[i].distance < bestDist)
                 {
                     bestDist = hitBuffer[i].distance;
                     best = hitBuffer[i];
+                    bestHealth = targetHealth;
+                    bestPart = part;
                     found = true;
                 }
             }
@@ -103,22 +137,20 @@ namespace HagenDa.Networking
             {
                 owner?.NotifyImpact(best.point);
 
-                var health = best.collider.GetComponentInParent<NetworkPlayerHealth>();
-                if (health != null)
+                if (bestHealth != null)
                 {
                     // Living entity: penetrate and keep flying (PHASE4).
-                    var targetCombatant = health.GetComponent<NetworkCombatant>();
+                    var targetCombatant = bestHealth.GetComponent<NetworkCombatant>();
                     bool friendly = ownerTeam >= 0 && targetCombatant != null &&
                                     targetCombatant.teamId == ownerTeam;
 
                     if (!friendly)
                     {
-                        float part = HitboxUtility.GetMultiplier(health.GetActiveCapsule(), best.point);
-                        float finalDamage = ComputeDamage(best.point, part);
-                        health.TakeBulletDamage(finalDamage, best.point, direction, ownerCombatant);
+                        float finalDamage = ComputeDamage(best.point, bestPart);
+                        bestHealth.TakeBulletDamage(finalDamage, best.point, direction, ownerCombatant);
 
-                        bool headshot = part >= HitboxUtility.HeadMultiplier;
-                        bool killed = health.health <= 0f;
+                        bool headshot = bestPart >= HitboxUtility.HeadMultiplier;
+                        bool killed = bestHealth.health <= 0f;
                         owner?.NotifyHit(headshot, killed);
                     }
                     // 友军：不伤害，子弹继续飞行。
@@ -128,7 +160,7 @@ namespace HagenDa.Networking
                     var damageable = best.collider.GetComponentInParent<IDamageable>();
                     if (damageable != null)
                     {
-                        float finalDamage = ComputeDamage(best.point, 1f);
+                        float finalDamage = ComputeDamage(best.point, bestPart);
                         damageable.TakeDamage(finalDamage);
                     }
                     // Non-entity (wall / static target): destroy.

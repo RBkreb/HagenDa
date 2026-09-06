@@ -4,14 +4,15 @@ using UnityEngine;
 
 namespace HagenDa.Networking
 {
-    /// <summary>一条小队目标（LLM 网格坐标，客户端 HUD/地图标记消费）。</summary>
+    /// <summary>一条小队目标（格编号 + 世界坐标；客户端 HUD/地图标记消费）。</summary>
     [System.Serializable]
     public struct SquadObjectiveMsg
     {
         public int team;
         public int squad;
-        public float gx;
-        public float gz;
+        public int cellId;   // 六边形格编号（1 基，LLM 口径）
+        public float wx;     // 目标世界坐标 X（PHASE11：客户端无需 Overlay 换算）
+        public float wz;     // 目标世界坐标 Z
     }
 
     /// <summary>Mirror 自动序列化的同步列表。</summary>
@@ -23,7 +24,7 @@ namespace HagenDa.Networking
     ///  - <see cref="matchStarted"/>：开局门控。场景中存在本对象时，比赛从"未开始"
     ///    启动（全员冻结、争夺/计分暂停），双方指挥官完成部署或超时退化后置 true。
     ///    不存在本对象的场景恒视为已开始——其他场景行为完全不变。
-    ///  - <see cref="objectives"/>：各小队当前抽象争夺点（网格坐标），驱动玩家小队
+    ///  - <see cref="objectives"/>：各小队当前抽象争夺点（格编号 + 世界坐标），驱动玩家小队
     ///    的 HUD 一行文字与地图黄色菱形标记（Q17:b）。
     /// </summary>
     [RequireComponent(typeof(NetworkIdentity))]
@@ -74,14 +75,16 @@ namespace HagenDa.Networking
         }
 
         [Server]
-        public void SetSquadObjective(int team, int squad, float gx, float gz)
+        public void SetSquadObjective(int team, int squad, int cellId, float wx, float wz)
         {
             for (int i = 0; i < objectives.Count; i++)
             {
                 var o = objectives[i];
                 if (o.team == team && o.squad == squad)
                 {
-                    o.gx = gx; o.gz = gz;
+                    o.cellId = cellId;
+                    o.wx = wx;
+                    o.wz = wz;
                     objectives[i] = o;
                     return;
                 }
@@ -90,8 +93,9 @@ namespace HagenDa.Networking
             {
                 team = team,
                 squad = squad,
-                gx = gx,
-                gz = gz,
+                cellId = cellId,
+                wx = wx,
+                wz = wz,
             });
         }
 

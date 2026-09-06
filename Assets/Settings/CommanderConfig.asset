@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: CommanderConfig
   m_EditorClassIdentifier: 
   baseUrl: http://localhost:1234
-  model: qwen3.5-4b
+  model: ornith1_5-9b
   apiKey: 
   maxTokens: 8192
-  temperature: 0.02
+  temperature: 0.1
   openingTimeout: 300
   roundTimeout: 120
   idleInterval: 30
@@ -25,10 +25,12 @@ MonoBehaviour:
   waitMin: 5
   waitMax: 120
   maxToolIterations: 8
-  memoryRounds: 10
-  snapshotLongSide: 2048
-  gridSizeMeters: 20
-  saveSnapshotPng: 1
+  memoryRounds: 2
+  hexTargetCells: 64
+  threatLargeEnemies: 20
+  threatMediumEnemies: 10
+  threatSmallEnemies: 5
+  threatPoiRadius: 60
   radarRadius: 50
   radarDuration: 20
   radarScanEvery: 5
