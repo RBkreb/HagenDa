@@ -1,0 +1,420 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fc25b8a156ba9740b71b3ca615e4b1f, type: 3}
+  m_Name: CrouchPose
+  m_EditorClassIdentifier: 
+  bones:
+  - boneName: arms_armor high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: arms_short high poly.001
+    localPosition: {x: -0.000000007708519, y: 0.00000004584963, z: -0.027976373}
+    localRotation: {x: -0.7071068, y: -1.5700926e-16, z: -1.5700928e-16, w: 0.7071067}
+  - boneName: back_armor high poly.001
+    localPosition: {x: -0, y: 0, z: -0.02286315}
+    localRotation: {x: -0.00000013767877, y: 0.7071068, z: 0.70710677, w: 0.00000013767878}
+  - boneName: backpack high poly.001
+    localPosition: {x: 3.0276163e-16, y: 1.3635172, z: -0.22909825}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: belt_low high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: buttons high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: elbows_long high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027975999}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: front_armor high poly.001
+    localPosition: {x: -0, y: 0, z: -0.02286315}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: gloves_long high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027975999}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: gloves_short high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: groin_armor high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: helmet high poly.001
+    localPosition: {x: -0.000014424324, y: 1.7241039, z: 0.036829866}
+    localRotation: {x: -0.50000006, y: -0.4999999, z: -0.5, w: 0.5}
+  - boneName: holster high poly.001
+    localPosition: {x: 0.19329204, y: 0.6705105, z: -0.01989959}
+    localRotation: {x: -0.0038017167, y: 0.08707282, z: -0.0434534, w: 0.9952466}
+  - boneName: holster_holder high poly.001
+    localPosition: {x: 0.1668476, y: 0.7802548, z: -0.019578854}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: Natlan Soldier Rig.001
+    localPosition: {x: -0, y: 0, z: 0}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: DEF-pelvis.L
+    localPosition: {x: 3.6210274e-10, y: -0.00002, z: 0.00489}
+    localRotation: {x: 0.16000889, y: 0.30792966, z: 0.7829656, w: 0.51627654}
+  - boneName: DEF-pelvis.L_end
+    localPosition: {x: -0, y: 0.0015663947, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-pelvis.R
+    localPosition: {x: -0, y: -0.00002, z: 0.00489}
+    localRotation: {x: 0.16000889, y: -0.30792966, z: -0.7829656, w: 0.51627654}
+  - boneName: DEF-pelvis.R_end
+    localPosition: {x: -0, y: 0.0015663947, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-spine
+    localPosition: {x: -0, y: -0.00002, z: 0.00489}
+    localRotation: {x: 0.98231506, y: -0.000000022756826, z: -0.000000043881883, w: 0.18723574}
+  - boneName: DEF-spine.001
+    localPosition: {x: -6.217249e-17, y: 0.0010433395, z: -4.9960034e-18}
+    localRotation: {x: -0.11849447, y: 0.000000034741266, z: 0.00000003479481, w: 0.99295473}
+  - boneName: DEF-spine.002
+    localPosition: {x: 8.6129015e-18, y: 0.0015711717, z: 9.8953025e-12}
+    localRotation: {x: -0.0981972, y: -0.0000000785377, z: -0.000000078682426, w: 0.995167}
+  - boneName: backpack
+    localPosition: {x: 0.00000018823954, y: 0.0020704775, z: -0.001628095}
+    localRotation: {x: -0.8126635, y: -0.000000028953211, z: 0.0000001076062, w: 0.5827333}
+  - boneName: backpack_end
+    localPosition: {x: -0, y: 0.0019999999, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-shoulder.L
+    localPosition: {x: -0.00027682527, y: 0.00201146, z: -0.00005100254}
+    localRotation: {x: 0.5615916, y: -0.4600098, z: 0.56189466, w: 0.39658576}
+  - boneName: DEF-shoulder.L_end
+    localPosition: {x: -0, y: 0.001420217, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-shoulder.R
+    localPosition: {x: 0.00027682612, y: 0.0020114565, z: -0.000051002855}
+    localRotation: {x: -0.5615919, y: -0.46000865, z: 0.56189466, w: -0.39658672}
+  - boneName: DEF-shoulder.R_end
+    localPosition: {x: -0, y: 0.0014202143, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-spine.004
+    localPosition: {x: 4.4408918e-17, y: 0.0024151604, z: 1.1175864e-10}
+    localRotation: {x: 0.21669473, y: 0.0000003475744, z: 0.00000038588973, w: 0.97623944}
+  - boneName: DEF-spine.005
+    localPosition: {x: -1.3766766e-16, y: 0.0004749724, z: 1.3038531e-10}
+    localRotation: {x: -0.47268665, y: 1.1937114e-12, z: 1.2079222e-12, w: 0.8812306}
+  - boneName: DEF-spine.006
+    localPosition: {x: 3.6637358e-17, y: 0.0004749698, z: -1.44355e-10}
+    localRotation: {x: -0.11965105, y: -0.00000028989882, z: -0.00000028989868, w: 0.99281603}
+  - boneName: DEF-spine.006_end
+    localPosition: {x: -0, y: 0.00067503453, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-upper_arm.L
+    localPosition: {x: -0.0016435755, y: 0.0016390459, z: -0.00015256985}
+    localRotation: {x: 0.031747345, y: 0.92899215, z: 0.34066477, w: 0.14111379}
+  - boneName: DEF-upper_arm.L.001
+    localPosition: {x: 9.608812e-10, y: 0.0011381288, z: 6.984919e-12}
+    localRotation: {x: -0.000000003841706, y: -0.00011459537, z: -0.00000009352938,
+      w: 1}
+  - boneName: DEF-forearm.L
+    localPosition: {x: -8.1772665e-11, y: 0.001138083, z: 1.3969838e-11}
+    localRotation: {x: 0.006316396, y: -0.000105655454, z: 0.0000009831152, w: 0.9999801}
+  - boneName: DEF-forearm.L.001
+    localPosition: {x: 1.3645149e-10, y: 0.00116124, z: -4.6566128e-12}
+    localRotation: {x: -0.000000013391497, y: -0.1336582, z: 0.00000043068664, w: 0.9910275}
+  - boneName: DEF-hand.L
+    localPosition: {x: -1.9790604e-10, y: 0.0011612445, z: -7.4505804e-11}
+    localRotation: {x: 0.013769414, y: -0.13583364, z: -0.06871219, w: 0.98825014}
+  - boneName: DEF-f_index.01.L
+    localPosition: {x: -0.000019516074, y: 0.0009312366, z: 0.0001878935}
+    localRotation: {x: -0.1571329, y: 0.6779881, z: 0.246137, w: 0.67457986}
+  - boneName: DEF-f_index.02.L
+    localPosition: {x: 1.2107193e-10, y: 0.00045609934, z: 7.4505804e-11}
+    localRotation: {x: -0.08618672, y: 0.16529503, z: -0.04730354, w: 0.98133165}
+  - boneName: DEF-f_index.02.L_end
+    localPosition: {x: -0, y: 0.00045609812, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-f_middle.01.L
+    localPosition: {x: 0.000017778128, y: 0.00093844504, z: -0.0003234303}
+    localRotation: {x: -0.10304313, y: 0.6940766, z: 0.1775684, w: 0.69000673}
+  - boneName: DEF-f_middle.02.L
+    localPosition: {x: 1.3038516e-10, y: 0.00042913272, z: 2.6077032e-10}
+    localRotation: {x: -0.25339994, y: 0.17842357, z: -0.080118425, w: 0.947383}
+  - boneName: DEF-f_middle.02.L_end
+    localPosition: {x: -0, y: 0.00042913004, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-palm.01.L
+    localPosition: {x: 0.00000021076528, y: 0.00023871478, z: 0.00003446138}
+    localRotation: {x: 0.018406337, y: 0.9654803, z: 0.06922077, w: 0.2504345}
+  - boneName: DEF-palm.01.L_end
+    localPosition: {x: -0, y: 0.00072356715, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-palm.02.L
+    localPosition: {x: 0.000004445198, y: 0.00023461228, z: -0.00008085782}
+    localRotation: {x: -0.03440171, y: 0.9519489, z: -0.16180027, w: 0.25774136}
+  - boneName: DEF-palm.02.L_end
+    localPosition: {x: -0, y: 0.0007445806, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-thumb.01.L
+    localPosition: {x: -0.000018616045, y: 0.00014520048, z: 0.00018558333}
+    localRotation: {x: -0.359726, y: 0.8459675, z: 0.12305932, w: -0.37388855}
+  - boneName: DEF-thumb.02.L
+    localPosition: {x: 1.6298145e-10, y: 0.0005523299, z: -7.4505804e-11}
+    localRotation: {x: 0.15853478, y: -0.12519334, z: 0.09723051, w: 0.97454584}
+  - boneName: DEF-thumb.02.L_end
+    localPosition: {x: -0, y: 0.0005523279, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-upper_arm.R
+    localPosition: {x: 0.0016435747, y: 0.0016390407, z: -0.00015256634}
+    localRotation: {x: -0.118984684, y: 0.92188734, z: 0.3524382, w: -0.1084148}
+  - boneName: DEF-upper_arm.R.001
+    localPosition: {x: 6.0719685e-10, y: 0.0011381336, z: 2.4447217e-11}
+    localRotation: {x: -0.0000000060535976, y: 0.00011423792, z: -0.000000011432349,
+      w: 1}
+  - boneName: DEF-forearm.R
+    localPosition: {x: 0.0000000017209549, y: 0.0011380886, z: -9.3132255e-12}
+    localRotation: {x: 0.0062919264, y: 0.0001055224, z: -0.00000047834965, w: 0.9999802}
+  - boneName: DEF-forearm.R.001
+    localPosition: {x: 6.106984e-10, y: 0.001161244, z: -4.6566128e-12}
+    localRotation: {x: 4.69876e-10, y: 0.13365796, z: -0.0000000713929, w: 0.99102753}
+  - boneName: DEF-hand.R
+    localPosition: {x: -1.6298145e-11, y: 0.0011612442, z: 1.3038516e-10}
+    localRotation: {x: 0.013760145, y: 0.13583252, z: 0.068711475, w: 0.98825043}
+  - boneName: DEF-f_index.01.R
+    localPosition: {x: 0.000019509047, y: 0.0009312343, z: 0.00018789373}
+    localRotation: {x: -0.15713257, y: -0.67798144, z: -0.24613494, w: 0.67458737}
+  - boneName: DEF-f_index.02.R
+    localPosition: {x: -1.7695129e-10, y: 0.00045609774, z: -1.44355e-10}
+    localRotation: {x: -0.08618981, y: -0.16534725, z: 0.047299087, w: 0.98132277}
+  - boneName: DEF-f_index.02.R_end
+    localPosition: {x: -0, y: 0.00045609692, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-f_middle.01.R
+    localPosition: {x: -0.000017756689, y: 0.00093844265, z: -0.00032343052}
+    localRotation: {x: -0.10304588, y: -0.6940854, z: -0.17757712, w: 0.68999517}
+  - boneName: DEF-f_middle.02.R
+    localPosition: {x: -3.72529e-10, y: 0.00042913083, z: -3.72529e-10}
+    localRotation: {x: -0.25340343, y: -0.17842391, z: 0.08011988, w: 0.9473819}
+  - boneName: DEF-f_middle.02.R_end
+    localPosition: {x: -0, y: 0.00042913115, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-palm.01.R
+    localPosition: {x: -0.00000021360815, y: 0.00023871416, z: 0.000034461737}
+    localRotation: {x: -0.018408632, y: 0.965489, z: 0.06922111, w: -0.2504009}
+  - boneName: DEF-palm.01.R_end
+    localPosition: {x: -0, y: 0.00072356476, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-palm.02.R
+    localPosition: {x: -0.0000044409044, y: 0.00023461113, z: -0.00008085804}
+    localRotation: {x: 0.03440757, y: 0.95195794, z: -0.16179863, w: -0.25770804}
+  - boneName: DEF-palm.02.R_end
+    localPosition: {x: -0, y: 0.00074458, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-thumb.01.R
+    localPosition: {x: 0.000018605666, y: 0.00014519876, z: 0.00018558338}
+    localRotation: {x: 0.35971212, y: 0.8459707, z: 0.12308965, w: 0.37388465}
+  - boneName: DEF-thumb.02.R
+    localPosition: {x: -1.7229468e-10, y: 0.0005523303, z: -3.7252902e-11}
+    localRotation: {x: 0.15853673, y: 0.12519307, z: -0.09723568, w: 0.97454506}
+  - boneName: DEF-thumb.02.R_end
+    localPosition: {x: -0, y: 0.00055232993, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: pouch_7
+    localPosition: {x: 0.0012605493, y: -0.00045831827, z: 0.0005484257}
+    localRotation: {x: 0.38634786, y: 0.5248527, z: 0.6399449, w: -0.40710628}
+  - boneName: pouch_7_end
+    localPosition: {x: -0, y: 0.00048861076, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: pouch_8
+    localPosition: {x: -0.0014064376, y: -0.0005379069, z: -0.00019391827}
+    localRotation: {x: -0.4592119, y: 0.44093528, z: 0.5550115, w: 0.535409}
+  - boneName: pouch_8_end
+    localPosition: {x: -0, y: 0.00059105095, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: pouch_talkie
+    localPosition: {x: -0.0012448111, y: -0.0005552418, z: 0.00059561885}
+    localRotation: {x: -0.29353172, y: 0.539455, z: 0.6986941, w: 0.36695233}
+  - boneName: pouch_talkie_end
+    localPosition: {x: -0, y: 0.0005488914, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: FX05 mag.002
+    localPosition: {x: 0.0007820147, y: 0.001580677, z: 0.0015102921}
+    localRotation: {x: 0.5699237, y: -0.40491822, z: 0.4483314, w: 0.55698043}
+  - boneName: FX05 mag.003
+    localPosition: {x: -0.000009152847, y: 0.001580677, z: 0.0015102923}
+    localRotation: {x: 0.51591074, y: -0.46327618, z: 0.51648146, w: 0.5024522}
+  - boneName: FX05 mag.004
+    localPosition: {x: -0.0007641359, y: 0.001580705, z: 0.0014050482}
+    localRotation: {x: 0.41849673, y: -0.54056144, z: 0.6074051, w: 0.40461436}
+  - boneName: pouch_5
+    localPosition: {x: 0.00018811841, y: 0.000016163027, z: 0.00167235}
+    localRotation: {x: 0.033908814, y: 0.68949527, z: 0.72228, w: -0.041929048}
+  - boneName: pouch_5_end
+    localPosition: {x: -0, y: 0.00048861076, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: pouch_6
+    localPosition: {x: 0.0010022452, y: 0.0002449766, z: 0.0014950852}
+    localRotation: {x: 0.23331696, y: 0.6445971, z: 0.6843764, w: -0.24836805}
+  - boneName: pouch_6_end
+    localPosition: {x: -0, y: 0.00048861076, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: front_armor
+    localPosition: {x: 0.00000018893357, y: 0.0009125118, z: 0.0012682758}
+    localRotation: {x: 0.99192804, y: 0.0006195194, z: 0.00519699, w: 0.1266943}
+  - boneName: front_armor_end
+    localPosition: {x: -0, y: 0.0021488813, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: pouch_1.L
+    localPosition: {x: -0.0015745863, y: 0.00047525353, z: 0.00012342614}
+    localRotation: {x: 0.09638533, y: 0.17263687, z: 0.691032, w: 0.6952562}
+  - boneName: pouch_1.L_end
+    localPosition: {x: -0, y: 0.00035812345, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: pouch_1.R
+    localPosition: {x: 0.0014936957, y: 0.0005660675, z: 0.00048817048}
+    localRotation: {x: 0.18888931, y: -0.26803425, z: -0.6501842, w: 0.68537503}
+  - boneName: pouch_1.R_end
+    localPosition: {x: -0, y: 0.0003581234, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-thigh.L
+    localPosition: {x: -0.00073, y: -0.00002, z: 0.00524}
+    localRotation: {x: -0.9984771, y: 0.0076457933, z: -0.004595512, w: 0.054441877}
+  - boneName: DEF-thigh.L.001
+    localPosition: {x: 3.204377e-11, y: 0.0024524182, z: -1.1641532e-12}
+    localRotation: {x: -0.000000007850757, y: -0.000105891406, z: -0.000000015530532,
+      w: 1}
+  - boneName: DEF-shin.L
+    localPosition: {x: 9.869836e-11, y: 0.0024524166, z: 3.4924596e-12}
+    localRotation: {x: 0.8967471, y: -0.00004683701, z: 0.00009492724, w: 0.4425434}
+  - boneName: DEF-shin.L.001
+    localPosition: {x: -4.8603396e-11, y: 0.0022051197, z: 3.958121e-11}
+    localRotation: {x: -0.000000017011207, y: 0.0014365689, z: -0.0000000040454373,
+      w: 0.999999}
+  - boneName: DEF-foot.L
+    localPosition: {x: 2.0954757e-11, y: 0.0022051183, z: 3.1432135e-11}
+    localRotation: {x: -0.4542664, y: 0.022081025, z: 0.013583762, w: 0.8904886}
+  - boneName: DEF-toe.L
+    localPosition: {x: -2.135776e-11, y: 0.0017899717, z: 5.2386893e-12}
+    localRotation: {x: 0.03255377, y: 0.937385, z: -0.34656134, w: 0.0120350765}
+  - boneName: DEF-toe.L_end
+    localPosition: {x: -0, y: 0.0004999561, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: DEF-thigh.R
+    localPosition: {x: 0.00073, y: -0.00002, z: 0.00524}
+    localRotation: {x: -0.9984771, y: -0.0076446775, z: 0.0045955013, w: 0.054442532}
+  - boneName: DEF-thigh.R.001
+    localPosition: {x: 5.570655e-13, y: 0.002452419, z: 4.5110938e-12}
+    localRotation: {x: -0.0000000013387759, y: 0.00010592093, z: -0.000000030926458,
+      w: 1}
+  - boneName: DEF-shin.R
+    localPosition: {x: -7.330527e-11, y: 0.0024524175, z: 6.984919e-12}
+    localRotation: {x: 0.8967522, y: 0.000046984966, z: -0.00009508518, w: 0.4425331}
+  - boneName: DEF-shin.R.001
+    localPosition: {x: 5.9080775e-11, y: 0.0022051223, z: 4.773028e-11}
+    localRotation: {x: 0.000000039228368, y: -0.0014364303, z: -0.000000001891751,
+      w: 0.999999}
+  - boneName: DEF-foot.R
+    localPosition: {x: -8.8475643e-11, y: 0.0022051227, z: -3.0267983e-11}
+    localRotation: {x: -0.45426753, y: -0.022081418, z: -0.0135833565, w: 0.890488}
+  - boneName: DEF-toe.R
+    localPosition: {x: -5.3529438e-11, y: 0.001789976, z: -1.330045e-10}
+    localRotation: {x: -0.032550767, y: 0.9373716, z: -0.34659782, w: -0.0120350905}
+  - boneName: DEF-toe.R_end
+    localPosition: {x: -0, y: 0.00050000177, z: 0}
+    localRotation: {x: 0, y: -0, z: -0, w: 1}
+  - boneName: neck high poly.001
+    localPosition: {x: -0, y: 1.5834767, z: -0.00036913733}
+    localRotation: {x: -0.5735765, y: -2.726437e-17, z: 2.7264366e-17, w: 0.819152}
+  - boneName: neck_armor high poly.001
+    localPosition: {x: -0.0024488142, y: 1.6358149, z: 0.011355881}
+    localRotation: {x: -0.6069226, y: 2.0854249e-17, z: -2.085424e-17, w: 0.79476094}
+  - boneName: pants_armor high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: pants_low high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: pouch_1 high poly.001
+    localPosition: {x: 0.000000059511347, y: 1.1056366, z: 0.07936198}
+    localRotation: {x: 0.9628017, y: -0.014349453, z: -0.26473284, w: -0.05218714}
+  - boneName: pouch_2 high poly.001
+    localPosition: {x: 0.13500987, y: 0.6959671, z: 0.065728}
+    localRotation: {x: -0.4055434, y: -0.032119658, z: 0.91106725, w: 0.0667783}
+  - boneName: pouch_3 high poly.001
+    localPosition: {x: 0.16657785, y: 0.8289096, z: 0.05021234}
+    localRotation: {x: -0.5808519, y: 0.40325072, z: 0.40325093, w: 0.5808517}
+  - boneName: pouch_4 high poly.001
+    localPosition: {x: -0.16927263, y: 0.7001194, z: -0.028391711}
+    localRotation: {x: 0.42579997, y: 0.5645304, z: 0.56453013, w: -0.42580009}
+  - boneName: pouch_5 high poly.001
+    localPosition: {x: 0.14411269, y: 1.229363, z: -0.00034561753}
+    localRotation: {x: 0.0017994973, y: 0.039741546, z: 0.9971819, w: -0.06360551}
+  - boneName: pouch_6 high poly.001
+    localPosition: {x: 0.12501438, y: 1.2756271, z: 0.12185555}
+    localRotation: {x: -0.668409, y: 0.29635578, z: 0.30948526, w: 0.6079651}
+  - boneName: pouch_7 high poly.001
+    localPosition: {x: 0.1497551, y: 1.2746208, z: 0.08143522}
+    localRotation: {x: -0.5978741, y: 0.3728309, z: 0.37772322, w: 0.6007236}
+  - boneName: pouch_8 high poly.001
+    localPosition: {x: -0.18456812, y: 1.2820647, z: 0.013823604}
+    localRotation: {x: 0.99861234, y: -0.048679188, z: -0.016354587, w: -0.011677705}
+  - boneName: pouch_9 high poly.001
+    localPosition: {x: -0.16675505, y: 1.1021088, z: 0.011666045}
+    localRotation: {x: -0.55861735, y: -0.38385028, z: -0.46357653, w: 0.57070345}
+  - boneName: pouch_10 high poly.001
+    localPosition: {x: -0.16460922, y: 1.1105202, z: -0.03921017}
+    localRotation: {x: -0.4359788, y: -0.47298265, z: -0.5318323, w: 0.55078524}
+  - boneName: pouch_11 high poly.001
+    localPosition: {x: 0.14574708, y: 1.0861915, z: -0.031101221}
+    localRotation: {x: 0.1025353, y: -0.04208508, z: 0.9909641, w: -0.07553473}
+  - boneName: pouch_back_1 high poly.001
+    localPosition: {x: -0.04352074, y: 1.071732, z: -0.13956238}
+    localRotation: {x: -0.67700326, y: 0, z: -0, w: 0.73598003}
+  - boneName: pouch_back_2 high poly.001
+    localPosition: {x: 0.050929826, y: 1.0791335, z: -0.12234473}
+    localRotation: {x: -0.037170656, y: 0.65476066, z: 0.7542562, w: 0.031694587}
+  - boneName: pouch_mags high poly.001
+    localPosition: {x: 0.0017855298, y: 1.2572165, z: 0.17319396}
+    localRotation: {x: -0.6988667, y: 0.0018280331, z: -0.0023135843, w: 0.71524584}
+  - boneName: pouch_talkie high poly.001
+    localPosition: {x: -0.124481134, y: 1.2783173, z: 0.09542692}
+    localRotation: {x: -0.61363953, y: -0.35134953, z: -0.35134953, w: 0.6136396}
+  - boneName: pourch_front high poly.001
+    localPosition: {x: -0.00012083049, y: 1.0392572, z: 0.1465952}
+    localRotation: {x: -0.6727155, y: 0, z: -0, w: 0.73990124}
+  - boneName: scarf high poly.001
+    localPosition: {x: -0.0024488142, y: 1.5834767, z: -0.00036913733}
+    localRotation: {x: -0.5735765, y: -2.726437e-17, z: 2.7264366e-17, w: 0.819152}
+  - boneName: shirt_long high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027975999}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: shirt_short high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: shoes_low high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: shoes_low.002 high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: shoulders_armor high poly.001
+    localPosition: {x: -0, y: 0, z: -0.027976379}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: side_armor high poly.001
+    localPosition: {x: -0, y: 0.051406033, z: -0.02286315}
+    localRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  - boneName: tablet high poly.001
+    localPosition: {x: -6.683491e-18, y: 1.4726175, z: 0.13610362}
+    localRotation: {x: -0.8009309, y: 2.809851e-17, z: -2.6403883e-17, w: 0.59875673}
+  - boneName: tag_front high poly.001
+    localPosition: {x: 0.00018508593, y: 1.4759556, z: 0.13340232}
+    localRotation: {x: -0.6839394, y: -0.0009723584, z: 0.00007528223, w: 0.72953826}
+  - boneName: talkiewalkie high poly.001
+    localPosition: {x: -0.13793284, y: 1.3479551, z: 0.11712546}
+    localRotation: {x: 0.00000020028892, y: 0.057985395, z: -0.000000012378039, w: 0.9983175}
+  - boneName: thigh_strap_low high poly.001
+    localPosition: {x: -0.0074536162, y: 1.0532237, z: 0.13496706}
+    localRotation: {x: -0.49303687, y: 0.5068675, z: 0.50686723, w: 0.49303713}
+  - boneName: watch_short high poly.001
+    localPosition: {x: -0.39231792, y: 1.1012211, z: -0.023462951}
+    localRotation: {x: -0.7071068, y: -1.5700926e-16, z: -1.5700928e-16, w: 0.7071067}

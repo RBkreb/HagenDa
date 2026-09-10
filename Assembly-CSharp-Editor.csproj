@@ -77,14 +77,17 @@
     <Analyzer Include="D:\HagenTa\HagenDa\Library\PackageCache\com.unity.entities@1.3.15\Unity.Entities\SourceGenerators\SystemGenerator.Common.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\ScriptTemplates\Editor\MoveToAssetsFolder.cs" />
-    <Compile Include="Assets\Scripts\Network\Editor\NailongClipGen.cs" />
     <Compile Include="Assets\Scripts\Network\Match\Editor\MatchSceneBuilder.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\NailongRigSetup.cs" />
-    <Compile Include="Assets\Scripts\Network\Editor\BuildScript.cs" />
+    <Compile Include="Assets\Effects\particle_package\UnionAssetes\Particle\ParticleScaler\Editor\ParticleScaleEditor.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\NetworkSetup.cs" />
-    <Compile Include="Assets\Scripts\Network\Commander\Editor\CommanderSetup.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\Editor\CommanderSmokeTest.cs" />
+    <Compile Include="Assets\ScriptTemplates\Editor\MoveToAssetsFolder.cs" />
+    <Compile Include="Assets\Scripts\Network\Editor\NailongClipGen.cs" />
+    <Compile Include="Assets\Scripts\Effects\Editor\InfinityVfxFactory.cs" />
+    <Compile Include="Assets\Scripts\Network\Editor\BuildScript.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\Editor\CommanderSetup.cs" />
+    <Compile Include="Assets\Scripts\Animation\Rigging\Editor\HandGripRigBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -487,12 +490,20 @@
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Mono.CecilX.Mdb">
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.IO.Abstractions">
       <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\System.IO.Abstractions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.YamlDotNet">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Cecil.Awesome">
@@ -519,6 +530,14 @@
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\System.Reflection.Metadata.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\System.Collections.Immutable.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Mono.CecilX.Rocks">
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
       <Private>False</Private>
@@ -527,8 +546,20 @@
       <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\ProtoBuffer\System.Interactive.Async.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.IonicZip">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.IO.Hashing">
       <HintPath>Library\PackageCache\com.unity.collections@2.5.7\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Google.Protobuf">
@@ -545,6 +576,10 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.2.1\Runtime\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.TextureAssets">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">
@@ -1075,6 +1110,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Physics.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="cn.tuanjie.AnimGraph.Runtime">
+      <HintPath>Library\ScriptAssemblies\cn.tuanjie.AnimGraph.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.ScriptableBuildPipeline">
       <HintPath>Library\ScriptAssemblies\Unity.ScriptableBuildPipeline.dll</HintPath>
       <Private>False</Private>
@@ -1089,6 +1128,10 @@
     </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Splines.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Splines.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.HighDefinition.Config.Runtime">
@@ -1127,6 +1170,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="cn.tuanjie.AnimGraph.Editor">
+      <HintPath>Library\ScriptAssemblies\cn.tuanjie.AnimGraph.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.ProBuilder.AssetIdRemapUtility">
       <HintPath>Library\ScriptAssemblies\Unity.ProBuilder.AssetIdRemapUtility.dll</HintPath>
       <Private>False</Private>
@@ -1137,6 +1184,10 @@
     </Reference>
     <Reference Include="Unity.Mathematics.Extensions.Hybrid">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Extensions.Hybrid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AutoGenerateInspector">
+      <HintPath>Library\ScriptAssemblies\AutoGenerateInspector.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Burst">
@@ -1175,6 +1226,10 @@
       <HintPath>Library\ScriptAssemblies\CrashKonijn.Agent.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.Flow.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Serialization.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Serialization.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1207,6 +1262,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Entities.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Splines">
+      <HintPath>Library\ScriptAssemblies\Unity.Splines.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Entities.Editor.Properties">
       <HintPath>Library\ScriptAssemblies\Unity.Entities.Editor.Properties.dll</HintPath>
       <Private>False</Private>
@@ -1219,8 +1278,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.Barracuda.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Tuanjie.RigGraph.Runtime.RigGraphCore">
+      <HintPath>Library\ScriptAssemblies\Tuanjie.RigGraph.Runtime.RigGraphCore.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Tuanjie.Infinity.Editor">
       <HintPath>Library\ScriptAssemblies\Tuanjie.Infinity.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.State">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Scenes">
@@ -1279,8 +1346,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.VisualEffectGraph.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.Flow">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Mathematics.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AnimRigGraph.Editor.AnimationGraphEditor">
+      <HintPath>Library\ScriptAssemblies\AnimRigGraph.Editor.AnimationGraphEditor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Tuanjie.Infinity">
@@ -1305,6 +1380,10 @@
     </Reference>
     <Reference Include="Unity.Physics.Hybrid">
       <HintPath>Library\ScriptAssemblies\Unity.Physics.Hybrid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AnimRigGraph.Runtime.AnimationGraph">
+      <HintPath>Library\ScriptAssemblies\AnimRigGraph.Runtime.AnimationGraph.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.AI.Navigation.Editor.ConversionSystem">
@@ -1339,6 +1418,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.Shared.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.ShaderGraph.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1347,8 +1430,24 @@
       <HintPath>Library\ScriptAssemblies\Unity.Barracuda.iOSBLAS.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Test">
+      <HintPath>Library\ScriptAssemblies\Test.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Core">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Tuanjie.RigGraphEditor">
+      <HintPath>Library\ScriptAssemblies\Tuanjie.RigGraphEditor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Core.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Barracuda.BurstBLAS">
@@ -1371,6 +1470,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Entities.Graphics.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Entities.Graphics.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1379,8 +1482,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Tuanjie.RigGraph.CodeGen">
+      <HintPath>Library\ScriptAssemblies\Tuanjie.RigGraph.CodeGen.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.AI.Navigation.Updater">
       <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Updater.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.State.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Mathematics">

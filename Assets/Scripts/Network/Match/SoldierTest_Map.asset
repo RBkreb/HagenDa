@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5389c69776d69ce4480dc0a1d3ad438e, type: 3}
+  m_Name: SoldierTest_Map
+  m_EditorClassIdentifier: 
+  kind: 0
+  sizeX: 60
+  sizeZ: 80
+  wallHeight: 4
+  coverCount: 6
+  coverSeed: 42
+  coverMinGap: 5
+  mapRootNames: []
+  ceilingKeyword: ceiling
+  doubleSidedMaterials: 1
+  anchorResolve: 1
+  anchors:
+  - role: 0
+    letter: A
+    markerName: 
+    position: {x: 0, y: 0, z: -24}
+    radius: 8
+    extent: {x: 0, y: 0}
+    deployPointCount: 4
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 1
+    letter: A
+    markerName: 
+    position: {x: 0, y: 0, z: 24}
+    radius: 8
+    extent: {x: 0, y: 0}
+    deployPointCount: 4
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 2
+    letter: A
+    markerName: 
+    position: {x: 0, y: 0, z: 0}
+    radius: 10
+    extent: {x: 0, y: 0}
+    deployPointCount: 2
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5

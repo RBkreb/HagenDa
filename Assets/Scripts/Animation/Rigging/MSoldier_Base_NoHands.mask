@@ -1,0 +1,253 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MSoldier_Base_NoHands
+  m_Mask: 01000000010000000100000001000000010000000100000001000000000000000000000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: Soldier
+    m_Weight: 1
+  - m_Path: Soldier/arms_armor high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/arms_short high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/back_armor high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/backpack high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/belt_low high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/buttons high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/elbows_long high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/front_armor high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/gloves_long high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/gloves_short high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/groin_armor high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/helmet high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/holster high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/holster_holder high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-pelvis.L
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-pelvis.L/DEF-pelvis.L_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-pelvis.R
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-pelvis.R/DEF-pelvis.R_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/backpack
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/backpack/backpack_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-shoulder.L
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-shoulder.L/DEF-shoulder.L_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-shoulder.R
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-shoulder.R/DEF-shoulder.R_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-spine.004
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-spine.004/DEF-spine.005
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-spine.004/DEF-spine.005/DEF-spine.006
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-spine.004/DEF-spine.005/DEF-spine.006/DEF-spine.006_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-upper_arm.L
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-upper_arm.L/DEF-upper_arm.L.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-upper_arm.L/DEF-upper_arm.L.001/DEF-forearm.L
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-upper_arm.L/DEF-upper_arm.L.001/DEF-forearm.L/DEF-forearm.L.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-upper_arm.L/DEF-upper_arm.L.001/DEF-forearm.L/LeftHint
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-upper_arm.R
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-upper_arm.R/DEF-upper_arm.R.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-upper_arm.R/DEF-upper_arm.R.001/DEF-forearm.R
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-upper_arm.R/DEF-upper_arm.R.001/DEF-forearm.R/DEF-forearm.R.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/DEF-upper_arm.R/DEF-upper_arm.R.001/DEF-forearm.R/RightHint
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/pouch_7
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/pouch_7/pouch_7_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/pouch_8
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/pouch_8/pouch_8_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/pouch_talkie
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/DEF-spine.002/pouch_talkie/pouch_talkie_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/FX05 mag.002
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/FX05 mag.003
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/FX05 mag.004
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/pouch_5
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/pouch_5/pouch_5_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/pouch_6
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/DEF-spine.001/pouch_6/pouch_6_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/front_armor
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/front_armor/front_armor_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/pouch_1.L
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/pouch_1.L/pouch_1.L_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/pouch_1.R
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-spine/pouch_1.R/pouch_1.R_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.L
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.L/DEF-thigh.L.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.L/DEF-thigh.L.001/DEF-shin.L
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.L/DEF-thigh.L.001/DEF-shin.L/DEF-shin.L.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.L/DEF-thigh.L.001/DEF-shin.L/DEF-shin.L.001/DEF-foot.L
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.L/DEF-thigh.L.001/DEF-shin.L/DEF-shin.L.001/DEF-foot.L/DEF-toe.L
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.L/DEF-thigh.L.001/DEF-shin.L/DEF-shin.L.001/DEF-foot.L/DEF-toe.L/DEF-toe.L_end
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.R
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.R/DEF-thigh.R.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.R/DEF-thigh.R.001/DEF-shin.R
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.R/DEF-thigh.R.001/DEF-shin.R/DEF-shin.R.001
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.R/DEF-thigh.R.001/DEF-shin.R/DEF-shin.R.001/DEF-foot.R
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.R/DEF-thigh.R.001/DEF-shin.R/DEF-shin.R.001/DEF-foot.R/DEF-toe.R
+    m_Weight: 1
+  - m_Path: Soldier/Natlan Soldier Rig.001/DEF-thigh.R/DEF-thigh.R.001/DEF-shin.R/DEF-shin.R.001/DEF-foot.R/DEF-toe.R/DEF-toe.R_end
+    m_Weight: 1
+  - m_Path: Soldier/neck high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/neck_armor high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pants_armor high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pants_low high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_1 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_2 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_3 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_4 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_5 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_6 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_7 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_8 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_9 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_10 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_11 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_back_1 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_back_2 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_mags high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pouch_talkie high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/pourch_front high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/scarf high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/shirt_long high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/shirt_short high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/shoes_low high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/shoes_low.002 high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/shoulders_armor high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/side_armor high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/tablet high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/tag_front high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/talkiewalkie high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/thigh_strap_low high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/watch_short high poly.001
+    m_Weight: 1
+  - m_Path: Soldier/HandGripRig
+    m_Weight: 1
+  - m_Path: Soldier/HandGripRig/LeftGrip
+    m_Weight: 1
+  - m_Path: Soldier/HandGripRig/RightGrip
+    m_Weight: 1
+  - m_Path: Soldier/M4_8
+    m_Weight: 1
+  - m_Path: Soldier/M4_8/Bolt
+    m_Weight: 1
+  - m_Path: Soldier/M4_8/Mag
+    m_Weight: 1
+  - m_Path: Soldier/M4_8/Rear_Sight
+    m_Weight: 1
+  - m_Path: Soldier/M4_8/Sight
+    m_Weight: 1
+  - m_Path: Soldier/M4_8/Trigger
+    m_Weight: 1
+  - m_Path: Soldier/M4_8/GripCapR
+    m_Weight: 1
+  - m_Path: Soldier/M4_8/GripCapR/GripRootR
+    m_Weight: 1
+  - m_Path: Soldier/M4_8/GripCapL
+    m_Weight: 1
+  - m_Path: Soldier/M4_8/GripCapL/GripRootL
+    m_Weight: 1

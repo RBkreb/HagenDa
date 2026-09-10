@@ -67,32 +67,21 @@
   <ItemGroup>
     <Compile Include="Assets\Mirror\Components\NetworkAnimator.cs" />
     <Compile Include="Assets\Mirror\Components\NetworkRoomManager.cs" />
-    <Compile Include="Assets\Mirror\Components\NetworkName.cs" />
     <Compile Include="Assets\Mirror\Components\PredictedRigidbody\PredictionUtils.cs" />
     <Compile Include="Assets\Mirror\Components\NetworkRigidbody\NetworkRigidbodyUnreliable.cs" />
-    <Compile Include="Assets\Mirror\Components\Profiling\NetworkBandwidthGraph.cs" />
-    <Compile Include="Assets\Mirror\Components\InterestManagement\SceneDistance\SceneDistanceInterestManagement.cs" />
     <Compile Include="Assets\Mirror\Components\NetworkRigidbody\NetworkRigidbodyUnreliable2D.cs" />
     <Compile Include="Assets\Mirror\Components\InterestManagement\Team\NetworkTeam.cs" />
     <Compile Include="Assets\Mirror\Components\LagCompensation\HistoryCollider.cs" />
     <Compile Include="Assets\Mirror\Components\NetworkLobbyManager.cs" />
     <Compile Include="Assets\Mirror\Components\NetworkRigidbody\NetworkRigidbodyUnreliableCompressed.cs" />
-    <Compile Include="Assets\Mirror\Components\NetworkTransform\NetworkTransformHybrid.cs" />
-    <Compile Include="Assets\Mirror\Components\PredictedRigidbody\PredictedRigidbodyPhysicsGhost.cs" />
-    <Compile Include="Assets\Mirror\Components\NetworkTransform\NetworkTransformBase.cs" />
     <Compile Include="Assets\Mirror\Components\NetworkRigidbody\NetworkRigidbodyReliable2D.cs" />
     <Compile Include="Assets\Mirror\Components\NetworkTransform\NetworkTransformReliable.cs" />
     <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\HexSpatialHash3DInterestManagement.cs" />
     <Compile Include="Assets\Mirror\Components\Profiling\NetworkPingGraph.cs" />
-    <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\HexGrid2D.cs" />
-    <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\Grid3D.cs" />
     <Compile Include="Assets\Mirror\Components\AssemblyInfo.cs" />
-    <Compile Include="Assets\Mirror\Components\Discovery\NetworkDiscoveryHUD.cs" />
     <Compile Include="Assets\Mirror\Components\InterestManagement\Match\NetworkMatch.cs" />
-    <Compile Include="Assets\Mirror\Components\PredictedRigidbody\RigidbodyState.cs" />
     <Compile Include="Assets\Mirror\Components\LagCompensation\LagCompensator.cs" />
     <Compile Include="Assets\Mirror\Components\NetworkTransform\NetworkTransformUnreliable.cs" />
-    <Compile Include="Assets\Mirror\Components\NetworkTransform\TransformSnapshot.cs" />
     <Compile Include="Assets\Mirror\Components\PredictedRigidbody\PredictedRigidbody.cs" />
     <Compile Include="Assets\Mirror\Components\Discovery\NetworkDiscovery.cs" />
     <Compile Include="Assets\Mirror\Components\Profiling\NetworkRuntimeProfiler.cs" />
@@ -105,24 +94,35 @@
     <Compile Include="Assets\Mirror\Components\PredictedRigidbody\PredictedRigidbodyRemoteGhost.cs" />
     <Compile Include="Assets\Mirror\Components\Profiling\ToggleHotkey.cs" />
     <Compile Include="Assets\Mirror\Components\InterestManagement\Distance\DistanceInterestManagementCustomRange.cs" />
-    <Compile Include="Assets\Mirror\Components\InterestManagement\Team\TeamInterestManagement.cs" />
-    <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\SpatialHashingInterestManagement.cs" />
     <Compile Include="Assets\Mirror\Components\NetworkPingDisplay.cs" />
     <Compile Include="Assets\Mirror\Components\RemoteStatistics.cs" />
-    <Compile Include="Assets\Mirror\Components\InterestManagement\Match\MatchInterestManagement.cs" />
     <Compile Include="Assets\Mirror\Components\InterestManagement\Scene\SceneInterestManagement.cs" />
-    <Compile Include="Assets\Mirror\Components\NetworkRoomPlayer.cs" />
-    <Compile Include="Assets\Mirror\Components\NetworkDiagnosticsDebugger.cs" />
-    <Compile Include="Assets\Mirror\Components\InterestManagement\PhysicsSimulator\PhysicsSimulator.cs" />
     <Compile Include="Assets\Mirror\Components\GUIConsole.cs" />
-    <Compile Include="Assets\Mirror\Components\NetworkStatistics.cs" />
-    <Compile Include="Assets\Mirror\Components\PredictedRigidbody\PredictedSyncData.cs" />
-    <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\Grid2D.cs" />
-    <Compile Include="Assets\Mirror\Components\Discovery\NetworkDiscoveryBase.cs" />
     <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\HexSpatialHash2DInterestManagement.cs" />
     <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\HexGrid3D.cs" />
     <Compile Include="Assets\Mirror\Components\NetworkTransform\TransformSyncData.cs" />
     <Compile Include="Assets\Mirror\Components\Discovery\ServerRequest.cs" />
+    <Compile Include="Assets\Mirror\Components\NetworkName.cs" />
+    <Compile Include="Assets\Mirror\Components\Profiling\NetworkBandwidthGraph.cs" />
+    <Compile Include="Assets\Mirror\Components\InterestManagement\SceneDistance\SceneDistanceInterestManagement.cs" />
+    <Compile Include="Assets\Mirror\Components\NetworkTransform\NetworkTransformHybrid.cs" />
+    <Compile Include="Assets\Mirror\Components\PredictedRigidbody\PredictedRigidbodyPhysicsGhost.cs" />
+    <Compile Include="Assets\Mirror\Components\NetworkTransform\NetworkTransformBase.cs" />
+    <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\HexGrid2D.cs" />
+    <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\Grid3D.cs" />
+    <Compile Include="Assets\Mirror\Components\Discovery\NetworkDiscoveryHUD.cs" />
+    <Compile Include="Assets\Mirror\Components\PredictedRigidbody\RigidbodyState.cs" />
+    <Compile Include="Assets\Mirror\Components\NetworkTransform\TransformSnapshot.cs" />
+    <Compile Include="Assets\Mirror\Components\InterestManagement\Team\TeamInterestManagement.cs" />
+    <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\SpatialHashingInterestManagement.cs" />
+    <Compile Include="Assets\Mirror\Components\InterestManagement\Match\MatchInterestManagement.cs" />
+    <Compile Include="Assets\Mirror\Components\NetworkRoomPlayer.cs" />
+    <Compile Include="Assets\Mirror\Components\NetworkDiagnosticsDebugger.cs" />
+    <Compile Include="Assets\Mirror\Components\InterestManagement\PhysicsSimulator\PhysicsSimulator.cs" />
+    <Compile Include="Assets\Mirror\Components\NetworkStatistics.cs" />
+    <Compile Include="Assets\Mirror\Components\PredictedRigidbody\PredictedSyncData.cs" />
+    <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\Grid2D.cs" />
+    <Compile Include="Assets\Mirror\Components\Discovery\NetworkDiscoveryBase.cs" />
     <Compile Include="Assets\Mirror\Components\InterestManagement\SpatialHashing\SpatialHashing3DInterestManagement.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -503,12 +503,20 @@
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Mono.CecilX.Mdb">
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.IO.Abstractions">
       <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\System.IO.Abstractions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.YamlDotNet">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Cecil.Awesome">
@@ -535,6 +543,14 @@
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\System.Reflection.Metadata.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\System.Collections.Immutable.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Mono.CecilX.Rocks">
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
       <Private>False</Private>
@@ -543,8 +559,20 @@
       <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\ProtoBuffer\System.Interactive.Async.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.IonicZip">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.IO.Hashing">
       <HintPath>Library\PackageCache\com.unity.collections@2.5.7\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Google.Protobuf">
@@ -561,6 +589,10 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.2.1\Runtime\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.TextureAssets">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">

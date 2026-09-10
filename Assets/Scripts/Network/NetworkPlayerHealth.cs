@@ -180,24 +180,10 @@ namespace HagenDa.Networking
             if (connectionToClient != null && amount > 0f)
                 TargetRpcDamageFeedback(amount);
 
-            // PHASE12: 受击动画广播（0.4s 节流，连发不反复打断）。
-            if (amount > 0f && Time.time - lastDamageAnimTime >= 0.4f)
-            {
-                lastDamageAnimTime = Time.time;
-                RpcDamageReaction();
-            }
+            // PHASE13: 受击动画已移除(受击只保留 HUD/相机反馈)。
 
             if (health <= 0f)
                 Die();
-        }
-
-        private float lastDamageAnimTime;
-
-        [ClientRpc]
-        private void RpcDamageReaction()
-        {
-            var soldier = GetComponent<NetworkSoldierAnimator>();
-            if (soldier != null) soldier.PlayDamage();
         }
 
         [TargetRpc]
@@ -435,7 +421,13 @@ namespace HagenDa.Networking
         private Vector3? ResolveDeployPoint(int choice)
         {
             var mm = NetworkMatchManager.Instance;
-            if (mm == null) return null;
+            if (mm == null)
+            {
+                // 无对局场景（AnimationTest 单人动画测试等）：回退到场景出生点。
+                // 否则真人永远卡在部署界面（CmdDeploy 解析不到位置而静默失败）。
+                var sp = FindObjectOfType<NetworkStartPosition>();
+                return sp != null ? (Vector3?)sp.transform.position : transform.position;
+            }
 
             var self = GetComponent<NetworkCombatant>();
             int team = self != null && self.teamId >= 0 ? self.teamId : (int)MatchTeam.Red;

@@ -34,6 +34,9 @@ namespace HagenDa.Networking.EditorTools
         private const string NatlanSoldierPath = "Assets/Model/natlan/Natlan Soldier FBX with collider.prefab";
         private const string FatuiSoldierPath = "Assets/Model/Fatui/Fatui Bodyguard FBX.prefab";
 
+        // PHASE13: 士兵模型使用的自建 Animator controller(4 剪辑层 + rig 权重驱动)。
+        private const string SoldierControllerPath = "Assets/Scripts/Network/Animation/NetworkSoldierLayers.controller";
+
         private const string EquipmentFolder = "Assets/Scripts/Network/Equipment";
         private const string EmpFieldPrefabPath = "Assets/Scripts/Network/Prefabs/EmpField.prefab";
         private const string HandGrenadePrefabPath = "Assets/Scripts/Network/Prefabs/HandGrenade.prefab";
@@ -384,6 +387,23 @@ namespace HagenDa.Networking.EditorTools
             soldierAnimator.redModel = AttachTeamModel(root, NatlanSoldierPath, "RedSoldierModel", 0f);
             soldierAnimator.blueModel = AttachTeamModel(root, FatuiSoldierPath, "BlueSoldierModel", 0.08f);
 
+            // PHASE13: force the self-made NetworkSoldier controller (guards against
+            // the model prefabs reverting to the vendor demo controller).
+            var soldierCtrl = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(SoldierControllerPath);
+            if (soldierCtrl != null)
+            {
+                foreach (var model in new[] { soldierAnimator.redModel, soldierAnimator.blueModel })
+                {
+                    if (model == null) continue;
+                    var modelAnim = model.GetComponentInChildren<Animator>(true);
+                    if (modelAnim != null)
+                    {
+                        modelAnim.runtimeAnimatorController = soldierCtrl;
+                        modelAnim.applyRootMotion = false;   // force-driven rigidbody
+                    }
+                }
+            }
+
             // Default to the red model; NetworkSoldierAnimator switches by teamId
             // (SyncVar) on the first update. Avoids a one-frame double-model overlap.
             if (soldierAnimator.blueModel != null) soldierAnimator.blueModel.SetActive(false);
@@ -416,6 +436,91 @@ namespace HagenDa.Networking.EditorTools
             inst.transform.localRotation = Quaternion.identity;
             inst.transform.localScale = Vector3.one;
             return inst;
+        }
+
+        // ---------------------------------------------------------------
+        // PHASE13: ANIMATION TEST SCENE（单人动画验证 + 镜子）
+        // ---------------------------------------------------------------
+
+        private const string AnimationTestScenePath = "Assets/Scenes/AnimationTest.scene";
+        private const string MirrorBodyLayer = "MirrorBody";
+
+        /// <summary>
+        /// 单人动画验证场景：无 AI / 无对局逻辑，Play 后自动 StartHost 出生
+        /// 一个真人玩家（主视角相机随 prefab 挂载）。玩家正前下方挂一面
+        /// "镜子"（MirrorView：镜像相机 → RenderTexture → 幕布），把被
+        /// 第一人称隐藏的本体模型投到 MirrorBody 层展示，用于观察自身
+        /// 8 向走/跑、瞄准、站蹲趴占位与动作过渡。
+        /// </summary>
+        [MenuItem("HagenDa/Setup Animation Test Scene")]
+        public static void SetupAnimationTestScene()
+        {
+            EnsureFolder("Assets", "Scenes");
+            EnsureLayerNamed(MirrorBodyLayer);
+            int mirrorLayer = LayerMask.NameToLayer(MirrorBodyLayer);
+
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(
+                UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Single);
+
+            EnsureLighting();
+
+            // 地面 + 方向参照物（观察 8 向移动的位移参照）。
+            var floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            floor.name = "Floor";
+            floor.transform.position = new Vector3(0f, -0.25f, 0f);
+            floor.transform.localScale = new Vector3(60f, 0.5f, 60f);
+
+            for (int i = 0; i < 3; i++)
+            {
+                var marker = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                marker.name = "Marker" + i;
+                marker.transform.position = new Vector3((i - 1) * 4f, 0.75f, 7f);
+                marker.transform.localScale = new Vector3(0.5f, 1.5f, 0.5f);
+            }
+
+            // NetworkManager：单人房间，Play 后自动 StartHost，自动出生玩家。
+            var nmGo = new GameObject("NetworkManager");
+            var nm = nmGo.AddComponent<NetworkManager>();
+            nm.transport = nmGo.AddComponent<kcp2k.KcpTransport>();
+            nm.playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+            nm.autoCreatePlayer = true;
+            nm.maxConnections = 4;
+            nmGo.AddComponent<TrainingAutoHost>();
+            nmGo.AddComponent<AnimationTestAutoDeploy>();   // 出生后自动走真实部署流程
+
+            var spawn = new GameObject("SpawnPoint");
+            spawn.AddComponent<NetworkStartPosition>();
+            spawn.transform.position = new Vector3(0f, 0.05f, 0f);
+
+            // 镜子：镜像相机（渲染到 RT）+ 主视角前下方的幕布。
+            var mirrorCamGo = new GameObject("MirrorCamera");
+            var mirrorCam = mirrorCamGo.AddComponent<Camera>();
+            mirrorCam.fieldOfView = 42f;
+            mirrorCam.clearFlags = CameraClearFlags.SolidColor;
+            mirrorCam.backgroundColor = new Color(0.16f, 0.19f, 0.26f);
+            mirrorCam.depth = -10f;
+            mirrorCam.transform.position = new Vector3(0f, 1.2f, -2.6f);
+            mirrorCam.transform.rotation = Quaternion.identity;   // MirrorView 每帧重定位
+
+            var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            quad.name = "Mirror";
+            Object.DestroyImmediate(quad.GetComponent<Collider>());
+            quad.transform.position = new Vector3(0f, 1.0f, 2.4f);
+            quad.transform.rotation = Quaternion.Euler(0f, 180f, 0f);   // 面向出生点
+            quad.transform.localScale = new Vector3(1.5f, 0.9f, 1f);
+
+            var view = quad.AddComponent<MirrorView>();
+            view.mirrorCamera = mirrorCam;
+            view.mirrorQuad = quad.GetComponent<Renderer>();
+
+            // 镜子层不参与任何物理碰撞（模型仅供观察）。
+            if (mirrorLayer >= 0)
+                for (int i = 0; i < 32; i++)
+                    Physics.IgnoreLayerCollision(mirrorLayer, i, true);
+
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, AnimationTestScenePath);
+            Debug.Log($"[NetworkSetup] Animation test scene ready: {AnimationTestScenePath} (Play 即自动 StartHost，主视角前下方挂镜子)");
         }
 
         // ---------------------------------------------------------------
@@ -2243,31 +2348,6 @@ namespace HagenDa.Networking.EditorTools
             camGo.tag = "MainCamera";
             camGo.AddComponent<AudioListener>();
             controller.playerCamera = cam;
-
-            // First-person weapon viewmodel: a pivot (driven by NetworkGun's
-            // hip/ads positions in LateUpdate) holding the M4 model, rotated 180° so
-            // the barrel points along the camera's +Z (the model's muzzle faces -Z).
-            var weaponPivot = new GameObject("WeaponPivot");
-            weaponPivot.transform.SetParent(camGo.transform, false);
-            weaponPivot.transform.localPosition = gun.hipPosition;
-            weaponPivot.transform.localRotation = Quaternion.identity;
-
-            var m4Prefab = AssetDatabase.LoadAssetAtPath<GameObject>(M4PrefabPath);
-            if (m4Prefab != null)
-            {
-                var m4 = (GameObject)PrefabUtility.InstantiatePrefab(m4Prefab);
-                m4.name = "M4_8";
-                m4.transform.SetParent(weaponPivot.transform, false);
-                m4.transform.localPosition = Vector3.zero;
-                m4.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
-                m4.transform.localScale = Vector3.one;
-            }
-            else
-            {
-                Debug.LogWarning($"[NetworkSetup] M4 model not found at {M4PrefabPath}");
-            }
-
-            gun.gunModel = weaponPivot.transform;
 
             // Remote visual (capsule body), scaled to match the 1.8m x 0.25m collider.
             // Player body is green to distinguish from red/blue AI.

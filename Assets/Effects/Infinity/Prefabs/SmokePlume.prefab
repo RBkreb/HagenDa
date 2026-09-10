@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!1 &4828227418271666997
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 7
+  m_Component:
+  - component: {fileID: 6961283656605402199}
+  - component: {fileID: 2666330846644478377}
+  - component: {fileID: 891020499699971980}
+  m_Layer: 0
+  m_HasEditorInfo: 1
+  m_Name: SmokePlume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6961283656605402199
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4828227418271666997}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1225040436 &2666330846644478377
+InfinityData:
+  serializedVersion: 1
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4828227418271666997}
+  m_Enabled: 1
+  m_InfinityAsset: {fileID: 5905505717634659298, guid: e0424d5c7b1fb2146aed70093ea4c2a1,
+    type: 2}
+  m_InstanceData:
+    m_CustomSimulationSpace: {fileID: 0}
+    m_ShapeMeshRenderer: {fileID: 0}
+    m_ShapeSkinnedMeshRenderer: {fileID: 0}
+    m_ShapeSpriteRenderer: {fileID: 0}
+    m_ExternalForceInfluenceList: []
+    m_CollisionPlanes: []
+    m_TriggerPrimitives: []
+    m_SubEmitterData: []
+    m_Light: {fileID: 0}
+    m_RendererAnchor: {fileID: 0}
+--- !u!114 &891020499699971980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4828227418271666997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1d1c19cb9bb45c890f38b5a99042a7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_InfinityData: {fileID: 2666330846644478377}
+  m_PlaybackSpeed: 1
+  m_TotalTime: 0

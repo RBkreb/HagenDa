@@ -213,3 +213,5 @@ Plus standard `com.unity.modules.*` engine modules.
 
 
 - [2026-08-27 17:30] PHASE10 实测调优追加（qwen3.5-4b:2 → qwen3.5-4b 16384ctx）：①视觉精度不足 → 网格代号方案（快照每格中心印 A1..F11，squad_order/commander_weapon 参数改 cell，解析层 cell→格中心），LLM 下令从"测量"降维成"识字"；②开局部署=单发制——每方仅一次对话请求，响应中 tool_calls 全部执行后立即落定解除门控，取消催促轮（之前 Opening 相位 IsDue 恒真 + nudge 第二轮导致多次部署请求打转）；③同回合同小队二次 squad_order 直接报错防打转；④传输层从 UnityWebRequest 迁移到后台线程 HttpClient——Play 模式下 UWR 大体积上传被主循环泵制约束导致 LM Studio 卡 0%，停 Play 秒恢复；⑤VRAM 教训：8GB 卡 = Unity Play(HDRP) + LM Studio 权重/KV 共存极紧张，换模型/扩上下文必须用 lms load --context-length 显式控制并在进 Play 前预载；⑥qwen3.5-4b 是多模态但需 LM Studio 安装 vision 解码器插件；⑦error 提取要对 {"error":"字符串"} 形态做类型判断，否则次生 "Cannot access child value" 掩盖真实错误。
+- Kevin Iglesias 触发型控制器必须每帧重发 weapon/posture/movement 组合条件
+- Mirror host 模式下 Spawn 后立即改 SyncVar 会被本地载荷反序列化覆盖，须在 OnStartServer 内赋值或延迟设置。

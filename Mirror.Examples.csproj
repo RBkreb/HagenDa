@@ -65,78 +65,39 @@
     <Analyzer Include="E:\Unity3D\2022.3.62t12\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\PickupsDropsChilds.cs" />
-    <Compile Include="Assets\Mirror\Examples\AutoLANClientController\Scripts\NetworkSceneScript.cs" />
-    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\BehaviourWrapper\IMoveWrapper.cs" />
     <Compile Include="Assets\Mirror\Examples\EdgegapLobby\Scripts\UILobbyEntry.cs" />
-    <Compile Include="Assets\Mirror\Examples\AdditiveScenes\Scripts\ZoneHandler.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleMatches\Scripts\MatchController.cs" />
     <Compile Include="Assets\Mirror\Examples\TanksHybrid\Scripts\Projectile.cs" />
-    <Compile Include="Assets\Mirror\Examples\AssignAuthority\Scripts\UI.cs" />
     <Compile Include="Assets\Mirror\Examples\RigidbodyBenchmark\Scripts\AutoForce.cs" />
-    <Compile Include="Assets\Mirror\Examples\Basic\Scripts\CanvasUI.cs" />
-    <Compile Include="Assets\Mirror\Examples\StackedPrediction\NetworkManagerStackedPrediction.cs" />
     <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\StaticVariables.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerControllerRB\PlayerControllerRBBase.cs" />
     <Compile Include="Assets\Mirror\Examples\Basic\Scripts\PlayerUI.cs" />
     <Compile Include="Assets\Mirror\Examples\BenchmarkIdle\BenchmarkIdleNetworkManager.cs" />
-    <Compile Include="Assets\Mirror\Examples\Room\Scripts\Reward.cs" />
     <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Scripts\SineMoveRandomBehaviour.cs" />
-    <Compile Include="Assets\Mirror\Examples\AssignAuthority\Scripts\ObserverBehaviour.cs" />
-    <Compile Include="Assets\Mirror\Examples\AutoLANClientController\Scripts\AutoLANNetworkManager.cs" />
-    <Compile Include="Assets\Mirror\Examples\BilliardsPredicted\Player\PlayerPredicted.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankControllerUI.cs" />
     <Compile Include="Assets\Mirror\Examples\Room\Scripts\NetworkRoomPlayerExt.cs" />
-    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Scripts\WanderMoveBehaviour.cs" />
-    <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\ScriptAnimations.cs" />
     <Compile Include="Assets\Mirror\Examples\Tanks\Scripts\Tank.cs" />
-    <Compile Include="Assets\Mirror\Examples\AdditiveLevels\Scripts\Portal.cs" />
-    <Compile Include="Assets\Mirror\Examples\AssignAuthority\Scripts\Player.cs" />
     <Compile Include="Assets\Mirror\Examples\BilliardsPredicted\Ball\Pockets.cs" />
-    <Compile Include="Assets\Mirror\Examples\EdgegapLobby\Scripts\UILobbyList.cs" />
-    <Compile Include="Assets\Mirror\Examples\AdditiveLevels\Scripts\LookAtMainCamera.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankTurretHybrid.cs" />
     <Compile Include="Assets\Mirror\Examples\TopDownShooter\Scripts\RespawnPortal.cs" />
-    <Compile Include="Assets\Mirror\Examples\RigidbodyBenchmark\Scripts\AddForce.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\ControllerUIBase.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\FlyerController\FlyerControllerUnreliable.cs" />
     <Compile Include="Assets\Mirror\Examples\TopDownShooter\Scripts\CanvasHUD.cs" />
-    <Compile Include="Assets\Mirror\Examples\AssignAuthority\Scripts\OwnerBehaviour.cs" />
     <Compile Include="Assets\Mirror\Examples\Tanks\Scripts\Projectile.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleAdditiveScenes\Scripts\MultiSceneNetManager.cs" />
     <Compile Include="Assets\Mirror\Examples\CouchCoop\Scripts\CameraViewForAll.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleAdditiveScenes\Scripts\Reward.cs" />
     <Compile Include="Assets\Mirror\Examples\TanksHybrid\Scripts\Tank.cs" />
-    <Compile Include="Assets\Mirror\Examples\Basic\Scripts\Player.cs" />
-    <Compile Include="Assets\Mirror\Examples\MultipleAdditiveScenes\Scripts\Spawner.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\FlyerController\FlyerControllerUI.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Scripts\FPS.cs" />
-    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\BehaviourWrapper\WanderMoveWrapper.cs" />
     <Compile Include="Assets\Mirror\Examples\LagCompensation\ClientCube.cs" />
-    <Compile Include="Assets\Mirror\Examples\BenchmarkPrediction\RandomForce.cs" />
     <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\Interfaces\EquippedBat.cs" />
     <Compile Include="Assets\Mirror\Examples\Chat\Scripts\ChatUI.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerController\PlayerControllerUnreliable.cs" />
     <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Scripts\GUIGame.cs" />
-    <Compile Include="Assets\Mirror\Examples\LagCompensation\Capture2D.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankTurretUnreliable.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerController\PlayerControllerBase.cs" />
-    <Compile Include="Assets\Mirror\Examples\CouchCoop\Scripts\MovingPlatform.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Scripts\FaceCamera.cs" />
-    <Compile Include="Assets\Mirror\Examples\TopDownShooter\Scripts\PlayerTopDown.cs" />
     <Compile Include="Assets\Mirror\Examples\Benchmark\Scripts\PlayerMovement.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Scripts\CanvasNetworkManagerHUD\CanvasNetworkManagerHUD.cs" />
     <Compile Include="Assets\Mirror\Examples\Basic\Scripts\BasicNetManager.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Projectiles\TankProjectile\TankProjectile.cs" />
     <Compile Include="Assets\Mirror\Examples\AdditiveScenes\Scripts\AdditiveNetworkManager.cs" />
-    <Compile Include="Assets\Mirror\Examples\Room\Scripts\NetworkRoomManagerExt.cs" />
-    <Compile Include="Assets\Mirror\Examples\AdditiveScenes\Scripts\ShootingTankBehaviour.cs" />
-    <Compile Include="Assets\Mirror\Examples\Pong\Scripts\Player.cs" />
     <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\Interfaces\EquippedBox.cs" />
-    <Compile Include="Assets\Mirror\Examples\TankTheftAuto\Scripts\TankAuthority.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerControllerRB\PlayerControllerRBUI.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleMatches\Scripts\MatchGUI.cs" />
-    <Compile Include="Assets\Mirror\Examples\RigidbodyPhysics\Scripts\AddForce.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleMatches\Scripts\RoomGUI.cs" />
     <Compile Include="Assets\Mirror\Examples\Room\Scripts\PlayerScore.cs" />
     <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\NetworkManagerCharacterSelection.cs" />
@@ -144,46 +105,30 @@
     <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\Interfaces\EquippedBall.cs" />
     <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\SceneReferencer.cs" />
     <Compile Include="Assets\Mirror\Examples\CouchCoop\Scripts\CanvasScript.cs" />
-    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\Unity-Simulation-Timer\Runtime\PauseableSimulationTimer.cs" />
     <Compile Include="Assets\Mirror\Examples\LagCompensation\ServerCube.cs" />
     <Compile Include="Assets\Mirror\Examples\CouchCoop\Scripts\CouchPlayerManager.cs" />
     <Compile Include="Assets\Mirror\Examples\Benchmark\Scripts\BenchmarkNetworkManager.cs" />
-    <Compile Include="Assets\Mirror\Examples\RigidbodyBenchmark\Scripts\RigidbodyBenchmarkNetworkManager.cs" />
-    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\BehaviourConfig.cs" />
-    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\BehaviourWrapper\SinMoveYWrapper.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Scripts\PerlinNoise.cs" />
     <Compile Include="Assets\Mirror\Examples\CCU\Player.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Scripts\PlayerCamera.cs" />
     <Compile Include="Assets\Mirror\Examples\Chat\Scripts\LoginUI.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Scripts\Respawn.cs" />
-    <Compile Include="Assets\Mirror\Examples\Editor\MirrorRenderPipelineConverter.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\FlyerController\FlyerControllerBase.cs" />
     <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\CanvasReferencer.cs" />
     <Compile Include="Assets\Mirror\Examples\Billiards\Ball\WhiteBall.cs" />
     <Compile Include="Assets\Mirror\Examples\StackedPrediction\PlayerForce.cs" />
-    <Compile Include="Assets\Mirror\Examples\AdditiveLevels\Scripts\AdditiveLevelsNetworkManager.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerController\PlayerControllerUI.cs" />
     <Compile Include="Assets\Mirror\Examples\CouchCoop\Scripts\CouchPlayer.cs" />
     <Compile Include="Assets\Mirror\Examples\HexSpatialHash\Scripts\Hex2DPlayerCamera.cs" />
     <Compile Include="Assets\Mirror\Examples\BilliardsPredicted\Ball\RedBallPredicted.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerControllerRB\PlayerControllerRBReliable.cs" />
     <Compile Include="Assets\Mirror\Examples\BenchmarkIdle\Player.cs" />
-    <Compile Include="Assets\Mirror\Examples\TopDownShooter\Scripts\CameraTopDown.cs" />
     <Compile Include="Assets\Mirror\Examples\TopDownShooter\Scripts\CanvasTopDown.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\FlyerController\FlyerControllerReliable.cs" />
-    <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\SceneCamera.cs" />
     <Compile Include="Assets\Mirror\Examples\CCU\Monster.cs" />
-    <Compile Include="Assets\Mirror\Examples\AdditiveLevels\Scripts\FadeInOut.cs" />
     <Compile Include="Assets\Mirror\Examples\Billiards\Ball\RedBall.cs" />
-    <Compile Include="Assets\Mirror\Examples\Chat\Scripts\ChatNetworkManager.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankTurretBase.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankControllerReliable.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleMatches\Scripts\CellGUI.cs" />
-    <Compile Include="Assets\Mirror\Examples\BenchmarkIdle\Npc.cs" />
     <Compile Include="Assets\Mirror\Examples\CouchCoop\Scripts\PlatformMovement.cs" />
     <Compile Include="Assets\Mirror\Examples\Snapshot Interpolation\ClientCube.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleAdditiveScenes\Scripts\PlayerScore.cs" />
-    <Compile Include="Assets\Mirror\Examples\EdgegapLobby\Scripts\UILobbyCreate.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleMatches\Scripts\PlayerGUI.cs" />
     <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\Enumerations.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleMatches\Scripts\MatchMessages.cs" />
@@ -192,48 +137,103 @@
     <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\Interfaces\IEquipped.cs" />
     <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\RandomVector3.cs" />
     <Compile Include="Assets\Mirror\Examples\Pong\Scripts\NetworkManagerPong.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TurretUI.cs" />
-    <Compile Include="Assets\Mirror\Examples\Snapshot Interpolation\Snapshot3D.cs" />
     <Compile Include="Assets\Mirror\Examples\PlayerTest\PlayerTestNetMan.cs" />
     <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\PlayerEmpty.cs" />
-    <Compile Include="Assets\Mirror\Examples\Benchmark\Scripts\MonsterMovement.cs" />
-    <Compile Include="Assets\Mirror\Examples\Chat\Scripts\ChatAuthenticator.cs" />
     <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\CharacterSelection.cs" />
     <Compile Include="Assets\Mirror\Examples\TopDownShooter\Scripts\EnemyTopDown.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerController\PlayerControllerHybrid.cs" />
+    <Compile Include="Assets\Mirror\Examples\EdgegapLobby\Scripts\UILobbyStatus.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankControllerBase.cs" />
+    <Compile Include="Assets\Mirror\Examples\AutoLANClientController\Scripts\CanvasHUD.cs" />
+    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\BehaviourWrapper\SinRandomMoveWrapper.cs" />
+    <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\SceneObject.cs" />
+    <Compile Include="Assets\Mirror\Examples\HexSpatialHash\Scripts\Hex3DPlayer.cs" />
+    <Compile Include="Assets\Mirror\Examples\TopDownShooter\Scripts\NetworkTopDown.cs" />
+    <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\CharacterData.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankControllerUnreliable.cs" />
+    <Compile Include="Assets\Mirror\Examples\HexSpatialHash\Scripts\Hex2DNetworkManager.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Scripts\RandomColor.cs" />
+    <Compile Include="Assets\Mirror\Examples\Tanks\Scripts\Box.cs" />
+    <Compile Include="Assets\Mirror\Examples\Pong\Scripts\Ball.cs" />
+    <Compile Include="Assets\Mirror\Examples\CCU\CCUNetworkManager.cs" />
+    <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\PickupsDropsChilds.cs" />
+    <Compile Include="Assets\Mirror\Examples\AutoLANClientController\Scripts\NetworkSceneScript.cs" />
+    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\BehaviourWrapper\IMoveWrapper.cs" />
+    <Compile Include="Assets\Mirror\Examples\AdditiveScenes\Scripts\ZoneHandler.cs" />
+    <Compile Include="Assets\Mirror\Examples\AssignAuthority\Scripts\UI.cs" />
+    <Compile Include="Assets\Mirror\Examples\Basic\Scripts\CanvasUI.cs" />
+    <Compile Include="Assets\Mirror\Examples\StackedPrediction\NetworkManagerStackedPrediction.cs" />
+    <Compile Include="Assets\Mirror\Examples\Room\Scripts\Reward.cs" />
+    <Compile Include="Assets\Mirror\Examples\AssignAuthority\Scripts\ObserverBehaviour.cs" />
+    <Compile Include="Assets\Mirror\Examples\AutoLANClientController\Scripts\AutoLANNetworkManager.cs" />
+    <Compile Include="Assets\Mirror\Examples\BilliardsPredicted\Player\PlayerPredicted.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankControllerUI.cs" />
+    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Scripts\WanderMoveBehaviour.cs" />
+    <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\ScriptAnimations.cs" />
+    <Compile Include="Assets\Mirror\Examples\AdditiveLevels\Scripts\Portal.cs" />
+    <Compile Include="Assets\Mirror\Examples\AssignAuthority\Scripts\Player.cs" />
+    <Compile Include="Assets\Mirror\Examples\EdgegapLobby\Scripts\UILobbyList.cs" />
+    <Compile Include="Assets\Mirror\Examples\AdditiveLevels\Scripts\LookAtMainCamera.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankTurretHybrid.cs" />
+    <Compile Include="Assets\Mirror\Examples\RigidbodyBenchmark\Scripts\AddForce.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\ControllerUIBase.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\FlyerController\FlyerControllerUnreliable.cs" />
+    <Compile Include="Assets\Mirror\Examples\AssignAuthority\Scripts\OwnerBehaviour.cs" />
+    <Compile Include="Assets\Mirror\Examples\Basic\Scripts\Player.cs" />
+    <Compile Include="Assets\Mirror\Examples\MultipleAdditiveScenes\Scripts\Spawner.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Scripts\FPS.cs" />
+    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\BehaviourWrapper\WanderMoveWrapper.cs" />
+    <Compile Include="Assets\Mirror\Examples\BenchmarkPrediction\RandomForce.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerController\PlayerControllerUnreliable.cs" />
+    <Compile Include="Assets\Mirror\Examples\LagCompensation\Capture2D.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankTurretUnreliable.cs" />
+    <Compile Include="Assets\Mirror\Examples\CouchCoop\Scripts\MovingPlatform.cs" />
+    <Compile Include="Assets\Mirror\Examples\TopDownShooter\Scripts\PlayerTopDown.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Projectiles\TankProjectile\TankProjectile.cs" />
+    <Compile Include="Assets\Mirror\Examples\Room\Scripts\NetworkRoomManagerExt.cs" />
+    <Compile Include="Assets\Mirror\Examples\AdditiveScenes\Scripts\ShootingTankBehaviour.cs" />
+    <Compile Include="Assets\Mirror\Examples\Pong\Scripts\Player.cs" />
+    <Compile Include="Assets\Mirror\Examples\TankTheftAuto\Scripts\TankAuthority.cs" />
+    <Compile Include="Assets\Mirror\Examples\RigidbodyPhysics\Scripts\AddForce.cs" />
+    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\Unity-Simulation-Timer\Runtime\PauseableSimulationTimer.cs" />
+    <Compile Include="Assets\Mirror\Examples\RigidbodyBenchmark\Scripts\RigidbodyBenchmarkNetworkManager.cs" />
+    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\BehaviourConfig.cs" />
+    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\BehaviourWrapper\SinMoveYWrapper.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Scripts\Respawn.cs" />
+    <Compile Include="Assets\Mirror\Examples\Editor\MirrorRenderPipelineConverter.cs" />
+    <Compile Include="Assets\Mirror\Examples\AdditiveLevels\Scripts\AdditiveLevelsNetworkManager.cs" />
+    <Compile Include="Assets\Mirror\Examples\TopDownShooter\Scripts\CameraTopDown.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\FlyerController\FlyerControllerReliable.cs" />
+    <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\SceneCamera.cs" />
+    <Compile Include="Assets\Mirror\Examples\AdditiveLevels\Scripts\FadeInOut.cs" />
+    <Compile Include="Assets\Mirror\Examples\Chat\Scripts\ChatNetworkManager.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankTurretBase.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankControllerReliable.cs" />
+    <Compile Include="Assets\Mirror\Examples\BenchmarkIdle\Npc.cs" />
+    <Compile Include="Assets\Mirror\Examples\EdgegapLobby\Scripts\UILobbyCreate.cs" />
+    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TurretUI.cs" />
+    <Compile Include="Assets\Mirror\Examples\Snapshot Interpolation\Snapshot3D.cs" />
+    <Compile Include="Assets\Mirror\Examples\Benchmark\Scripts\MonsterMovement.cs" />
+    <Compile Include="Assets\Mirror\Examples\Chat\Scripts\ChatAuthenticator.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleMatches\Scripts\MatchNetworkManager.cs" />
     <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Scripts\SineMoveYBehaviour.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerController\PlayerControllerHybrid.cs" />
     <Compile Include="Assets\Mirror\Examples\Room\Scripts\Spawner.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankControllerHybrid.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerController\PlayerControllerReliable.cs" />
-    <Compile Include="Assets\Mirror\Examples\EdgegapLobby\Scripts\UILobbyStatus.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankControllerBase.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankTurretReliable.cs" />
-    <Compile Include="Assets\Mirror\Examples\AutoLANClientController\Scripts\CanvasHUD.cs" />
-    <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\netcode-benchmarker-util\Runtime\Scripts\BehaviourWrapper\SinRandomMoveWrapper.cs" />
     <Compile Include="Assets\Mirror\Examples\SyncDirection\Player.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerControllerRB\PlayerControllerRBUnreliable.cs" />
-    <Compile Include="Assets\Mirror\Examples\PickupsDropsChilds\Scripts\SceneObject.cs" />
     <Compile Include="Assets\Mirror\Examples\LagCompensation\Snapshot3D.cs" />
     <Compile Include="Assets\Mirror\Examples\AutoLANClientController\Scripts\AutoLANNetworkDiscovery.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankHealth.cs" />
     <Compile Include="Assets\Mirror\Examples\BilliardsPredicted\Ball\WhiteBallPredicted.cs" />
     <Compile Include="Assets\Mirror\Examples\HexSpatialHash\Scripts\Hex3DNetworkManager.cs" />
-    <Compile Include="Assets\Mirror\Examples\HexSpatialHash\Scripts\Hex3DPlayer.cs" />
-    <Compile Include="Assets\Mirror\Examples\TopDownShooter\Scripts\NetworkTopDown.cs" />
-    <Compile Include="Assets\Mirror\Examples\CharacterSelection\Scripts\CharacterData.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Controllers\TankController\TankControllerUnreliable.cs" />
     <Compile Include="Assets\Mirror\Examples\BenchmarkStinkySteak\Dependencies\Unity-Simulation-Timer\Runtime\SimulationTimer.cs" />
-    <Compile Include="Assets\Mirror\Examples\HexSpatialHash\Scripts\Hex2DNetworkManager.cs" />
-    <Compile Include="Assets\Mirror\Examples\_Common\Scripts\RandomColor.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleAdditiveScenes\Scripts\PhysicsCollision.cs" />
-    <Compile Include="Assets\Mirror\Examples\Tanks\Scripts\Box.cs" />
     <Compile Include="Assets\Mirror\Examples\HexSpatialHash\Scripts\Hex2DPlayer.cs" />
     <Compile Include="Assets\Mirror\Examples\_Common\Controllers\PlayerControllerRB\PlayerControllerRBHybrid.cs" />
     <Compile Include="Assets\Mirror\Examples\Snapshot Interpolation\ServerCube.cs" />
-    <Compile Include="Assets\Mirror\Examples\Pong\Scripts\Ball.cs" />
     <Compile Include="Assets\Mirror\Examples\MultipleMatches\Scripts\CanvasController.cs" />
-    <Compile Include="Assets\Mirror\Examples\CCU\CCUNetworkManager.cs" />
     <Compile Include="Assets\Mirror\Examples\TankTheftAuto\Scripts\TankTheftAutoNetMan.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -636,12 +636,20 @@
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Mono.CecilX.Mdb">
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.IO.Abstractions">
       <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\System.IO.Abstractions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.YamlDotNet">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Cecil.Awesome">
@@ -668,6 +676,14 @@
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\System.Reflection.Metadata.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\System.Collections.Immutable.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Mono.CecilX.Rocks">
       <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
       <Private>False</Private>
@@ -676,8 +692,20 @@
       <HintPath>D:\HagenTa\ml-agents-release_20\com.unity.ml-agents\Plugins\ProtoBuffer\System.Interactive.Async.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.IonicZip">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.IO.Hashing">
       <HintPath>Library\PackageCache\com.unity.collections@2.5.7\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>Library\PackageCache\cn.tuanjie.animgraph@1.0.0\Editor\Plugins\Roslyn\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Google.Protobuf">
@@ -694,6 +722,10 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.2.1\Runtime\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.TextureAssets">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">

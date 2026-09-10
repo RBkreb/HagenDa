@@ -1,3 +1,4 @@
+using HagenDa.Animation.Rigging;
 using Mirror;
 using UnityEngine;
 
@@ -24,15 +25,71 @@ namespace HagenDa.Networking
         public GameObject bulletPrefab;
         public int bulletPoolCapacity = 60;
 
-        [Header("First-person presentation (owner only)")]
-        public Transform gunModel;                 // M4 viewmodel under the camera
-        public Vector3 hipPosition = new Vector3(0.28f, -0.24f, 0.45f);
-        public Vector3 adsPosition = new Vector3(0f, -0.18f, 0.3f);
-        public Vector3 hipEuler = Vector3.zero;
-        public Vector3 adsEuler = Vector3.zero;
-
         [Header("References")]
-        public NetworkPlayerController controller; // for the visual-recoil camera shake
+        public NetworkPlayerController controller; // for the activeSlot weapon-slot check
+
+        [Header("Third-person presentation (PHASE13)")]
+        [Tooltip("第三人称枪模(挂到士兵 rig 的 WeaponAnchor;双手 IK + Aim 约束由 SoldierRigSetup 接管)")]
+        public GameObject thirdPersonModelPrefab;
+
+        private GameObject tpModel;
+        private SoldierRigSetup boundRig;
+        private NetworkSoldierAnimator soldierAnim;
+        private NetworkPlayerHealth healthComp;
+
+        private void Awake()
+        {
+            soldierAnim = GetComponent<NetworkSoldierAnimator>();
+            healthComp = GetComponent<NetworkPlayerHealth>();
+        }
+
+        /// <summary>
+        /// 第三人称枪模同步(PHASE13):绑定当前士兵模型的 rig;死亡/切到非主武器
+        /// 槽时隐藏并解绑(手部 IK 权重经 weaponHeld→0 由 NetworkSoldierAnimator
+        /// 处理);队伍模型切换时自动重绑到新 rig。第一人称 owner 的模型整体隐藏
+        /// (ActiveRig == null),本枪模随之不可见。
+        /// </summary>
+        private void Update()
+        {
+            if (soldierAnim == null) soldierAnim = GetComponent<NetworkSoldierAnimator>();
+            var rig = soldierAnim != null ? soldierAnim.ActiveRig : null;
+
+            bool desired = rig != null
+                && (healthComp == null || !healthComp.IsDead)
+                && (controller == null || controller.activeSlot == -1);
+
+            if (rig == null || !desired)
+            {
+                if (tpModel != null && tpModel.activeSelf)
+                {
+                    if (boundRig != null) boundRig.ClearWeapon();
+                    tpModel.SetActive(false);
+                }
+                return;
+            }
+
+            if (tpModel == null)
+            {
+                if (thirdPersonModelPrefab == null) return;
+                tpModel = Instantiate(thirdPersonModelPrefab);
+            }
+
+            bool needBind = rig != boundRig || !tpModel.activeSelf;
+            if (rig != boundRig)
+            {
+                tpModel.transform.SetParent(rig.WeaponAnchor, false);
+                tpModel.transform.localPosition = Vector3.zero;
+                tpModel.transform.localRotation = Quaternion.identity;
+                tpModel.transform.localScale = Vector3.one;
+                boundRig = rig;
+            }
+
+            if (needBind)
+            {
+                tpModel.SetActive(true);
+                rig.BindWeapon(tpModel);
+            }
+        }
 
         // ---- Server-authoritative synced state ----
         [SyncVar] public int magAmmo;
@@ -65,10 +122,6 @@ namespace HagenDa.Networking
         private ReloadState reloadState = ReloadState.Idle;
         private float reloadRemaining;
         private float reloadDuration;
-
-        // ---- Client-side visual recoil (gun model kick) ----
-        private Vector3 visualKick;
-        private Quaternion visualKickRot = Quaternion.identity;
 
         public WeaponDefinition Definition => definition;
 
@@ -320,11 +373,6 @@ namespace HagenDa.Networking
                 var eval = Object.FindObjectOfType<S1EvaluationStats>();
                 if (eval != null) eval.RecordShot();
             }
-
-            // Visual recoil only makes sense for an owned player (AI has no owner
-            // connection and no first-person camera).
-            if (connectionToClient != null)
-                TargetRpcVisualRecoil();
         }
 
         private void SpawnBullet(Vector3 origin, Vector3 dir)
@@ -409,46 +457,6 @@ namespace HagenDa.Networking
         private void RpcImpactSmoke(Vector3 pos)
         {
             NetworkSmoke.Spawn(pos, 0.6f, 0.3f, 0.4f);
-        }
-
-        // ---------------------------------------------------------------
-        // VISUAL RECOIL + VIEWMODEL (owner client only)
-        // ---------------------------------------------------------------
-
-        [TargetRpc]
-        private void TargetRpcVisualRecoil()
-        {
-            if (!isLocalPlayer) return;
-
-            // Gun model micro-jitter (visual recoil; does not change aim).
-            visualKick += new Vector3(
-                Random.Range(-0.008f, 0.008f),
-                Random.Range(-0.008f, 0.008f),
-                Random.Range(-0.012f, 0.004f));
-            visualKickRot *= Quaternion.Euler(
-                Random.Range(-1.2f, 1.2f), 0f, Random.Range(-0.8f, 0.8f));
-
-            // Small camera micro-shake, separate from the screen-recoil pitch kick.
-            if (controller != null)
-                controller.ApplyCameraShake(0.03f, 0.08f, true);
-        }
-
-        private void LateUpdate()
-        {
-            if (!isLocalPlayer) return;
-            if (gunModel == null) return;
-
-            // Hip -> ADS transition: the viewmodel recenters on the screen centre.
-            Vector3 targetPos = Vector3.Lerp(hipPosition, adsPosition, aimAmount);
-            Quaternion targetRot = Quaternion.Euler(Vector3.Lerp(hipEuler, adsEuler, aimAmount));
-
-            // Decay the visual-recoil kick back to zero.
-            float k = 1f - Mathf.Exp(-12f * Time.deltaTime);
-            visualKick = Vector3.Lerp(visualKick, Vector3.zero, k);
-            visualKickRot = Quaternion.Slerp(visualKickRot, Quaternion.identity, k);
-
-            gunModel.localPosition = targetPos + visualKick;
-            gunModel.localRotation = targetRot * visualKickRot;
         }
     }
 }

@@ -77,131 +77,250 @@
     <Analyzer Include="D:\HagenTa\HagenDa\Library\PackageCache\com.unity.entities@1.3.15\Unity.Entities\SourceGenerators\SystemGenerator.Common.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Network\Animation\ThirdPersonCam.cs" />
+    <Compile Include="Assets\Scripts\Animation\Rigging\SpineAimConstraint.cs" />
     <Compile Include="Assets\Scripts\Network\TrainingMap.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
-    <Compile Include="Assets\Scripts\Network\Match\MapDefinition.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Splines_Spline.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_Unity_Entities_Content_WeakObjectSceneReference.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_TextCore_Glyph.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_TextCore_LowLevel_GlyphPairAdjustmentRecord.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Animations_Rigging_RigLayer.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\CommanderSituationText.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
-    <Compile Include="Assets\Scripts\Network\DeployableSlot.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_Slider_SliderEvent.cs" />
     <Compile Include="Assets\Scripts\Network\CapturePoint.cs" />
     <Compile Include="Assets\Scripts\Network\DeployBeacon.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
-    <Compile Include="Assets\Scripts\Network\TrainingAutoHost.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_TextCore_Text_Character.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_TextCore_GlyphMetrics.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_PlayerInputManager_PlayerLeftEvent.cs" />
     <Compile Include="Assets\Scripts\Network\SquadCommander.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkMatchManager.cs" />
-    <Compile Include="Assets\Scripts\Network\Commander\CommanderHud.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkShootableTarget.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
-    <Compile Include="Assets\Scripts\Network\Commander\CommanderWeaponSystem.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkCombat.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_Unity_Mathematics_quaternion.cs" />
     <Compile Include="Assets\Kevin Iglesias\Human Animations\Unity Demo Scenes\Human Soldier Animations\Scripts\HumanSoldierController.cs" />
-    <Compile Include="Assets\Scripts\Network\Animation\HeadCamFollow.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_InputActionAsset.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\CommanderOrchestrator.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
-    <Compile Include="Assets\Scripts\Network\Commander\CommanderRoundLogger.cs" />
     <Compile Include="Assets\Scripts\Network\MapIndicator.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Cone.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_TextCore_Text_FontWeightPair.cs" />
     <Compile Include="Assets\Scripts\Network\PlayerHud.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkEmpField.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkPlayerHealth.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkBullet.cs" />
     <Compile Include="Assets\Scripts\Network\IDamageable.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_Unity_MLAgents_Policies_BrainParameters.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Torus.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkHitbox.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkThrowable.cs" />
-    <Compile Include="Assets\Scripts\Network\MinimapCamera.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_InputAction.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_InputActionProperty.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_HorizontalAlignmentOptions.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Cube.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Rendering_HighDefinition_LightLayerEnum.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_SpriteState.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_InputField_OnChangeEvent.cs" />
     <Compile Include="Assets\Scripts\Network\TrainingSessionManager.cs" />
     <Compile Include="Assets\Scripts\Network\AgentRaySensor.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\LlmRestClient.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_Character.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_InputField_SelectionEvent.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_Unity_Entities_Serialization_EntitySceneReference.cs" />
+    <Compile Include="Assets\Scripts\Network\LoadoutRules.cs" />
+    <Compile Include="Assets\Scripts\Network\MapLayers.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_TextEventHandler_WordSelectionEvent.cs" />
+    <Compile Include="Assets\Scripts\Network\MLAgentBridge.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_ColorBlock.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_AnimGraph_SendMessageCall.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Sprite.cs" />
+    <Compile Include="Assets\Scripts\Network\MirrorView.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_AnimationTriggers.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_Scrollbar_ScrollEvent.cs" />
+    <Compile Include="Assets\Scripts\Network\Match\MatchConfig.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_Mirror_SimpleWeb_ClientWebsocketSettings.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_InputField_SubmitEvent.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Prism.cs" />
+    <Compile Include="Assets\Scripts\Network\FSMStatsHud.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Vector4.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_InputField_TextSelectionEvent.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\NetworkCommanderState.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
+    <Compile Include="Assets\Scripts\Network\GarrisonZone.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
+    <Compile Include="Assets\Scripts\Network\HitboxUtility.cs" />
+    <Compile Include="Assets\Scripts\Network\Animation\AimController.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Splines_SplineInstantiate_InstantiableItem.cs" />
+    <Compile Include="Assets\Scripts\Environment\TreePhysicsProxy.cs" />
+    <Compile Include="Assets\Scripts\Network\AgentVisionSensor.cs" />
+    <Compile Include="Assets\Scripts\Animation\Rigging\HipsPoseConstraint.cs" />
+    <Compile Include="Assets\Scripts\Network\TrainingArena.cs" />
+    <Compile Include="Assets\Scripts\Network\ScriptedAIController.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_TextCore_Text_TextStyle.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkExplosion.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ParticleSystem_MinMaxCurve.cs" />
+    <Compile Include="Assets\Scripts\Network\GameHud.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_TextEventHandler_CharacterSelectionEvent.cs" />
+    <Compile Include="Assets\Scripts\Network\SupplyPackThrowable.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
+    <Compile Include="Assets\Scripts\Network\SmokeThrowable.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Animations_Rigging_WeightedTransform.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_VerticalAlignmentOptions.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_Button_ButtonClickedEvent.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_TextCore_Text_SpriteCharacter.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_GlyphPairAdjustmentRecord.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Sphere.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_SpriteGlyph.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_MaskableGraphic_CullStateChangedEvent.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Splines_SplineComponent_AlignAxis.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkAIController.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
+    <Compile Include="Assets\Scripts\Network\DebugHud.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_PlayerInput_ControlsChangedEvent.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_Dropdown_OptionDataList.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_Unity_Mathematics_bool2.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_ScrollRect_ScrollRectEvent.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderGateController.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkSmoke.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Arch.cs" />
+    <Compile Include="Assets\Scripts\Network\LargeSupplyCrate.cs" />
+    <Compile Include="Assets\Scripts\Animation\Rigging\SoldierRigSetup.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_Unity_Entities_Serialization_EntityPrefabReference.cs" />
+    <Compile Include="Assets\Scripts\Network\FSMAIController.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_InputField_EndEditEvent.cs" />
+    <Compile Include="Assets\Scripts\Network\CoverRegistrar.cs" />
+    <Compile Include="Assets\Scripts\Network\DeployScreen.cs" />
+    <Compile Include="Assets\Scripts\Network\HeadMarker.cs" />
+    <Compile Include="Assets\Scripts\Network\S1EvaluationStats.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
+    <Compile Include="Assets\Kevin Iglesias\Human Animations\Unity Demo Scenes\Human Soldier Animations\Scripts\HumanSoldierChangeWeaponSMB.cs" />
+    <Compile Include="Assets\Scripts\Network\Animation\ThirdPersonCam.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Splines_EmbeddedSplineData.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Quaternion.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_VFX_Utility_ExposedProperty.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
+    <Compile Include="Assets\Scripts\Network\Match\MapDefinition.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_InputActionReference.cs" />
+    <Compile Include="Assets\Scripts\Network\DeployableSlot.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Stairs.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_AnimGraph_FunctionCall.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Events_UnityEvent.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_InputField_SubmitEvent.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_LowLevel_GamepadButton.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
+    <Compile Include="Assets\Scripts\Animation\Rigging\SoldierPoseAsset.cs" />
+    <Compile Include="Assets\Scripts\Network\TrainingAutoHost.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkMatchManager.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderHud.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Cylinder.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkShootableTarget.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderWeaponSystem.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_FontData.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkCombat.cs" />
+    <Compile Include="Assets\Scripts\Network\Animation\HeadCamFollow.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_PlayerInput_DeviceRegainedEvent.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
+    <Compile Include="Assets\Scripts\Network\Commander\CommanderRoundLogger.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_Dropdown_DropdownEvent.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_AnimGraph_SocketAttachment.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_SpriteCharacter.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_EventSystems_EventTrigger_TriggerEvent.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_Toggle_ToggleEvent.cs" />
+    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkPlayerHealth.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkBullet.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_PlayerInputManager_PlayerJoinedEvent.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_TextEventHandler_LineSelectionEvent.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkThrowable.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_Style.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ParticleSystem_MinMaxGradient.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_InputField_OnChangeEvent.cs" />
+    <Compile Include="Assets\Scripts\Network\MinimapCamera.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Plane.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_Navigation.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_TextCore_Text_SpriteGlyph.cs" />
     <Compile Include="Assets\Scripts\Network\WeaponDefinition.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_AnimGraph_ClipLineData.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_Dropdown_OptionDataList.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TextAlignmentOptions.cs" />
     <Compile Include="Assets\Scripts\Network\GrenadeThrowable.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\Scripts\Network\DeployPointSet.cs" />
     <Compile Include="Assets\Kevin Iglesias\Human Animations\Scripts\SpineProxy.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
-    <Compile Include="Assets\Scripts\Network\LoadoutRules.cs" />
-    <Compile Include="Assets\Scripts\Network\MapLayers.cs" />
-    <Compile Include="Assets\Scripts\Network\MLAgentBridge.cs" />
+    <Compile Include="Assets\Scripts\Network\AnimationTestAutoDeploy.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_Unity_Mathematics_RigidTransform.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkPlayerController.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_Dropdown_DropdownEvent.cs" />
     <Compile Include="Assets\Scripts\Network\MovingZone.cs" />
-    <Compile Include="Assets\Scripts\Network\Match\MatchConfig.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_TextEventHandler_SpriteSelectionEvent.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\CommanderHexGrid.cs" />
-    <Compile Include="Assets\Scripts\Network\FSMStatsHud.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_Unity_Mathematics_bool2x2.cs" />
+    <Compile Include="Assets\Scripts\Animation\Rigging\HandGripConstraintBinder.cs" />
+    <Compile Include="Assets\Scripts\Animation\Rigging\HandGripConstraint.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Animations_Rigging_Vector3Bool.cs" />
     <Compile Include="Assets\Scripts\Network\BlastShield.cs" />
-    <Compile Include="Assets\Scripts\Network\Commander\NetworkCommanderState.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkInputState.cs" />
     <Compile Include="Assets\Scripts\Network\FreeCamera.cs" />
     <Compile Include="Assets\Scripts\Network\StrategicZone.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
-    <Compile Include="Assets\Scripts\Network\GarrisonZone.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_CrashKonijn_Goap_Runtime_SerializableEffect.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkGun.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\Scripts\Network\RemoteChargeThrowable.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
-    <Compile Include="Assets\Scripts\Network\HitboxUtility.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Pipe.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_InputActionMap.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Splines_SplineInfo.cs" />
     <Compile Include="Assets\Scripts\Network\TeamIntel.cs" />
-    <Compile Include="Assets\Scripts\Network\Animation\AimController.cs" />
-    <Compile Include="Assets\Scripts\Environment\TreePhysicsProxy.cs" />
-    <Compile Include="Assets\Scripts\Network\AgentVisionSensor.cs" />
     <Compile Include="Assets\Scripts\Network\EquipmentDefinition.cs" />
-    <Compile Include="Assets\Scripts\Network\TrainingArena.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Animations_Rigging_WeightedTransformArray.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Events_UnityEventBase.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkSoldierAnimator.cs" />
     <Compile Include="Assets\Scripts\Showcase\ShowcaseLoopState.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Door.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_PlayerInput_DeviceLostEvent.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_TextEventHandler_LinkSelectionEvent.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\CommanderConfig.cs" />
-    <Compile Include="Assets\Scripts\Network\ScriptedAIController.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkExplosion.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
-    <Compile Include="Assets\Scripts\Network\GameHud.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_InputField_TouchScreenKeyboardEvent.cs" />
     <Compile Include="Assets\Scripts\Network\SensorProbe.cs" />
-    <Compile Include="Assets\Scripts\Network\SupplyPackThrowable.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
-    <Compile Include="Assets\Scripts\Network\SmokeThrowable.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_TextCore_Text_UnicodeLineBreakingRules.cs" />
+    <Compile Include="Assets\Effects\particle_package\UnionAssetes\Particle\ParticleScaler\ParticleScale.cs" />
     <Compile Include="Assets\Scripts\Network\RewardBus.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Rendering_HighDefinition_DecalLayerEnum.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_PlayerInput_ActionEvent.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkInterceptor.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_AnimGraph_SingleClipLineData.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\CommanderTools.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_FontWeightPair.cs" />
     <Compile Include="Assets\Scripts\Network\LoadoutDefinition.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkSmokeVolume.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkAIController.cs" />
     <Compile Include="Assets\Scripts\Network\SpecialCover.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
     <Compile Include="Assets\Scripts\Network\FSMBattleSystem.cs" />
-    <Compile Include="Assets\Scripts\Network\DebugHud.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_TextCore_GlyphRect.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Rendering_HighDefinition_DiffusionProfileSettings.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
     <Compile Include="Assets\Scripts\Network\HudMath.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
     <Compile Include="Assets\Scripts\Network\MapPointMarker.cs" />
-    <Compile Include="Assets\Scripts\Network\Commander\CommanderGateController.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkSmoke.cs" />
+    <Compile Include="Assets\Scripts\Animation\Rigging\SkeletonPoseConstraint.cs" />
     <Compile Include="Assets\Scripts\Network\EmpGrenadeThrowable.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkEquipment.cs" />
     <Compile Include="Assets\Scripts\Network\RescueThrowable.cs" />
-    <Compile Include="Assets\Scripts\Network\LargeSupplyCrate.cs" />
-    <Compile Include="Assets\Scripts\Network\FSMAIController.cs" />
+    <Compile Include="Assets\Scripts\Animation\LocalSoldierDriver.cs" />
     <Compile Include="Assets\Scripts\Network\DeployableUtil.cs" />
-    <Compile Include="Assets\Scripts\Network\CoverRegistrar.cs" />
-    <Compile Include="Assets\Scripts\Network\DeployScreen.cs" />
-    <Compile Include="Assets\Scripts\Network\HeadMarker.cs" />
-    <Compile Include="Assets\Scripts\Network\S1EvaluationStats.cs" />
+    <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Splines_TangentMode.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkCombatant.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
-    <Compile Include="Assets\Kevin Iglesias\Human Animations\Unity Demo Scenes\Human Soldier Animations\Scripts\HumanSoldierChangeWeaponSMB.cs" />
+    <Compile Include="Assets\Scripts\Animation\SoldierAnimDebugger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll" />
@@ -647,6 +766,10 @@
     </Reference>
     <Reference Include="System.IO.Hashing">
       <HintPath>Library\PackageCache\com.unity.collections@2.5.7\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.5\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Google.Protobuf">
@@ -1173,6 +1296,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Physics.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="cn.tuanjie.AnimGraph.Runtime">
+      <HintPath>Library\ScriptAssemblies\cn.tuanjie.AnimGraph.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.ScriptableBuildPipeline">
       <HintPath>Library\ScriptAssemblies\Unity.ScriptableBuildPipeline.dll</HintPath>
       <Private>False</Private>
@@ -1187,6 +1314,10 @@
     </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Splines.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Splines.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.HighDefinition.Config.Runtime">
@@ -1225,6 +1356,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="cn.tuanjie.AnimGraph.Editor">
+      <HintPath>Library\ScriptAssemblies\cn.tuanjie.AnimGraph.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.ProBuilder.AssetIdRemapUtility">
       <HintPath>Library\ScriptAssemblies\Unity.ProBuilder.AssetIdRemapUtility.dll</HintPath>
       <Private>False</Private>
@@ -1235,6 +1370,10 @@
     </Reference>
     <Reference Include="Unity.Mathematics.Extensions.Hybrid">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Extensions.Hybrid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AutoGenerateInspector">
+      <HintPath>Library\ScriptAssemblies\AutoGenerateInspector.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Burst">
@@ -1273,6 +1412,10 @@
       <HintPath>Library\ScriptAssemblies\CrashKonijn.Agent.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.Flow.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Serialization.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Serialization.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1305,6 +1448,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Entities.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Splines">
+      <HintPath>Library\ScriptAssemblies\Unity.Splines.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Entities.Editor.Properties">
       <HintPath>Library\ScriptAssemblies\Unity.Entities.Editor.Properties.dll</HintPath>
       <Private>False</Private>
@@ -1317,8 +1464,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.Barracuda.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Tuanjie.RigGraph.Runtime.RigGraphCore">
+      <HintPath>Library\ScriptAssemblies\Tuanjie.RigGraph.Runtime.RigGraphCore.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Tuanjie.Infinity.Editor">
       <HintPath>Library\ScriptAssemblies\Tuanjie.Infinity.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.State">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Scenes">
@@ -1377,8 +1532,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.VisualEffectGraph.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.Flow">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Mathematics.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AnimRigGraph.Editor.AnimationGraphEditor">
+      <HintPath>Library\ScriptAssemblies\AnimRigGraph.Editor.AnimationGraphEditor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Tuanjie.Infinity">
@@ -1403,6 +1566,10 @@
     </Reference>
     <Reference Include="Unity.Physics.Hybrid">
       <HintPath>Library\ScriptAssemblies\Unity.Physics.Hybrid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AnimRigGraph.Runtime.AnimationGraph">
+      <HintPath>Library\ScriptAssemblies\AnimRigGraph.Runtime.AnimationGraph.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.AI.Navigation.Editor.ConversionSystem">
@@ -1437,6 +1604,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.Shared.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.ShaderGraph.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1445,8 +1616,24 @@
       <HintPath>Library\ScriptAssemblies\Unity.Barracuda.iOSBLAS.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Test">
+      <HintPath>Library\ScriptAssemblies\Test.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Core">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Tuanjie.RigGraphEditor">
+      <HintPath>Library\ScriptAssemblies\Tuanjie.RigGraphEditor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Core.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Barracuda.BurstBLAS">
@@ -1469,6 +1656,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Entities.Graphics.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Entities.Graphics.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1477,8 +1668,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Tuanjie.RigGraph.CodeGen">
+      <HintPath>Library\ScriptAssemblies\Tuanjie.RigGraph.CodeGen.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.AI.Navigation.Updater">
       <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Updater.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.State.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Mathematics">
