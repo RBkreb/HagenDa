@@ -25,6 +25,10 @@ namespace HagenDa.Animation.Rigging
         [Range(0f, 1f)] public float chestPitchShare;  // 胸部 pitch 分担,默认 0.3
         [Range(0f, 1f)] public float headPitchShare;   // 头部 pitch 分担,默认 0.6
 
+        [Tooltip("身体朝向在 hips 本地空间的轴(Blender armature 默认 -Y;0 向量时回落 -Y)。" +
+                 "用 eulerAngles.y 读翻转骨架的 yaw 会得到分解伪影,故与 HipsPoseConstraint 一致改用朝向向量。")]
+        public Vector3 facingAxis;
+
         public bool IsValid()
         {
             return root != null && hips != null && chest != null && aimSource != null;
@@ -40,6 +44,7 @@ namespace HagenDa.Animation.Rigging
             maxTwist = 60f;
             chestPitchShare = 0.3f;
             headPitchShare = 0.6f;
+            facingAxis = new Vector3(0f, -1f, 0f);
         }
     }
 
@@ -55,6 +60,7 @@ namespace HagenDa.Animation.Rigging
         public float maxTwist;
         public float chestPitchShare;
         public float headPitchShare;
+        public Vector3 facingAxis;      // 已归一化
 
         public FloatProperty jobWeight { get; set; }
 
@@ -66,12 +72,17 @@ namespace HagenDa.Animation.Rigging
             if (w <= 0.0001f) return;
 
             Quaternion aimRot = aimSource.GetRotation(stream);
-            Vector3 aimEuler = aimRot.eulerAngles;
-            float aimYaw = aimEuler.y;
-            float aimPitch = aimEuler.x > 180f ? aimEuler.x - 360f : aimEuler.x;
+            Vector3 aimDir = aimRot * Vector3.forward;
+            // yaw 用朝向向量测差:翻转骨架(Blender X=270 rest)上 eulerAngles.y 是分解
+            // 伪影,直接读会得到错误 lag(HipsPoseConstraint 同因改用向量)。
+            Vector3 hipsFwd = hips.GetRotation(stream) * facingAxis;
+            hipsFwd.y = 0f;
+            Vector3 aimFwd = aimDir; aimFwd.y = 0f;
+            if (hipsFwd.sqrMagnitude < 1e-6f || aimFwd.sqrMagnitude < 1e-6f) return;
+            float lag = Vector3.SignedAngle(hipsFwd, aimFwd, Vector3.up);
 
-            float hipsYaw = hips.GetRotation(stream).eulerAngles.y;
-            float lag = Mathf.DeltaAngle(hipsYaw, aimYaw);
+            // pitch 由瞄准方向的垂直分量求:正值 = 低头(与 euler x 同号约定)。
+            float aimPitch = -Mathf.Asin(Mathf.Clamp(aimDir.y, -1f, 1f)) * Mathf.Rad2Deg;
 
             float chestTwist = Mathf.Clamp(lag, -maxTwist, maxTwist);
             float headTwist = lag - chestTwist;
@@ -105,6 +116,7 @@ namespace HagenDa.Animation.Rigging
     {
         public override SpineAimConstraintJob Create(Animator animator, ref SpineAimConstraintData data, Component component)
         {
+            var axis = data.facingAxis.sqrMagnitude < 1e-6f ? new Vector3(0f, -1f, 0f) : data.facingAxis;
             return new SpineAimConstraintJob
             {
                 chest = ReadWriteTransformHandle.Bind(animator, data.chest),
@@ -116,6 +128,7 @@ namespace HagenDa.Animation.Rigging
                 maxTwist = data.maxTwist,
                 chestPitchShare = data.chestPitchShare,
                 headPitchShare = data.headPitchShare,
+                facingAxis = axis.normalized,
                 jobWeight = FloatProperty.Bind(animator, component, "m_Weight")
             };
         }

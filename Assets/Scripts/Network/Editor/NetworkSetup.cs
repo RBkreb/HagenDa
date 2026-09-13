@@ -4,6 +4,7 @@ using Mirror;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem.UI;
@@ -28,11 +29,12 @@ namespace HagenDa.Networking.EditorTools
         private const string AIPrefabPath = "Assets/Scripts/Network/Prefabs/AIEntity.prefab";
         private const string WeaponFolder = "Assets/Scripts/Network/Weapons";
         private const string M4DefinitionPath = "Assets/Scripts/Network/Weapons/M4Definition.asset";
-        private const string M4PrefabPath = "Assets/Low Poly Weapons VOL.1/Prefabs/M4_8.prefab";
+        private const string M4PrefabPath = "Assets/Model/Guns/M4_8.prefab";
 
         // PHASE12: 队伍士兵模型（红 = Natlan Soldier，蓝 = Fatui Bodyguard）。
         private const string NatlanSoldierPath = "Assets/Model/natlan/Natlan Soldier FBX with collider.prefab";
-        private const string FatuiSoldierPath = "Assets/Model/Fatui/Fatui Bodyguard FBX.prefab";
+        // PHASE14: Fatui 改由自建 rig 预制体(FatuiRigBuilder 烘入 4 层 rig + SoldierRigSetup)。
+        private const string FatuiSoldierPath = "Assets/Model/Fatui/Fatui with Collider.prefab";
 
         // PHASE13: 士兵模型使用的自建 Animator controller(4 剪辑层 + rig 权重驱动)。
         private const string SoldierControllerPath = "Assets/Scripts/Network/Animation/NetworkSoldierLayers.controller";
@@ -386,6 +388,13 @@ namespace HagenDa.Networking.EditorTools
 
             soldierAnimator.redModel = AttachTeamModel(root, NatlanSoldierPath, "RedSoldierModel", 0f);
             soldierAnimator.blueModel = AttachTeamModel(root, FatuiSoldierPath, "BlueSoldierModel", 0.08f);
+            // PHASE14:队伍未指定(单人验证场景 teamId<0)时显示 Fatui —— 它是唯一带
+            // 完整 PHASE14 rig(HipsPose/SpineAim/FootIK/Hands)的模型;Natlan 无。
+            soldierAnimator.defaultModel = soldierAnimator.blueModel;
+
+            // PHASE14 角色结构:胶囊根 -> [角色模型 + 枪械基准(同级)] -> 枪模。
+            // 枪械基准挂在实体根(动画层级之外),双手 IK 目标读到的是实时 Transform。
+            EnsureWeaponBasis(root);
 
             // PHASE13: force the self-made NetworkSoldier controller (guards against
             // the model prefabs reverting to the vendor demo controller).
@@ -418,6 +427,40 @@ namespace HagenDa.Networking.EditorTools
                 var r = body.GetComponent<Renderer>();
                 if (r != null) r.enabled = false;
             }
+        }
+
+        /// <summary>
+        /// 确保实体根下有 WeaponBasis(与角色模型同级)并在其下摆一把枪。
+        /// PHASE14:枪必须在动画层级之外,双手 IK 才能持续读到实时目标。
+        /// 幂等:已有则复用。第三把枪(模型内残留)由 NetworkGun 运行时剔除。
+        /// </summary>
+        private static Transform EnsureWeaponBasis(GameObject root)
+        {
+            var basis = root.transform.Find("WeaponBasis");
+            if (basis == null)
+            {
+                var go = new GameObject("WeaponBasis");
+                go.transform.SetParent(root.transform, false);
+                basis = go.transform;
+            }
+            basis.localPosition = Vector3.zero;
+            basis.localRotation = Quaternion.identity;
+
+            if (basis.childCount > 0) return basis;   // 已有枪
+
+            var gunPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(M4PrefabPath);
+            if (gunPrefab == null) return basis;
+            var gun = (GameObject)PrefabUtility.InstantiatePrefab(gunPrefab);
+            gun.name = "M4_8";
+            gun.transform.SetParent(basis, false);
+            gun.transform.localPosition = Vector3.zero;
+            gun.transform.localRotation = Quaternion.identity;
+            gun.transform.localScale = Vector3.one;
+            // 枪自带 AimConstraint 在 rig 之后求值会造成握把锚点滞后,停用
+            var ac = gun.GetComponent<AimConstraint>();
+            if (ac == null) ac = gun.AddComponent<AimConstraint>();
+            ac.constraintActive = false;
+            return basis;
         }
 
         private static GameObject AttachTeamModel(GameObject root, string prefabPath, string name, float yOffset)
@@ -521,6 +564,66 @@ namespace HagenDa.Networking.EditorTools
 
             UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, AnimationTestScenePath);
             Debug.Log($"[NetworkSetup] Animation test scene ready: {AnimationTestScenePath} (Play 即自动 StartHost，主视角前下方挂镜子)");
+        }
+
+        // ---------------------------------------------------------------
+        // PHASE14: 单人 FPS 验证场景
+        // ---------------------------------------------------------------
+
+        private const string SoldierSoloScenePath = "Assets/Scenes/SoldierSoloFPS.scene";
+
+        /// <summary>
+        /// 单人玩家网络对局(无 AI):真实的 NetworkManager + StartHost + 自动部署一名真人玩家,
+        /// 第一人称相机随 prefab。用于验证 PHASE14 的腰射/瞄准/冲刺/开火/走跑跳趴与转向。
+        /// 无需人工开服:Play 即自动 Host 并部署(AnimationTestAutoDeploy)。
+        /// </summary>
+        [MenuItem("HagenDa/Setup Soldier Solo FPS Scene")]
+        public static void SetupSoldierSoloScene()
+        {
+            EnsureFolder("Assets", "Scenes");
+
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(
+                UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Single);
+
+            EnsureLighting();
+
+            // 地面 + 参照物(观察走/跑/冲刺位移与转向)
+            var floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            floor.name = "Floor";
+            floor.transform.position = new Vector3(0f, -0.25f, 0f);
+            floor.transform.localScale = new Vector3(80f, 0.5f, 80f);
+
+            for (int i = 0; i < 4; i++)
+            {
+                var marker = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                marker.name = "Marker" + i;
+                marker.transform.position = new Vector3((i - 1.5f) * 5f, 0.75f, 10f);
+                marker.transform.localScale = new Vector3(0.6f, 1.5f, 0.6f);
+            }
+            // 远处的靶标(验证腰射/瞄准可指向)
+            var target = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            target.name = "Target";
+            target.transform.position = new Vector3(0f, 1.0f, 25f);
+            target.transform.localScale = new Vector3(1.2f, 2f, 0.4f);
+
+            // 单人房间:Play 即自动 StartHost + 自动部署真人
+            var nmGo = new GameObject("NetworkManager");
+            var nm = nmGo.AddComponent<NetworkManager>();
+            nm.transport = nmGo.AddComponent<kcp2k.KcpTransport>();
+            nm.playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+            nm.autoCreatePlayer = true;
+            nm.maxConnections = 1;
+            nmGo.AddComponent<TrainingAutoHost>();
+            nmGo.AddComponent<AnimationTestAutoDeploy>();
+
+            var spawn = new GameObject("SpawnPoint");
+            spawn.AddComponent<NetworkStartPosition>();
+            spawn.transform.position = new Vector3(0f, 0.05f, 0f);
+
+            UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene, SoldierSoloScenePath);
+            Debug.Log($"[NetworkSetup] Solo FPS scene ready: {SoldierSoloScenePath}" +
+                      " (Play 自动 Host + 部署;相机在胶囊体外表面,低头可见自身;手动验证腰射/瞄准/开火/冲刺/趴/跳/转向)");
         }
 
         // ---------------------------------------------------------------
@@ -2326,6 +2429,10 @@ namespace HagenDa.Networking.EditorTools
             gun.definition = BuildM4Definition();
             gun.bulletPrefab = bulletPrefab;
             gun.controller = controller;
+            // PHASE14: 第三人称枪模 = 新枪(含 RearGrip/BarrelGrip/MagGrip 握把锚点 +
+            // 照门/枪机)。运行时 NetworkGun 实例化到 SoldierRigSetup.WeaponAnchor,
+            // 由 BindWeapon 绑定双手 IK 目标与握把胶囊。
+            gun.thirdPersonModelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(M4PrefabPath);
 
             controller.standCollider = standCapsule;
             controller.crouchCollider = crouchCapsule;
@@ -3373,6 +3480,7 @@ namespace HagenDa.Networking.EditorTools
             var gun = root.AddComponent<NetworkGun>();
             gun.definition = BuildM4Definition();
             gun.bulletPrefab = bulletPrefab;
+            gun.thirdPersonModelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(M4PrefabPath);   // PHASE14
 
             // Health (same as player).
             root.AddComponent<NetworkPlayerHealth>();

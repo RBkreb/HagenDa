@@ -43,10 +43,10 @@ namespace HagenDa.Animation
         public bool debugCrouch;
 
         [Header("Foot IK gating (触地软钉 / 抬脚释放,逐脚独立)")]
-        [Tooltip("脚踝低于此高度=触地,该脚 IK 权重升至上限。剪辑踝高 rest≈0.11。")]
-        public float footPlantHeight = 0.12f;
-        [Tooltip("脚踝高于此高度=抬脚,该脚 IK 权重归零(剪辑自然摆腿)。实测左脚剪辑峰值 0.201/右脚 0.230——阈值需低于较低一侧,否则低摆幅脚的级联释放在摆幅顶点前完不成。")]
-        public float footLiftHeight = 0.15f;
+        [Tooltip("触地带宽(米,相对该脚观测到的最低踝高=落地帧)。低于 最低+该值 = 触地。")]
+        public float footPlantBand = 0.02f;
+        [Tooltip("释放带宽(米,相对最低踝高)。高于 最低+该值 = 完全释放(剪辑自然摆腿)。")]
+        public float footLiftBand = 0.09f;
         [Tooltip("移动时的 IK 权重上限(<1,关键):恒 1 会把脚踝锁死贴地,门控永远看不到抬脚。0.15 时摆幅混合高度≈0.18>lift 阈值,级联释放能完成。")]
         [Range(0f, 1f)] public float footIKCapMoving = 0.15f;
         [Tooltip("静止时的 IK 权重上限(1=完全钉地,站立/转身时脚不漂)。")]
@@ -95,11 +95,14 @@ namespace HagenDa.Animation
         private float moveX, moveZ;
         private float vy;
         private float footWeightL = 1f, footWeightR = 1f;
+        private float minAnkleL = float.MaxValue, minAnkleR = float.MaxValue;   // 逐脚最低踝高(自适应基准)
         private Transform footBoneL, footBoneR;
         private bool crouched;
         private float poseCrouchCur;
         private bool yawInit;
         private float dampedYaw;
+        private float aimAmount;      // PHASE14:右键 ADS 平滑量
+        private uint shotCount;       // PHASE14:枪机往复触发(无网络时本地模拟)
 
         private void Awake()
         {
@@ -112,39 +115,17 @@ namespace HagenDa.Animation
             if (rig != null)
             {
                 rig.SetHipsWeight(1f);        // 差速转身开
-                rig.SetSpineWeight(0f);       // 无脊柱瞄准
-                rig.SetPoseWeights(0f, 0f);   // 无蹲/趴姿态
-                rig.SetHandsWeight(0f);       // 绑枪成功后再开
+                rig.SetSpineWeight(1f);       // 上半身立即跟随水平瞄准(脊柱反扭)
+                rig.SetPoseWeights(0f, 0f);   // Fatui 无 SkeletonPose 姿态资产(蹲用 MultiPosition 下移)
+                rig.SetHandsWeight(1f);
 
                 yawDriver = rig.YawDriver;
                 footBoneL = rig.FootTipL;
                 footBoneR = rig.FootTipR;
-
-                // 绑烘焙在模型内的 M4(GripCap 下补建 GripRoot 手腕锚点后 BindWeapon)。
-                var gunT = FindDeep(transform, "M4_8");
-                if (gunT != null)
-                {
-                    var gun = gunT.gameObject;
-                    EnsureGripRoot(gun.transform, "GripCapR", "GripRootR");
-                    EnsureGripRoot(gun.transform, "GripCapL", "GripRootL");
-
-                    // 枪模挂 WeaponAnchor(生产同款):蹲/瞄准时锚点跟胸骨走,
-                    // 手臂 IK 跟枪,身体下蹲时手臂不被硬拉。
-                    if (rig.WeaponAnchor != null)
-                    {
-                        gunT.SetParent(rig.WeaponAnchor, false);
-                        gunT.localPosition = Vector3.zero;
-                        gunT.localRotation = Quaternion.identity;
-                    }
-
-                    rig.BindWeapon(gun);
-                    weaponBound = rig.BoundWeapon == gun;
-                    if (weaponBound) rig.SetHandsWeight(1f);
-                    gunRoot = gunT;
-                }
+                TryBindWeapon();
             }
 
-            // ---- Head aim pivot:枪绕头部转动的旋转中心 ----
+            // ---- Head aim pivot ----
             if (headAimPivot == null) headAimPivot = transform.Find("HeadAimPivot");
             if (headAimPivot == null)
             {
@@ -153,14 +134,29 @@ namespace HagenDa.Animation
                 go.transform.localPosition = headPivotLocalPos;
                 headAimPivot = go.transform;
             }
-            if (gunRoot != null && headAimPivot != null)
-                gunHoldOffset = transform.InverseTransformVector(gunRoot.position - headAimPivot.position);
 
             if (animator != null)
             {
                 animator.SetFloat(MoveX, 0f);
                 animator.SetFloat(MoveZ, 0f);
             }
+        }
+
+        /// <summary>
+        /// 绑定枪械基准下的枪(PHASE14:基准与模型同级挂在胶囊根下)。
+        /// 打包前 Start 可能早于 Animator 就绪,BindWeapon 内部只登记一次待重建,
+        /// 等 Animator 就绪后由 SoldierRigSetup 执行 —— 无逐帧重试。
+        /// </summary>
+        private bool TryBindWeapon()
+        {
+            if (rig == null || weaponBound) return weaponBound;
+            var gunT = FindDeep(transform, "M4_8");
+            if (gunT == null) return false;
+
+            rig.BindWeapon(gunT.gameObject);
+            weaponBound = true;
+            gunRoot = gunT;
+            return true;
         }
 
         private void Update()
@@ -201,6 +197,15 @@ namespace HagenDa.Animation
             if (y <= 0f) { y = 0f; vy = 0f; }
             transform.position = new Vector3(transform.position.x, y, transform.position.z);
 
+            // ---- 蹲:MultiPositionConstraint 把骨架根(hips)压低 + 脚 IK 贴地 → 屈膝。
+            //      (PHASE14 姿态专项;与 NetworkSoldierAnimator 同款机制,无姿态资产依赖) ----
+            if (rig != null && transform.position.y <= 0.001f)
+            {
+                poseCrouchCur = Mathf.MoveTowards(poseCrouchCur, crouched ? 1f : 0f, crouchRampSpeed * dt);
+                rig.SetBodyOffset(Vector3.Lerp(Vector3.zero, crouchOffset, poseCrouchCur));
+                rig.SetHipsPosWeight(poseCrouchCur);
+            }
+
             // ---- 下半身差速追赶(逻辑与 NetworkSoldierAnimator.DriveRig 相同) ----
             float aimYaw = transform.eulerAngles.y;
             if (!yawInit) { dampedYaw = aimYaw; yawInit = true; }
@@ -215,14 +220,16 @@ namespace HagenDa.Animation
             if (yawDriver != null) yawDriver.rotation = Quaternion.Euler(0f, dampedYaw, 0f);
 
             // ---- 脚部地面 IK:逐脚按踝高门控——低(触地)=软钉贴合,高(抬脚)=释放。
-            //      权重上限分两档:移动=软钉(0.15,剪辑保留抬脚自由度,级联释放能完成),
+            //      基准 = 该脚观测到的最低踝高(落地帧),自适应标定,模型无关。
+            //      权重上限分两档:移动=软钉(0.15,剪辑保留抬脚自由度),
             //      静止=完全钉地(站立/转身时脚不漂)。 ----
             if (rig != null)
             {
                 float speed01 = Mathf.Clamp01(Mathf.Max(Mathf.Abs(moveX), Mathf.Abs(moveZ)) / 0.25f);
                 float cap = Mathf.Lerp(footIKCapIdle, footIKCapMoving, speed01);
-                footWeightL = StepFootIK(footWeightL, footBoneL != null ? footBoneL.position.y : 0f, cap, dt);
-                footWeightR = StepFootIK(footWeightR, footBoneR != null ? footBoneR.position.y : 0f, cap, dt);
+                float rootY = transform.position.y;
+                footWeightL = StepFootIK(footWeightL, footBoneL != null ? footBoneL.position.y - rootY : 0f, cap, dt, ref minAnkleL);
+                footWeightR = StepFootIK(footWeightR, footBoneR != null ? footBoneR.position.y - rootY : 0f, cap, dt, ref minAnkleR);
                 rig.SetFootIKWeight(footWeightL, footWeightR);
             }
 
@@ -233,12 +240,18 @@ namespace HagenDa.Animation
                 Quaternion aimDir = Quaternion.Euler(pitch, aimYaw, 0f);
                 rig.SetAimPose(eye, aimDir);
                 rig.SetAimTarget(eye + aimDir * Vector3.forward * aimTargetDistance);
+
+                // PHASE14 枪械表现:右键 ADS(瞳距拉近) + Shift 冲刺摆枪。
+                // 无网络,直接喂状态量;枪机往复用模拟 shotCount(左键按下时递增)。
+                bool ads = mouse != null && mouse.rightButton.isPressed;
+                aimAmount = Mathf.MoveTowards(aimAmount, ads ? 1f : 0f, dt * 4f);
+                bool sprint = kb != null && kb.leftShiftKey.isPressed && Mathf.Abs(moveZ) > 0.1f;
+                if (mouse != null && mouse.leftButton.wasPressedThisFrame) shotCount++;
+                rig.SetWeaponState(aimAmount, sprint, 0f, shotCount);
             }
 
-            // ---- 枪绕头部 pivot 公转:位置 = pivot + 瞄准旋转 × 持枪偏移。
-            //      旋转中心从枪自身移到头部;AimConstraint 仍负责枪的指向。 ----
-            if (gunRoot != null && headAimPivot != null)
-                gunRoot.position = headAimPivot.position + Quaternion.Euler(pitch, aimYaw, 0f) * gunHoldOffset;
+            // 枪的位置/朝向现由 WeaponAnchor 驱动(SetWeaponState),不再手工公转——
+            // 手工改枪的 transform 会让握把锚点脱离手臂 IK 目标,手指/手腕再次脱节。
 
             // ---- 持枪层权重(与 NetworkSoldierAnimator.UpdateLocomotionLayers 相同) ----
             if (animator != null)
@@ -249,10 +262,15 @@ namespace HagenDa.Animation
             }
         }
 
-        /// <summary>单脚 IK 权重步进:踝高在 [plant,lift] 区间线性降落,平滑 + cap 钳制。</summary>
-        private float StepFootIK(float cur, float ankleY, float cap, float dt)
+        /// <summary>
+        /// 单脚 IK 权重步进:基准 = 该脚观测到的最低踝高(落地帧),自适应标定。
+        /// 低(触地)=启用,高(抬脚)=释放,中间平滑过渡,上限 cap。
+        /// </summary>
+        private float StepFootIK(float cur, float ankleRel, float cap, float dt, ref float minAnkle)
         {
-            float t = (ankleY - footPlantHeight) / Mathf.Max(0.01f, footLiftHeight - footPlantHeight);
+            if (ankleRel < minAnkle) minAnkle = ankleRel;                              // 记录新的最低点
+            else minAnkle = Mathf.MoveTowards(minAnkle, ankleRel, dt * 0.05f);         // 极慢回弹,适应坡面
+            float t = (ankleRel - (minAnkle + footPlantBand)) / Mathf.Max(0.01f, footLiftBand - footPlantBand);
             float target = Mathf.Clamp01(1f - t) * cap;
             return Mathf.MoveTowards(cur, target, footWeightSpeed * dt);
         }
@@ -267,19 +285,6 @@ namespace HagenDa.Animation
             if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) x += 1f;
             if (kb.aKey.isPressed || kb.leftArrowKey.isPressed) x -= 1f;
             return new Vector2(x, y);
-        }
-
-        /// <summary>GripCap* 下没有 GripRoot* 手腕锚点时补建(BindWeapon 契约)。</summary>
-        private static void EnsureGripRoot(Transform gun, string capName, string rootName)
-        {
-            var cap = FindDeep(gun, capName);
-            if (cap == null) return;
-            var existing = cap.Find(rootName);
-            if (existing != null) return;
-            var go = new GameObject(rootName);
-            go.transform.SetParent(cap, false);
-            go.transform.localPosition = Vector3.zero;
-            go.transform.localRotation = Quaternion.identity;
         }
 
         private static Transform FindDeep(Transform root, string name)

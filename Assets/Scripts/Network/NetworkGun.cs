@@ -34,6 +34,7 @@ namespace HagenDa.Networking
 
         private GameObject tpModel;
         private SoldierRigSetup boundRig;
+        private Transform weaponBasis;      // 实体根下、与模型同级的枪械基准
         private NetworkSoldierAnimator soldierAnim;
         private NetworkPlayerHealth healthComp;
 
@@ -44,10 +45,10 @@ namespace HagenDa.Networking
         }
 
         /// <summary>
-        /// 第三人称枪模同步(PHASE13):绑定当前士兵模型的 rig;死亡/切到非主武器
-        /// 槽时隐藏并解绑(手部 IK 权重经 weaponHeld→0 由 NetworkSoldierAnimator
-        /// 处理);队伍模型切换时自动重绑到新 rig。第一人称 owner 的模型整体隐藏
-        /// (ActiveRig == null),本枪模随之不可见。
+        /// 第三人称枪模(PHASE14):胶囊根 -> [角色模型 + 枪械基准(同级)] -> 枪模。
+        /// 枪械基准在动画层级之外,故双手 IK 目标/握把胶囊读到的是实时 Transform ——
+        /// 手-枪可持续自主同步,且不随模型(含可能的自装配枪)进入 AnimationStream。
+        /// 这里:确保基准与枪存在、剔除模型内自装配的枪、把枪绑到当前 rig、死亡/切槽显隐。
         /// </summary>
         private void Update()
         {
@@ -60,34 +61,72 @@ namespace HagenDa.Networking
 
             if (rig == null || !desired)
             {
-                if (tpModel != null && tpModel.activeSelf)
-                {
-                    if (boundRig != null) boundRig.ClearWeapon();
-                    tpModel.SetActive(false);
-                }
+                if (tpModel != null && tpModel.activeSelf) tpModel.SetActive(false);
                 return;
             }
 
-            if (tpModel == null)
+            EnsureBasisAndGun();
+            if (tpModel == null) return;
+
+            // 先绑到实体层的枪,再剔除模型内的残留枪(避免剔除瞬间 IK 目标悬空)
+            if (boundRig != rig)
             {
-                if (thirdPersonModelPrefab == null) return;
-                tpModel = Instantiate(thirdPersonModelPrefab);
+                boundRig = rig;
+                rig.BindWeapon(tpModel);
+            }
+            StripModelGuns();
+
+            if (!tpModel.activeSelf) tpModel.SetActive(true);
+        }
+
+        /// <summary>确保实体根下有 WeaponBasis + 一把枪(与角色模型同级)。</summary>
+        private void EnsureBasisAndGun()
+        {
+            if (weaponBasis == null) weaponBasis = transform.Find("WeaponBasis");
+            if (weaponBasis == null)
+            {
+                var go = new GameObject("WeaponBasis");
+                go.transform.SetParent(transform, false);
+                weaponBasis = go.transform;
             }
 
-            bool needBind = rig != boundRig || !tpModel.activeSelf;
-            if (rig != boundRig)
+            if (tpModel == null && weaponBasis.childCount > 0)
             {
-                tpModel.transform.SetParent(rig.WeaponAnchor, false);
+                // 已在基准下摆好枪(预制体装配)
+                for (int i = 0; i < weaponBasis.childCount; i++)
+                {
+                    var c = weaponBasis.GetChild(i);
+                    if (c.GetComponentInChildren<MeshRenderer>(true) != null) { tpModel = c.gameObject; break; }
+                }
+            }
+            if (tpModel == null && thirdPersonModelPrefab != null)
+            {
+                tpModel = Instantiate(thirdPersonModelPrefab, weaponBasis, false);
                 tpModel.transform.localPosition = Vector3.zero;
                 tpModel.transform.localRotation = Quaternion.identity;
                 tpModel.transform.localScale = Vector3.one;
-                boundRig = rig;
             }
+        }
 
-            if (needBind)
+        /// <summary>
+        /// 剔除角色模型内的枪(PHASE14:枪只能挂在实体层的 WeaponBasis 下)。
+        /// 网络胶囊体预设可能自装配一把枪,遗留会变成动画层级内的第二把枪。
+        /// </summary>
+        private void StripModelGuns()
+        {
+            var soldier = soldierAnim != null ? soldierAnim.ActiveModel : null;
+            if (soldier == null) return;
+            var doomed = new System.Collections.Generic.List<GameObject>();
+            foreach (var t in soldier.GetComponentsInChildren<Transform>(true))
             {
-                tpModel.SetActive(true);
-                rig.BindWeapon(tpModel);
+                if (t == soldier.transform || t == transform) continue;
+                if (t.name == "M4_8" && t.parent != null && t.parent != weaponBasis)
+                    doomed.Add(t.gameObject);
+            }
+            foreach (var g in doomed)
+            {
+                if (g == tpModel) continue;
+                g.SetActive(false);      // 保留引用安全:隐藏而非销毁(仍可能是 rig 目标源)
             }
         }
 
@@ -101,6 +140,7 @@ namespace HagenDa.Networking
         [SyncVar] public bool reloading;
         [SyncVar] public bool reloadPaused;
         [SyncVar] public uint shotCount;   // PHASE12: 开枪计数（NetworkSoldierAnimator 检测增量播 Shoot01）
+        [SyncVar] public bool sprinting;   // PHASE14: 冲刺持枪（枪械表现切 SprintAim + 摆枪）
 
         private enum ReloadState { Idle, Reloading, Paused }
 
@@ -109,7 +149,6 @@ namespace HagenDa.Networking
         private bool aimHeld;
         private Vector3 aimOrigin;
         private Vector3 aimForward;
-        private bool sprinting;
 
         // ---- Server runtime ----
         private BulletPool pool;

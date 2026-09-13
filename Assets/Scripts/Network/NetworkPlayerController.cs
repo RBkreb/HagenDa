@@ -100,6 +100,28 @@ namespace HagenDa.Networking
         [Header("Camera")]
         [Tooltip("Distance below the capsule top for the eye/camera.")]
         public float eyeOffsetFromTop = 0.15f;
+        [Tooltip("PHASE14:相机置于胶囊体外表面时,沿水平朝向外推的距离(≈胶囊半径 0.25)。0=回到胶囊中轴。")]
+        public float cameraSurfaceOffset = 0.25f;
+        [Tooltip("PHASE14:相机在眼高基础上的额外抬升(m)。抬高相机同时抬高枪械基准 → " +
+                 "枪在视野中不再过低、蹲下时手也够得到。0=纯眼高(1.65m)。\n" +
+                 "注意:相机过高(≈1.8m 以上)会让枪械基准超出双臂可及范围(臂长约 0.63m)。")]
+        public float cameraHeightBoost = 0.40f;
+        [Tooltip("蹲姿相机额外抬升(m,叠加在 cameraHeightBoost 上);蹲下时身体降低," +
+                 "抬高相机可让枪保持在手可及范围内。")]
+        public float crouchCameraBoost = 0.15f;
+
+        [Header("Camera eye anchor (PHASE14)")]
+        [Tooltip("可选:头部锚(Fatui 头部骨骼 DEF-spine.005 的子对象 headcollider)。\n" +
+                 "赋值后站立相机高度直接取自该锚的世界高度,自动跟随头部(含蹲/趴低头),\n" +
+                 "不再用 standHeight 推算;cameraHeightBoost 只在无锚时生效。\n" +
+                 "由 NetworkSoldierAnimator 运行时自动填充。")]
+        public Transform eyeAnchor;
+        [Tooltip("相对 eyeAnchor 的高度微调(m)。")]
+        public float eyeAnchorOffset = 0f;
+        [Tooltip("相机跟随锚点高度的平滑速度(消除走路点头抖动)。")]
+        public float eyeAnchorSmooth = 14f;
+        private float eyeAnchorHeightCur;
+        private bool eyeAnchorHeightInit;
 
         [Header("Camera shake")]
         public float jumpShakeIntensity = 0.2f;
@@ -388,8 +410,31 @@ namespace HagenDa.Networking
             UpdateCameraHeight();
             UpdateCameraShake();
 
+            // PHASE14 相机:置于胶囊体外表面的眼高(默认 1.65m + 抬升)。水平方向沿
+            // 相机自身水平朝向外推一个胶囊半径(跟随胶囊外表),垂直旋转只转相机自身。
+            // cameraHeightBoost/crouchCameraBoost 抬升相机(进而抬升枪械基准)——
+            // 原先相机偏低导致枪偏低、蹲下时手够不到枪。
+            PlayerPosture camPosture = sliding ? PlayerPosture.Crouch : posture;
+            float height;
+            if (eyeAnchor != null)
+            {
+                // 头部锚(headcollider)路径:相机高度直接取自锚点世界高度,自动跟随
+                // 头部(含蹲/趴低头)。平滑锚高,消除走路点头造成的抖动。
+                float anchorH = eyeAnchor.position.y - transform.position.y + eyeAnchorOffset;
+                if (!eyeAnchorHeightInit) { eyeAnchorHeightCur = anchorH; eyeAnchorHeightInit = true; }
+                else eyeAnchorHeightCur = Mathf.Lerp(eyeAnchorHeightCur, anchorH,
+                                                     Mathf.Clamp01(Time.deltaTime * eyeAnchorSmooth));
+                height = eyeAnchorHeightCur;
+            }
+            else
+            {
+                float boost = cameraHeightBoost
+                            + (camPosture == PlayerPosture.Crouch ? crouchCameraBoost : 0f);
+                height = cameraEyeHeight + boost;
+            }
+            Vector3 surface = Quaternion.Euler(0f, localYaw, 0f) * Vector3.forward * cameraSurfaceOffset;
             playerCamera.transform.position =
-                transform.position + Vector3.up * cameraEyeHeight + shakeOffset;
+                transform.position + surface + Vector3.up * height + shakeOffset;
 
             // Apply the server's screen recoil (pitch kick up) as a temporary offset
             // on top of the player's clamped aim pitch. The final rendered pitch is
@@ -482,9 +527,14 @@ namespace HagenDa.Networking
         // ---------------------------------------------------------------
         private void FixedUpdate()
         {
-            if (isLocalPlayer) SendInput();
+            // 外部输入接管(自动化/AI 验证):跳过本地键鼠采样,直接采用 SetServerInput
+            // 写入的 intent。与 AI 实体走的是同一条 server-input 通路。
+            if (isLocalPlayer && !externalInputOverride) SendInput();
             if (isServer) SimulateServer();
         }
+
+        /// <summary>true 时忽略本地键鼠,改用 SetServerInput 注入的输入(自动化验证/AI)。</summary>
+        [System.NonSerialized] public bool externalInputOverride;
 
         private void SendInput()
         {

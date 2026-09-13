@@ -367,6 +367,10 @@ MonoBehaviour:
     reachFrac: 0.35
     curl: 1
     autoCurl: 1
+    gripRadiusFrac: 0
+    gripPalmFrac: 0
+    gripReleaseFrac: 0
+    thumbXBias: 0
     armIK: 0
     twistDeg: 0
     wristAnchor: {fileID: 0}
@@ -429,6 +433,7 @@ MonoBehaviour:
     maxTwist: 60
     chestPitchShare: 0.3
     headPitchShare: 0.6
+    facingAxis: {x: 0, y: 0, z: 0}
 --- !u!1 &2548847326591372156
 GameObject:
   m_ObjectHideFlags: 0
@@ -1871,6 +1876,10 @@ MonoBehaviour:
     reachFrac: 0.35
     curl: 1
     autoCurl: 1
+    gripRadiusFrac: 0
+    gripPalmFrac: 0
+    gripReleaseFrac: 0
+    thumbXBias: 0
     armIK: 0
     twistDeg: 0
     wristAnchor: {fileID: 0}
@@ -2316,12 +2325,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9138012901786345804}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2279184bbb858af4aaa29d19bfc4853a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 1
+  m_Weight: 0
   m_Data:
     hips: {fileID: 8035197304613471508}
     yawDriver: {fileID: 5874528407106070347}
@@ -3138,7 +3147,46 @@ MonoBehaviour:
   footHintForward: 0.35
   footHintUp: 0.4
   gunAimUpVector: {x: 0, y: -1, z: 0}
+  leftHandUsesMagGrip: 0
+  adsEyeRelief: 0.13
+  sprintDropback: 0.06
+  sprintSwayAmplitude: 5
+  sprintSwayFrequency: 2.2
+  recoilPitchPerUnit: 1.2
+  recoilYawPerUnit: 0.35
+  recoilKickPerUnit: 0.004
+  boltForwardLimit: 0.156
+  boltRearLimit: 0.185
+  boltSpeed: 3.5
   rigEnabled: 1
+  rigBuilder: {fileID: 0}
+  animator: {fileID: 0}
+  hipsPose: {fileID: 0}
+  hipsPos: {fileID: 0}
+  spineAim: {fileID: 0}
+  footIKL: {fileID: 0}
+  footIKR: {fileID: 0}
+  handIKR: {fileID: 0}
+  handIKL: {fileID: 0}
+  gripR: {fileID: 0}
+  gripL: {fileID: 0}
+  crouchPose: {fileID: 0}
+  pronePose: {fileID: 0}
+  footTipL: {fileID: 0}
+  footTipR: {fileID: 0}
+  yawDriver: {fileID: 0}
+  offsetDriver: {fileID: 0}
+  aimSource: {fileID: 0}
+  aimTarget: {fileID: 0}
+  weaponAnchor: {fileID: 0}
+  footTargetL: {fileID: 0}
+  footTargetR: {fileID: 0}
+  footHintL: {fileID: 0}
+  footHintR: {fileID: 0}
+  sprintAimSource: {fileID: 0}
+  weaponBasis: {fileID: 0}
+  weaponFollowChest: 1
+  hipHoldOffset: {x: 0.05, y: -0.24, z: 0.2}
 --- !u!4 &2734745997963663109 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8989158278000282194, guid: 35abb1c11d8839f45bc207c22a99f152,

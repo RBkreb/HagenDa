@@ -78,7 +78,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Network\Match\Editor\MatchSceneBuilder.cs" />
+    <Compile Include="Assets\Scripts\Animation\Rigging\Editor\SoldierLocomotionTuner.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\NailongRigSetup.cs" />
+    <Compile Include="Assets\Scripts\Animation\Rigging\Editor\FatuiRigBuilder.cs" />
     <Compile Include="Assets\Effects\particle_package\UnionAssetes\Particle\ParticleScaler\Editor\ParticleScaleEditor.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\NetworkSetup.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\Editor\CommanderSmokeTest.cs" />
