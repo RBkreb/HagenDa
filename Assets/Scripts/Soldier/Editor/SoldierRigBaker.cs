@@ -205,6 +205,15 @@ namespace HagenDa.Soldier.EditorTools
                 hg.data = d;
             }
 
+            // ---- 5b) 约束求值顺序（= 层级顺序，同层内按子物体顺序解算）----
+            // 手 IK **必须**先于 HandGrip：HandGrip 的 gripNear（握持贴近度）用
+            // **腕位**到握把胶囊轴的距离计算；顺序反了会拿未 IK 的腕位算出
+            // gripNear≈0 → 手指不握紧（实测踩坑）。
+            ReorderChild(hands, "ArmIK_R", 0);
+            ReorderChild(hands, "ArmIK_L", 1);
+            ReorderChild(hands, "LeftGrip", 2);
+            ReorderChild(hands, "RightGrip", 3);
+
             // ---- 6) RigBuilder 层序：LowerBody → UpperBody → Hands ----
             var rigBuilder = root.GetComponent<RigBuilder>();
             if (rigBuilder == null) rigBuilder = root.AddComponent<RigBuilder>();
@@ -246,6 +255,12 @@ namespace HagenDa.Soldier.EditorTools
             d.targetRotationWeight = rotationWeight;
             d.hintWeight = hintWeight;
             ik.data = d;
+        }
+
+        private static void ReorderChild(Transform parent, string name, int index)
+        {
+            var c = parent.Find(name);
+            if (c != null) c.SetSiblingIndex(index);
         }
 
         private static Transform NewChild(Transform parent, string name)

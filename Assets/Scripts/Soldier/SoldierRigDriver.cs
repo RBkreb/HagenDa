@@ -71,6 +71,8 @@ namespace HagenDa.Soldier
         [Tooltip("移动 IK 权重上限（<1 软钉，保留剪辑抬脚自由度）。")]
         [Range(0f, 1f)] public float footIKCapMoving = 0.15f;
         public float footWeightSpeed = 8f;
+        [Tooltip("冻结脚释放距离（米）：动画脚踝离开冻结点超过此值即释放并重新标定\n（修：走→停时脚被钉在走路最后一帧的步伐位置，腿部呈现跨步姿态）。")]
+        public float footFreezeRelease = 0.05f;
 
         [Header("Differential turn (下半身滞后)")]
         public float turnSmoothTime = 0.18f;
@@ -85,10 +87,14 @@ namespace HagenDa.Soldier
 
         [Header("Posture (模型根位移/前倾)")]
         public Vector3 crouchOffset = new Vector3(0f, -0.5f, 0f);
-        [Tooltip("趴：根位移（下压+前移）。")]
+        [Tooltip("趴：腹部（枢轴点）在实体本地的目标位置：y=离地高度，z=前移量。\n用腹部目标表述（而非根位移），与腹部枢轴旋转自洽、天然防沉。")]
+        public Vector3 proneBellyTarget = new Vector3(0f, 0.30f, 0.45f);
+        [Tooltip("（旧）趴根位移：仅作兼容保留，趴姿位移已改由 proneBellyTarget 决定。")]
         public Vector3 proneOffset = new Vector3(0f, -0.9f, 0.25f);
         [Tooltip("趴：模型根前倾角（度，正=前倾脸朝下贴地；负=仰躺）。")]
         public float pronePitch = 75f;   // 正=前倾脸朝下（绕X正角使+Z前向转向-Y）；负值会成仰躺
+        [Tooltip("身体旋转枢轴高度（米，模型本地）：趴/前倾时绕此高度（腹部）旋转，\n而不是绕脚根——修“趴下以脚根为中心旋转”与旋转扫入柱子。")]
+        public float bodyPivotHeight = 0.7f;
         [Tooltip("姿态位移/前倾渐变速率（每秒）。")]
         public float postureRampSpeed = 5f;
 
@@ -396,39 +402,35 @@ namespace HagenDa.Soldier
             gunBolt = FindDeep(gun.transform, "Bolt");
             gunRearAim = FindDeep(gun.transform, "RearAim");
             gunSightAim = FindDeep(gun.transform, "SightAim");
-            gunRearSight = FindDeep(gun.transform, "Rear_Sight");   // 近眼瞄具（ADS 贴眼锚）
-            gunFrontSight = FindDeep(gun.transform, "Sight");       // 近枪口瞄具
+            gunRearSight = FindDeep(gun.transform, "Rear_Sight");   // 近眼瞄具（3D 件）
+            gunFrontSight = FindDeep(gun.transform, "Sight");       // 近枪口瞄具（3D 件）
 
             // 枪管轴（枪根局部，= 枪口方向）——单一事实源。
-            // 首选 FBX 真瞄具：Sight(近枪口) - Rear_Sight(近眼) = 枪口方向（语义无歧义）。
-            // 缺失时回落锚点经验方向：本枪模 RearAim(z=+0.112) 在枪口端、SightAim(z=-0.198)
-            // 在枪托/贴眼侧 —— 名义命名与实际相反，故轴 = RearAim - SightAim。
-            // 再缺失：枪根本地 +Z。
-            Transform rearSight = FindDeep(gun.transform, "Rear_Sight");
-            Transform frontSight = FindDeep(gun.transform, "Sight");
+            // **真瞄准点**：M4 预制体 RearAim(挂在 Rear_Sight 下) / SightAim(挂在 Sight 下)，
+            // 二者共线于枪管，是精确瞄准点 → 首选：轴 = SightAim - RearAim。
+            // 缺失时回落瞄具 3D 件：Sight - Rear_Sight；再缺失：枪根本地 +Z。
             Vector3 axis;
-            if (rearSight != null && frontSight != null)
+            if (gunRearAim != null && gunSightAim != null)
             {
-                axis = gun.transform.InverseTransformPoint(frontSight.position)
-                     - gun.transform.InverseTransformPoint(rearSight.position);
+                axis = gun.transform.InverseTransformPoint(gunSightAim.position)
+                     - gun.transform.InverseTransformPoint(gunRearAim.position);
+            }
+            else if (gunRearSight != null && gunFrontSight != null)
+            {
+                axis = gun.transform.InverseTransformPoint(gunFrontSight.position)
+                     - gun.transform.InverseTransformPoint(gunRearSight.position);
             }
             else
             {
-                Vector3 rear = gunRearAim != null
-                    ? gun.transform.InverseTransformPoint(gunRearAim.position)
-                    : Vector3.zero;
-                Vector3 sight = gunSightAim != null
-                    ? gun.transform.InverseTransformPoint(gunSightAim.position)
-                    : Vector3.forward;
-                axis = rear - sight;
+                axis = Vector3.forward;
             }
             if (axis.sqrMagnitude > 1e-8f)
             {
                 gunAimLocalAxis = axis.normalized;
-                // 上方向 = 近眼瞄具相对枪管轴的垂直分量（瞄具在枪管上方 → +Y 侧）。
-                Vector3 upRef = rearSight != null
-                    ? gun.transform.InverseTransformPoint(rearSight.position)
-                    : (gunRearAim != null ? gun.transform.InverseTransformPoint(gunRearAim.position) : Vector3.up);
+                // 上方向 = 近眼瞄准点相对枪管轴的垂直分量（瞄准点在枪管上方 → +Y 侧）。
+                Vector3 upRef = gunRearAim != null
+                    ? gun.transform.InverseTransformPoint(gunRearAim.position)
+                    : (gunRearSight != null ? gun.transform.InverseTransformPoint(gunRearSight.position) : Vector3.up);
                 Vector3 up = upRef - gunAimLocalAxis * Vector3.Dot(upRef, gunAimLocalAxis);
                 if (up.sqrMagnitude > 1e-8f) gunAimLocalUp = up.normalized;
             }
@@ -436,8 +438,6 @@ namespace HagenDa.Soldier
             // 基准 AimConstraint(默认 aimVector=+Z) 与 ADS 直解共用此约定。
             gunAlignRot = Quaternion.Inverse(Quaternion.LookRotation(gunAimLocalAxis, gunAimLocalUp));
             gun.transform.localRotation = gunAlignRot;
-            gunRearSight = rearSight;    // 近眼瞄具（ADS 贴眼锚）
-            gunFrontSight = frontSight;  // 近枪口瞄具
 
             // 枪基准 AimConstraint：源=Driver_AimTarget（相机射线 50m 目标点）。
             // 默认 aimVector=本地 +Z、worldUpType=Vector/(0,1,0)，配合枪对齐旋转即所需。
@@ -545,11 +545,19 @@ namespace HagenDa.Soldier
             float pitch = proneCur > 0.001f ? pronePitch * proneCur : 0f;
             if (modelDrop != null)
             {
-                modelDrop.localRotation = Quaternion.Euler(pitch, dampedYaw - parentYaw, 0f);
+                Quaternion bodyRot = Quaternion.Euler(pitch, dampedYaw - parentYaw, 0f);
+                // 枢轴（腹部）在模型空间的位置 → 其在实体本地空间的目标位置：
+                //   站立(proneCur=0)：腹部就在枢轴处 → 位移 0（不改变站姿）；
+                //   趴下(proneCur=1)：腹部落到 proneBellyTarget（离地高度+前移量）→
+                //   身体绕**腹部**旋转且天然不穿地（取代旧根位移 -0.9 的过度下沉）。
+                // 公式 p = bellyLocal - R*pivot 使腹部精确落在目标点。
+                Vector3 pivot = Vector3.up * bodyPivotHeight;
+                Vector3 bellyLocal = Vector3.Lerp(pivot, proneBellyTarget, proneCur);
+                modelDrop.localRotation = bodyRot;
                 modelDrop.localPosition = modelBaseLocalPos
                     + crouchOffset * crouchCur
-                    + proneOffset * proneCur
-                    + s.bodyOffsetExtra;
+                    + s.bodyOffsetExtra
+                    + (bellyLocal - bodyRot * pivot);
             }
             lastBodyOffsetExtra = s.bodyOffsetExtra;
 
@@ -588,9 +596,17 @@ namespace HagenDa.Soldier
             // 滑铲仍要脚贴地（仅 Y 固定）；滞空/死亡完全释放。
             float airGate = (s.airborne || s.dead) ? 0f : 1f;
             bool yOnly = s.sliding;   // 滑铲：仅 Y 固定，脚贴地滑行
-            // 静止（站/蹲/趴）强制贴地：T-pose 等无落地帧的状态下踝高基线门控
-            // 永不触发，会导致脚悬空——静止时脚必须钉在地面。
-            bool forcePlant = !s.moving && !s.airborne && !s.dead;
+            // 强制贴地：
+            //  - 蹲/滑铲：**持续 IK**（低位时脚踝本就接近地面，落地帧门控会漏——
+            //    蹲走时脚嵌入地面的根因）。
+            //  - 静止（站/蹲/趴）：T-pose 等无落地帧状态下基线门控永不触发 → 必须钉地。
+            bool crouchLike = s.posture == PlayerPosture.Crouch || s.sliding;
+            bool forcePlant = (crouchLike || !s.moving) && !s.airborne && !s.dead;
+            // 完全静止（非移动/滑铲且转向已收敛）→ 每帧重新标定触地脚：脚随 idle
+            // 动画（T-pose）位置自然贴地，避免两脚在不同帧冻结、各自公转累积成偏斜站姿。
+            bool settledIdle = !s.moving && !s.sliding
+                && Mathf.Abs(Mathf.DeltaAngle(footLagYaw, aimYaw)) < 1f;
+            if (settledIdle) { footFrozenL = false; footFrozenR = false; }
             footPlantL = StepFoot(footTipL, footTargetL, footHintL, cap * airGate,
                                   yOnly, forcePlant, dt, ref footFrozenL, ref footFrozenPosL, ref footFrozenYawL,
                                   ref minAnkleL, ref footWeightL, footIKL);
@@ -643,6 +659,10 @@ namespace HagenDa.Soldier
             if (hit.collider != null)
             {
                 Vector3 ground = hit.point + Vector3.up * footHeight;
+                // 冻结脚释放：动画脚踝已远离冻结点（走→停的 T-pose 复位、被推挤、
+                // 台阶变化）→ 释放并在当前位置重新标定，避免脚步姿态被钉在旧位置
+                //（修"移动→静止停在走路最后一帧的姿态"）。
+                if (frozen && Vector3.Distance(ankle, frozenPos) > footFreezeRelease) frozen = false;
                 bool wantFreeze = plant > 0.5f && capWeight > 0.05f;
                 if (wantFreeze)
                 {
@@ -738,6 +758,15 @@ namespace HagenDa.Soldier
             if (basisAim != null) basisAim.constraintActive = alive && !s.sprinting && !adsMode;
             if (gunSprintAim != null) gunSprintAim.constraintActive = alive && s.sprinting && !adsMode;
 
+            // ---- 后座旋转（**先于基准求解**应用）----
+            // ADS 基准解算会整体抵消枪的当前局部旋转（含后座增量），因此瞄具连线
+            // （RearAim/SightAim）在震动中仍恒落在相机射线上（后座只表现为相机上抬）。
+            Quaternion recoilRot = s.recoil > 0.0001f
+                ? Quaternion.Euler(-s.recoil * recoilPitchPerUnit, s.recoil * recoilYawPerUnit, 0f)
+                : Quaternion.identity;
+            if (boundGun.transform.parent == weaponBasis)
+                boundGun.transform.localRotation = gunAlignRot * recoilRot;
+
             // ---- 基准位置（腰射=右前胸持枪位；冲刺=后撤；ADS=向射线解过渡）----
             if (driverAimSource != null)
             {
@@ -768,51 +797,78 @@ namespace HagenDa.Soldier
                 }
             }
 
-            // ---- 后座（枪根震动，不动基准）----
-            if (s.recoil > 0.0001f)
+            // ---- 后座位移（枪根沿枪管轴后撤；朝向已在基准求解前应用，此处只做位移）----
+            if (boundGun.transform.parent == weaponBasis)
             {
-                Quaternion recoilRot = Quaternion.Euler(
-                    -s.recoil * recoilPitchPerUnit, s.recoil * recoilYawPerUnit, 0f);
-                boundGun.transform.localRotation = gunAlignRot * recoilRot;
                 Vector3 axisWorld = weaponBasis.rotation * gunAimLocalAxis;
-                boundGun.transform.localPosition =
-                    boundGun.transform.parent == weaponBasis
-                        ? Vector3.zero - axisWorld * (s.recoil * recoilKickPerUnit)
-                        : boundGun.transform.localPosition;
-            }
-            else if (boundGun.transform.parent == weaponBasis)
-            {
-                boundGun.transform.localRotation = gunAlignRot;
-                boundGun.transform.localPosition = Vector3.zero;
+                boundGun.transform.localPosition = s.recoil > 0.0001f
+                    ? Vector3.zero - axisWorld * (s.recoil * recoilKickPerUnit)
+                    : Vector3.zero;
             }
 
             UpdateBolt(s.shotCount, dt);
         }
 
         /// <summary>
-        /// ADS 直解（统一约定：基准本地 +Z ≡ 枪口，gunAlignRot 已把枪口轴对到 +Z）。
-        ///  1) 旋转 R = LookRotation(射线方向, 相机 up) —— 枪口(=基准+Z)即对齐射线，
-        ///     瞄具"上"经 gunAlignRot 映射为基准 +Y = 相机 up，滚转消除。
-        ///  2) 位置 P = (眼位 + 射线方向·瞳距) - R·(gunAlignRot·Rear_Sight_local)。
-        ///     **贴眼锚 = Rear_Sight（近眼真瞄具）**落射线、距眼=瞳距（可调）；
-        ///     两瞄具共线于枪管 → Rear_Sight 与 Sight 同时上射线（PHASE14）。
+        /// ADS 直解（用户原理：**每帧求解枪械基准的位置/朝向，使 RearAim 与 SightAim
+        /// 恒落在相机射线上**）。
+        ///  1) 枪的目标世界旋转 gunWorldTarget = LookRotation(射线方向, 相机 up) ∘
+        ///     Inverse(LookRotation(枪口轴局部, 瞄具上局部)) —— 枪口轴对射线、瞄具“上”
+        ///     对相机 up（滚转消除）。
+        ///  2) 基准旋转 = gunWorldTarget ∘ Inverse(枪当前局部旋转)：**抵消枪自身局部
+        ///     旋转（含后座震动增量）**，因此枪的世界朝向恒等于 gunWorldTarget ——
+        ///     后座只表现为相机上抬，瞄具连线不会脱离射线（实测踩坑：不抵消时后座
+        ///     1.6 会让瞄具连线偏离射线 ~2.2°）。
+        ///  3) 基准位置 = (眼位 + 射线方向·瞳距) − gunWorldTarget·贴眼锚_local：
+        ///     贴眼锚（RearAim）落射线，距眼=瞳距（可调）；锚共线于枪管 → SightAim
+        ///     同时上射线。枪根的轴向后座位移沿射线方向，不影响垂直偏离。
         /// </summary>
         private bool SolveAdsRail(in SoldierFrameState s, out Vector3 pos, out Quaternion rot)
         {
             pos = Vector3.zero;
             rot = Quaternion.identity;
-            if (gunRearSight == null || boundGun == null) return false;
+            // 贴眼锚：**RearAim**（Rear_Sight 的子对象 = 真瞄准点）。
+            // 锚落射线 + 瞄准轴（RearAim→SightAim）对齐射线 → 两点同时上射线。
+            // 退化顺序：RearAim → Rear_Sight(3D 件) → SightAim。
+            Transform aimAnchor = gunRearAim != null ? gunRearAim
+                                : (gunRearSight != null ? gunRearSight : gunSightAim);
+            if (aimAnchor == null || boundGun == null) return false;
 
             Vector3 rayDir = (s.eyeRot * Vector3.forward).normalized;
             Vector3 worldUp = s.eyeRot * Vector3.up;
 
-            rot = Quaternion.LookRotation(rayDir, worldUp);
+            // 瞄准轴/上方向：**每帧从当前瞄准点位置重算**（RearAim/SightAim 为瞄准点，
+            // 不是瞄具网格；缓存值还会因 FBX 子物体变换漂移产生恒定夹角）。
+            Vector3 a = gunAimLocalAxis, u = gunAimLocalUp;
+            {
+                Transform rearRef = gunRearAim != null ? gunRearAim : gunRearSight;
+                Transform frontRef = gunSightAim != null ? gunSightAim : gunFrontSight;
+                if (rearRef != null && frontRef != null)
+                {
+                    Vector3 rPos = boundGun.transform.InverseTransformPoint(rearRef.position);
+                    Vector3 fPos = boundGun.transform.InverseTransformPoint(frontRef.position);
+                    Vector3 axis = fPos - rPos;
+                    if (axis.sqrMagnitude > 1e-8f)
+                    {
+                        a = axis.normalized;
+                        Vector3 up = rPos - a * Vector3.Dot(rPos, a);   // 近眼瞄准点垂直分量 = 瞄具“上”
+                        if (up.sqrMagnitude > 1e-8f) u = up.normalized;
+                    }
+                }
+            }
 
-            // 近眼瞄具在枪根局部的偏移（FBX 内可能嵌套，用 InverseTransformPoint）
-            Vector3 anchorLocal = boundGun.transform.InverseTransformPoint(gunRearSight.position);
-            Vector3 anchorInBasis = gunAlignRot * anchorLocal;                // 锚在基准空间的偏移
+            // 枪的目标世界旋转（枪口轴 → 射线，瞄具上 → 相机上）
+            Quaternion gunWorldTarget = Quaternion.LookRotation(rayDir, worldUp)
+                * Quaternion.Inverse(Quaternion.LookRotation(a, u));
+
+            // 抵消枪当前局部旋转（含后座），使枪世界朝向恒为 gunWorldTarget
+            Quaternion gunLocal = boundGun.transform.localRotation;
+            rot = gunWorldTarget * Quaternion.Inverse(gunLocal);
+
+            // 贴眼瞄准点在枪根局部的偏移（嵌套层级用 InverseTransformPoint）
+            Vector3 anchorLocal = boundGun.transform.InverseTransformPoint(aimAnchor.position);
             Vector3 anchorOnRay = s.eyePos + rayDir * adsEyeRelief;
-            pos = anchorOnRay - rot * anchorInBasis;
+            pos = anchorOnRay - gunWorldTarget * anchorLocal;
             return true;
         }
 

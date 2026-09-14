@@ -125,7 +125,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.41
+  m_Radius: 0.44
   m_Height: 1.48
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -190,7 +190,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.32
+  m_Radius: 0.44
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -283,13 +283,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7993950737428726842}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.62784207, y: 0.5970045, z: -0.3441293, w: 0.36190483}
-  m_LocalPosition: {x: 0.0623, y: 0.004, z: -0.012}
+  m_LocalRotation: {x: -0.75193757, y: 0.44777486, z: -0.24581152, w: 0.4167304}
+  m_LocalPosition: {x: 0.0643, y: -0.0134, z: -0.0141}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5326855215665412016}
-  m_LocalEulerAnglesHint: {x: -2.496, y: 120.111, z: -91.447}
+  m_LocalEulerAnglesHint: {x: -23.99, y: 125.599, z: -105.99}
 --- !u!1 &8724279241068121206
 GameObject:
   m_ObjectHideFlags: 0
@@ -351,7 +351,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.33
+  m_Radius: 0.3
   m_Height: 0.94
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -365,7 +365,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100002, guid: c7741850eebe1df4ea75a80275b16311, type: 3}
       propertyPath: m_Name
-      value: M4_8 1
+      value: M4_8
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: c7741850eebe1df4ea75a80275b16311, type: 3}
       propertyPath: m_LocalScale.x

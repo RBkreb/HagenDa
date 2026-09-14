@@ -95,8 +95,19 @@ namespace HagenDa.Networking
 
         [Header("Look")]
         public float lookSensitivity = 0.05793f;
-        public float minPitch = -89f;
-        public float maxPitch = 89f;
+        public float minPitch = -80f;
+        public float maxPitch = 80f;
+        [Tooltip("趴姿俯仰限位（度，本项目约定：负=抬头、正=低头）：\n" +
+                 "上限 0=不能瞄地；下限 -60=最多抬头 60°。")]
+        public float proneMinPitch = -60f;
+        public float proneMaxPitch = 0f;
+        [Tooltip("趴姿水平旋转最大角速度（度/秒）——趴下时整体随相机缓慢转身（PHASE14）。")]
+        public float proneYawRate = 60f;
+
+        /// <summary>当前姿态下的俯仰下限（趴姿：最多抬头 60°，不能瞄地）。</summary>
+        private float PitchMin => posture == PlayerPosture.Prone ? proneMinPitch : minPitch;
+        /// <summary>当前姿态下的俯仰上限（趴姿：水平=0，不可低头）。</summary>
+        private float PitchMax => posture == PlayerPosture.Prone ? proneMaxPitch : maxPitch;
 
         [Header("Camera")]
         [Tooltip("Distance below the capsule top for the eye/camera.")]
@@ -409,8 +420,18 @@ namespace HagenDa.Networking
             d.y = -d.y;
             d *= lookSensitivity;
 
-            localYaw += d.x;
-            localPitch = Mathf.Clamp(localPitch + d.y, minPitch, maxPitch);
+            // 趴姿：整体随相机缓慢转身（≤proneYawRate°/s，与视觉/瞄准一致）；
+            // 其余姿态：直接采纳鼠标 yaw。
+            if (posture == PlayerPosture.Prone)
+            {
+                float maxStep = proneYawRate * Time.deltaTime;
+                localYaw += Mathf.Clamp(d.x, -maxStep, maxStep);
+            }
+            else
+            {
+                localYaw += d.x;
+            }
+            localPitch = Mathf.Clamp(localPitch + d.y, PitchMin, PitchMax);
 
             if (playerCamera == null) return;
 
@@ -421,7 +442,7 @@ namespace HagenDa.Networking
             // clamped to the fixed view limits so accumulated recoil can never push
             // the camera past minPitch/maxPitch.
             float recoilPitch = gun != null ? gun.recoil : 0f;
-            float renderPitch = Mathf.Clamp(localPitch - recoilPitch, minPitch, maxPitch);
+            float renderPitch = Mathf.Clamp(localPitch - recoilPitch, PitchMin, PitchMax);
             Quaternion view = Quaternion.Euler(renderPitch, localYaw, 0f);
 
             // PHASE14 相机:置于头部骨骼子对象 headcollider(球体)表面——不是球心。
@@ -678,8 +699,9 @@ namespace HagenDa.Networking
             }
 
             // Look: adopt the client's absolute view (client-authoritative aim).
+            // 俯仰按当前姿态限位（趴姿 0..60，不允许瞄地）。
             yaw = serverInput.yaw;
-            pitch = Mathf.Clamp(serverInput.pitch, minPitch, maxPitch);
+            pitch = Mathf.Clamp(serverInput.pitch, PitchMin, PitchMax);
             transform.rotation = Quaternion.Euler(0f, yaw, 0f);
 
             // Dead: stay prone, no 3C / combat. Apply horizontal drag so a corpse

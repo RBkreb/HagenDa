@@ -23,6 +23,8 @@ namespace HagenDa.Soldier
     ///         LocoSpeed=状态速度倍率（0=冻结帧：滑铲/趴/滞空 0.1s 后）、Death=触发。
     /// </summary>
     [RequireComponent(typeof(NetworkIdentity))]
+    [DefaultExecutionOrder(100)]   // 晚于 NetworkPlayerController.Update：读到当帧相机位姿，
+                                   // 枪械基准 ADS 求解不落后一帧（实测瞄准连线残余 ≈1°）
     public class SoldierAnimatorDriver : NetworkBehaviour
     {
         [Header("References")]

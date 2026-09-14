@@ -220,8 +220,11 @@ MonoBehaviour:
   diveSpeed: 15
   diveTriggerSpeed: 4
   lookSensitivity: 0.05793
-  minPitch: -89
-  maxPitch: 89
+  minPitch: -80
+  maxPitch: 80
+  proneMinPitch: -60
+  proneMaxPitch: 0
+  proneYawRate: 60
   eyeOffsetFromTop: 0.15
   cameraSurfaceOffset: 0.25
   cameraHeightBoost: 0.4
