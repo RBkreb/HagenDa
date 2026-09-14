@@ -138,6 +138,7 @@
     <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_ProBuilder_Shapes_Prism.cs" />
     <Compile Include="Assets\Scripts\Network\FSMStatsHud.cs" />
     <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_Vector4.cs" />
+    <Compile Include="Assets\Scripts\Soldier\UpperBodyAimConstraint.cs" />
     <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_InputField_TextSelectionEvent.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\NetworkCommanderState.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="Assets\Scripts\Network\Commander\CommanderWeaponSystem.cs" />
     <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_UI_FontData.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkCombat.cs" />
+    <Compile Include="Assets\Scripts\Soldier\SoldierAnimatorDriver.cs" />
     <Compile Include="Assets\Scripts\Network\Animation\HeadCamFollow.cs" />
     <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_UnityEngine_InputSystem_PlayerInput_DeviceRegainedEvent.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
@@ -260,6 +262,7 @@
     <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_Dropdown_DropdownEvent.cs" />
     <Compile Include="Assets\Scripts\Network\MovingZone.cs" />
     <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_TMPro_TMP_TextEventHandler_SpriteSelectionEvent.cs" />
+    <Compile Include="Assets\Scripts\Soldier\SoldierRigDriver.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\CommanderHexGrid.cs" />
     <Compile Include="Assets\Unity.VisualScripting.Generated\VisualScripting.Core\Property Providers\PropertyProvider_Unity_Mathematics_bool2x2.cs" />
     <Compile Include="Assets\Scripts\Animation\Rigging\HandGripConstraintBinder.cs" />
@@ -777,7 +780,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Codely.Newtonsoft.Json">
-      <HintPath>D:\HagenTa\cn.tuanjie.codely.bridge@1.0.78\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
+      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.81\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Grpc.Core">
@@ -1288,6 +1291,10 @@
       <HintPath>E:\Unity3D\2022.3.62t12\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Codely.Common">
+      <HintPath>Library\ScriptAssemblies\Codely.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Burst.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1656,12 +1663,20 @@
       <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Cn.Tuanjie.Codely.Editor">
+      <HintPath>Library\ScriptAssemblies\Cn.Tuanjie.Codely.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Entities.Graphics.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Entities.Graphics.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityTcp.Editor">
+      <HintPath>Library\ScriptAssemblies\UnityTcp.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model">
@@ -1706,7 +1721,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Codely.Common.csproj" />
     <ProjectReference Include="Telepathy.csproj" />
     <ProjectReference Include="Mirror.Examples.csproj" />
     <ProjectReference Include="Edgegap.csproj" />
@@ -1728,8 +1742,6 @@
     <ProjectReference Include="Unity.ML-Agents.Editor.csproj" />
     <ProjectReference Include="EncryptionTransportEditor.csproj" />
     <ProjectReference Include="Mirror.Transports.csproj" />
-    <ProjectReference Include="Cn.Tuanjie.Codely.Editor.csproj" />
-    <ProjectReference Include="UnityTcp.Editor.csproj" />
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>

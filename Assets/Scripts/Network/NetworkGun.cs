@@ -1,4 +1,4 @@
-using HagenDa.Animation.Rigging;
+using HagenDa.Soldier;
 using Mirror;
 using UnityEngine;
 
@@ -29,18 +29,18 @@ namespace HagenDa.Networking
         public NetworkPlayerController controller; // for the activeSlot weapon-slot check
 
         [Header("Third-person presentation (PHASE13)")]
-        [Tooltip("第三人称枪模(挂到士兵 rig 的 WeaponAnchor;双手 IK + Aim 约束由 SoldierRigSetup 接管)")]
+        [Tooltip("第三人称枪模(挂到枪械基准 WeaponBasis;双手 IK + 三态 Aim 约束由 SoldierRigDriver 接管)")]
         public GameObject thirdPersonModelPrefab;
 
         private GameObject tpModel;
-        private SoldierRigSetup boundRig;
+        private SoldierRigDriver boundRig;
         private Transform weaponBasis;      // 实体根下、与模型同级的枪械基准
-        private NetworkSoldierAnimator soldierAnim;
+        private SoldierAnimatorDriver soldierAnim;
         private NetworkPlayerHealth healthComp;
 
         private void Awake()
         {
-            soldierAnim = GetComponent<NetworkSoldierAnimator>();
+            soldierAnim = GetComponent<SoldierAnimatorDriver>();
             healthComp = GetComponent<NetworkPlayerHealth>();
         }
 
@@ -52,7 +52,7 @@ namespace HagenDa.Networking
         /// </summary>
         private void Update()
         {
-            if (soldierAnim == null) soldierAnim = GetComponent<NetworkSoldierAnimator>();
+            if (soldierAnim == null) soldierAnim = GetComponent<SoldierAnimatorDriver>();
             var rig = soldierAnim != null ? soldierAnim.ActiveRig : null;
 
             bool desired = rig != null

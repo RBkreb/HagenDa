@@ -82,12 +82,15 @@
     <Compile Include="Assets\Scripts\Network\Editor\NailongRigSetup.cs" />
     <Compile Include="Assets\Scripts\Animation\Rigging\Editor\FatuiRigBuilder.cs" />
     <Compile Include="Assets\Effects\particle_package\UnionAssetes\Particle\ParticleScaler\Editor\ParticleScaleEditor.cs" />
+    <Compile Include="Assets\Scripts\Soldier\Editor\SoldierRigBaker.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\NetworkSetup.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\Editor\CommanderSmokeTest.cs" />
+    <Compile Include="Assets\Scripts\Soldier\Editor\SoldierAssembly.cs" />
     <Compile Include="Assets\ScriptTemplates\Editor\MoveToAssetsFolder.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\NailongClipGen.cs" />
     <Compile Include="Assets\Scripts\Effects\Editor\InfinityVfxFactory.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\BuildScript.cs" />
+    <Compile Include="Assets\Scripts\Soldier\Editor\SoldierControllerBaker.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\Editor\CommanderSetup.cs" />
     <Compile Include="Assets\Scripts\Animation\Rigging\Editor\HandGripRigBuilder.cs" />
   </ItemGroup>
@@ -569,7 +572,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Codely.Newtonsoft.Json">
-      <HintPath>D:\HagenTa\cn.tuanjie.codely.bridge@1.0.78\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
+      <HintPath>Library\PackageCache\cn.tuanjie.codely.bridge@1.0.81\Plugins\Codely.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Grpc.Core">
@@ -1104,6 +1107,10 @@
       <HintPath>Library\ScriptAssemblies\UnityEngine.TestRunner.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Codely.Common">
+      <HintPath>Library\ScriptAssemblies\Codely.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Burst.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1472,12 +1479,20 @@
       <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Cn.Tuanjie.Codely.Editor">
+      <HintPath>Library\ScriptAssemblies\Cn.Tuanjie.Codely.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Entities.Graphics.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Entities.Graphics.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityTcp.Editor">
+      <HintPath>Library\ScriptAssemblies\UnityTcp.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model">
@@ -1523,7 +1538,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp.csproj" />
-    <ProjectReference Include="Codely.Common.csproj" />
     <ProjectReference Include="Telepathy.csproj" />
     <ProjectReference Include="Mirror.Examples.csproj" />
     <ProjectReference Include="Edgegap.csproj" />
@@ -1545,8 +1559,6 @@
     <ProjectReference Include="Unity.ML-Agents.Editor.csproj" />
     <ProjectReference Include="EncryptionTransportEditor.csproj" />
     <ProjectReference Include="Mirror.Transports.csproj" />
-    <ProjectReference Include="Cn.Tuanjie.Codely.Editor.csproj" />
-    <ProjectReference Include="UnityTcp.Editor.csproj" />
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>

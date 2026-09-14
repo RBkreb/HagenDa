@@ -37,7 +37,7 @@ namespace HagenDa.Networking
         public int textureHeight = 480;
 
         private NetworkPlayerController player;
-        private NetworkSoldierAnimator soldier;
+        private HagenDa.Soldier.SoldierAnimatorDriver soldier;
         private GameObject bodyModel;
         private Camera fpCamera;
         private bool patched;
@@ -104,7 +104,7 @@ namespace HagenDa.Networking
                 : FindObjectOfType<NetworkPlayerController>();
             if (ctrl == null) return;
 
-            var sold = ctrl.GetComponent<NetworkSoldierAnimator>();
+            var sold = ctrl.GetComponent<HagenDa.Soldier.SoldierAnimatorDriver>();
             var model = sold != null ? sold.ActiveModel : null;
             if (model == null) return;
 

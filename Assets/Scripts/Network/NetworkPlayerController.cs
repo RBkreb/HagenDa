@@ -1,3 +1,4 @@
+using HagenDa.Soldier;
 using Mirror;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -178,7 +179,9 @@ namespace HagenDa.Networking
         private Rigidbody rb;
         private bool grounded;
         private bool wasGrounded;
-        private NetworkInputState serverInput;
+        private NetworkInputState serverInput;        // 本 tick 消费的工作副本
+        private NetworkInputState pendingServerInput; // 最近注入的输入（边沿只生效一 tick）
+        private SoldierAnimatorDriver soldierAnim;   // PHASE14: 相机球(头部 headcollider)来源
 
         private bool dead;               // server: 3C + combat disabled, forced prone
         private NetworkPlayerHealth health;
@@ -190,6 +193,9 @@ namespace HagenDa.Networking
 
         /// <summary>ML 训练观测：粘性冲刺是否激活。</summary>
         public bool Sprinting => sprintActive;
+
+        /// <summary>PHASE14:本地瞄准意图（右键）——拥有者客户端枪械视觉直驱用，不经服务端回环。</summary>
+        public bool AimHeld => clientAim;
 
         /// <summary>ML 训练观测：飞扑进行中（空中）。</summary>
         public bool Diving => diving;
@@ -233,6 +239,7 @@ namespace HagenDa.Networking
             if (standCollider == null)
                 standCollider = GetComponent<CapsuleCollider>();
             health = GetComponent<NetworkPlayerHealth>();
+            soldierAnim = GetComponent<SoldierAnimatorDriver>();
         }
 
         public override void OnStartServer()
@@ -407,34 +414,7 @@ namespace HagenDa.Networking
 
             if (playerCamera == null) return;
 
-            UpdateCameraHeight();
             UpdateCameraShake();
-
-            // PHASE14 相机:置于胶囊体外表面的眼高(默认 1.65m + 抬升)。水平方向沿
-            // 相机自身水平朝向外推一个胶囊半径(跟随胶囊外表),垂直旋转只转相机自身。
-            // cameraHeightBoost/crouchCameraBoost 抬升相机(进而抬升枪械基准)——
-            // 原先相机偏低导致枪偏低、蹲下时手够不到枪。
-            PlayerPosture camPosture = sliding ? PlayerPosture.Crouch : posture;
-            float height;
-            if (eyeAnchor != null)
-            {
-                // 头部锚(headcollider)路径:相机高度直接取自锚点世界高度,自动跟随
-                // 头部(含蹲/趴低头)。平滑锚高,消除走路点头造成的抖动。
-                float anchorH = eyeAnchor.position.y - transform.position.y + eyeAnchorOffset;
-                if (!eyeAnchorHeightInit) { eyeAnchorHeightCur = anchorH; eyeAnchorHeightInit = true; }
-                else eyeAnchorHeightCur = Mathf.Lerp(eyeAnchorHeightCur, anchorH,
-                                                     Mathf.Clamp01(Time.deltaTime * eyeAnchorSmooth));
-                height = eyeAnchorHeightCur;
-            }
-            else
-            {
-                float boost = cameraHeightBoost
-                            + (camPosture == PlayerPosture.Crouch ? crouchCameraBoost : 0f);
-                height = cameraEyeHeight + boost;
-            }
-            Vector3 surface = Quaternion.Euler(0f, localYaw, 0f) * Vector3.forward * cameraSurfaceOffset;
-            playerCamera.transform.position =
-                transform.position + surface + Vector3.up * height + shakeOffset;
 
             // Apply the server's screen recoil (pitch kick up) as a temporary offset
             // on top of the player's clamped aim pitch. The final rendered pitch is
@@ -442,7 +422,46 @@ namespace HagenDa.Networking
             // the camera past minPitch/maxPitch.
             float recoilPitch = gun != null ? gun.recoil : 0f;
             float renderPitch = Mathf.Clamp(localPitch - recoilPitch, minPitch, maxPitch);
-            playerCamera.transform.rotation = Quaternion.Euler(renderPitch, localYaw, 0f);
+            Quaternion view = Quaternion.Euler(renderPitch, localYaw, 0f);
+
+            // PHASE14 相机:置于头部骨骼子对象 headcollider(球体)表面——不是球心。
+            // 位置 = 球心 + 视线方向·半径（表面点），朝向 = 视线方向 = 该点球面法线
+            //（相机 forward 恒与球面法线平行，模拟长在头上的眼睛）。跟随头部动画
+            //（含蹲/趴低头、走路点头）。无模型/无头部球时回落胶囊体路径。
+            if (GetHeadSphere(out Vector3 center, out float radius))
+            {
+                Vector3 normal = view * Vector3.forward;
+                playerCamera.transform.position = center + normal * radius + shakeOffset;
+                playerCamera.transform.rotation = view;
+            }
+            else
+            {
+                UpdateCameraHeight();
+
+                // 回落路径:置于胶囊体外表面的眼高。水平方向沿相机水平朝向外推一个
+                // 胶囊半径(跟随胶囊外表),垂直旋转只转相机自身。
+                PlayerPosture camPosture = sliding ? PlayerPosture.Crouch : posture;
+                float height;
+                if (eyeAnchor != null)
+                {
+                    // 头部锚路径:相机高度直接取自锚点世界高度,自动跟随头部(含蹲/趴低头)。
+                    float anchorH = eyeAnchor.position.y - transform.position.y + eyeAnchorOffset;
+                    if (!eyeAnchorHeightInit) { eyeAnchorHeightCur = anchorH; eyeAnchorHeightInit = true; }
+                    else eyeAnchorHeightCur = Mathf.Lerp(eyeAnchorHeightCur, anchorH,
+                                                         Mathf.Clamp01(Time.deltaTime * eyeAnchorSmooth));
+                    height = eyeAnchorHeightCur;
+                }
+                else
+                {
+                    float boost = cameraHeightBoost
+                                + (camPosture == PlayerPosture.Crouch ? crouchCameraBoost : 0f);
+                    height = cameraEyeHeight + boost;
+                }
+                Vector3 surface = Quaternion.Euler(0f, localYaw, 0f) * Vector3.forward * cameraSurfaceOffset;
+                playerCamera.transform.position =
+                    transform.position + surface + Vector3.up * height + shakeOffset;
+                playerCamera.transform.rotation = view;
+            }
 
             // PHASE8 受击反馈：FOV 增大 2% 并在 2 渲染帧内快速回到正常值。
             if (fovPulseFrames > 0)
@@ -455,6 +474,43 @@ namespace HagenDa.Networking
             {
                 playerCamera.fieldOfView = baseFov;
             }
+        }
+
+        /// <summary>
+        /// PHASE14:解析头部相机球（headcollider）。优先动画 rig 的 HeadAnchor
+        ///（装配时亦写入 eyeAnchor）。世界半径取 SphereCollider.radius×最大缩放。
+        /// </summary>
+        private bool GetHeadSphere(out Vector3 center, out float radius)
+        {
+            center = Vector3.zero;
+            radius = 0f;
+            Transform head = null;
+            if (soldierAnim != null && soldierAnim.ActiveRig != null)
+                head = soldierAnim.ActiveRig.HeadAnchor;
+            if (head == null) head = eyeAnchor;
+            if (head == null) return false;
+
+            var sphere = head.GetComponent<SphereCollider>();
+            center = head.position;
+            radius = sphere != null
+                ? sphere.radius * Mathf.Max(Mathf.Abs(head.lossyScale.x),
+                    Mathf.Max(Mathf.Abs(head.lossyScale.y), Mathf.Abs(head.lossyScale.z)))
+                : 0.08f;
+            return true;
+        }
+
+        /// <summary>
+        /// PHASE14:服务端命中射线起点 = 头部球面沿视线方向的表面点（与本地相机
+        /// 同式）。服务端同样运行动画，headcollider 位姿有效；无模型回落胶囊眼高。
+        /// </summary>
+        private Vector3 ComputeEye(PlayerPosture eff)
+        {
+            if (GetHeadSphere(out Vector3 center, out float radius))
+            {
+                Vector3 dir = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
+                return center + dir * radius;
+            }
+            return transform.position + Vector3.up * GetEyeHeight(eff);
         }
 
         private void UpdateCameraHeight()
@@ -568,7 +624,7 @@ namespace HagenDa.Networking
         [Command(channel = Channels.Unreliable)]
         private void CmdInput(NetworkInputState s)
         {
-            serverInput = s;
+            pendingServerInput = s;
         }
 
         /// <summary>
@@ -578,7 +634,7 @@ namespace HagenDa.Networking
         [Server]
         public void SetServerInput(NetworkInputState s)
         {
-            serverInput = s;
+            pendingServerInput = s;
         }
 
         // ---------------------------------------------------------------
@@ -586,6 +642,12 @@ namespace HagenDa.Networking
         // ---------------------------------------------------------------
         private void SimulateServer()
         {
+            // 边沿自动清除契约（AGENTS.md: Edge actions auto-clear）：取走本次 tick
+            // 输入后清空 pending —— jump/crouchToggle 等 edge 字段只生效一 tick，
+            // 注入方（AI/自动化/真人 SendInput）每 tick 重推全量，持有字段不受影响。
+            serverInput = pendingServerInput;
+            pendingServerInput = default;
+
             // 对局结束：冻结战斗（不再处理输入/移动/开火），仅让空中身体落地。
             if (NetworkMatchManager.Instance != null && NetworkMatchManager.Instance.matchOver)
             {
@@ -729,7 +791,7 @@ namespace HagenDa.Networking
             // Combat: shooting (gun) + throwing (combat). Fire/aim are fed every tick;
             // reload and fire-mode switch are edge-triggered commands.
             PlayerPosture eff2 = sliding ? PlayerPosture.Crouch : posture;
-            Vector3 eye = transform.position + Vector3.up * GetEyeHeight(eff2);
+            Vector3 eye = ComputeEye(eff2);   // PHASE14: 头部球面沿视线方向的表面点
             Vector3 forward = Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward;
 
             // PHASE7: Q 标记敌人。
