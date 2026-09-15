@@ -85,6 +85,7 @@
     <Compile Include="Assets\Scripts\Soldier\Editor\SoldierRigBaker.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\NetworkSetup.cs" />
     <Compile Include="Assets\Scripts\Network\Commander\Editor\CommanderSmokeTest.cs" />
+    <Compile Include="Assets\Scripts\Soldier\Editor\SoldierRigTuning.cs" />
     <Compile Include="Assets\Scripts\Soldier\Editor\SoldierAssembly.cs" />
     <Compile Include="Assets\ScriptTemplates\Editor\MoveToAssetsFolder.cs" />
     <Compile Include="Assets\Scripts\Network\Editor\NailongClipGen.cs" />

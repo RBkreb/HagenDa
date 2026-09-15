@@ -172,9 +172,9 @@ namespace HagenDa.Soldier.EditorTools
             var lower = NewChild(root.transform, "Rig_LowerBody");
             lower.gameObject.AddComponent<Rig>().weight = 1f;
             BuildTwoBoneIK(lower, "FootIK_L", "DEF-thigh.L", "DEF-shin.L", "DEF-foot.L",
-                footTargetL, footHintL, positionWeight: 1f, rotationWeight: 0f, hintWeight: 0.5f);
+                footTargetL, footHintL, positionWeight: 1f, rotationWeight: 0f, hintWeight: 1f);
             BuildTwoBoneIK(lower, "FootIK_R", "DEF-thigh.R", "DEF-shin.R", "DEF-foot.R",
-                footTargetR, footHintR, positionWeight: 1f, rotationWeight: 0f, hintWeight: 0.5f);
+                footTargetR, footHintR, positionWeight: 1f, rotationWeight: 0f, hintWeight: 1f);
 
             // ---- 4) Rig_UpperBody：脊柱反扭 ----
             var upper = NewChild(root.transform, "Rig_UpperBody");
@@ -194,10 +194,22 @@ namespace HagenDa.Soldier.EditorTools
             ua.data = ud;
 
             // ---- 5) Rig_Hands：臂 IK（HandGrip 实例已保留）----
+            // 肘 pole（hint）= 预制体 Hint 对象里的 RtElbow/LtElbow **静态基准点**。
+            // hint 决定 TwoBoneIK 的弯曲平面：用相对角色静态的点，位置恒可预测；
+            // 早期版本由驱动每帧按关节位置重算，会在部分姿势把 hint 推到角色身后，
+            // 使肘绕错误平面弯曲（已废弃）。
+            var elbowHintR = EnsureHintPoint(root.transform, "Hint/RtElbow");
+            var elbowHintL = EnsureHintPoint(root.transform, "Hint/LtElbow");
             BuildTwoBoneIK(hands, "ArmIK_R", "DEF-upper_arm.R", "DEF-forearm.R", "DEF-hand.R",
-                null, null, positionWeight: 1f, rotationWeight: 1f, hintWeight: 0.5f);
+                null, elbowHintR, positionWeight: 1f, rotationWeight: 1f, hintWeight: 1f);
             BuildTwoBoneIK(hands, "ArmIK_L", "DEF-upper_arm.L", "DEF-forearm.L", "DEF-hand.L",
-                null, null, positionWeight: 1f, rotationWeight: 1f, hintWeight: 0.5f);
+                null, elbowHintL, positionWeight: 1f, rotationWeight: 1f, hintWeight: 1f);
+            // 清理早期版本的驱动侧动态 hint 空物体（已不再使用）。
+            foreach (var stale in new[] { "ElbowHint_R", "ElbowHint_L" })
+            {
+                var t = hands.Find(stale);
+                if (t != null) Object.DestroyImmediate(t.gameObject, true);
+            }
             foreach (var hg in hands.GetComponentsInChildren<HandGripConstraint>(true))
             {
                 var d = hg.data;
@@ -223,8 +235,15 @@ namespace HagenDa.Soldier.EditorTools
             rigBuilder.layers.Add(new RigLayer(handsRig));
 
             // ---- 7) 运行时驱动 ----
-            if (root.GetComponent<SoldierRigDriver>() == null)
-                root.AddComponent<SoldierRigDriver>();
+            var driver = root.GetComponent<SoldierRigDriver>();
+            if (driver == null) driver = root.AddComponent<SoldierRigDriver>();
+            // 趴姿绕**腹部**旋转（bodyPivotHeight<=0 = 自动取骨盆高度），腹部落在实体竖轴上；
+            // 肘/膝 hint 距离（hint 目标由 ElbowHint_* 空物体 + 本驱动每帧摆放提供）。
+            driver.bodyPivotHeight = 0f;
+            driver.proneBellyTarget = new Vector3(0f, 0.28f, 0f);
+            driver.useRestFootPlacement = true;
+            driver.footHeightProne = 0.03f;
+            EditorUtility.SetDirty(driver);
 
             // ---- 8) 预制体 Animator 指向 SoldierLoco（若已烘焙）----
             // 保证从预制体直接实例化也拿到"只用八向剪辑"的新控制器，
@@ -263,11 +282,44 @@ namespace HagenDa.Soldier.EditorTools
             if (c != null) c.SetSiblingIndex(index);
         }
 
+        /// <summary>按 "A/B" 路径解析静态基准点（如 Hint/RtElbow）；缺失仅告警不中断。</summary>
+        private static Transform EnsureHintPoint(Transform root, string path)
+        {
+            var t = root.Find(path);
+            if (t == null) Debug.LogWarning($"[SoldierBake] 静态基准点缺失: {path}（IK pole 将退化，可能翻转）");
+            return t;
+        }
+
         private static Transform NewChild(Transform parent, string name)
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             return go.transform;
+        }
+
+        /// <summary>确保同名子物体只保留一个（复用现有者，删掉多余副本）。</summary>
+        private static Transform EnsureChild(Transform parent, string name)
+        {
+            Transform first = null;
+            for (int i = parent.childCount - 1; i >= 0; i--)
+            {
+                var c = parent.GetChild(i);
+                if (c.name != name) continue;
+                if (first == null) first = c;
+                else Object.DestroyImmediate(c.gameObject, true);   // 删掉旧副本
+            }
+            if (first != null) return first;
+            return NewChild(parent, name);
+        }
+
+        /// <summary>删除 parent 下所有名为 name 的子物体（用于幂等重建前清理）。</summary>
+        private static void RemoveDuplicates(Transform parent, string name)
+        {
+            for (int i = parent.childCount - 1; i >= 0; i--)
+            {
+                var c = parent.GetChild(i);
+                if (c.name == name) Object.DestroyImmediate(c.gameObject, true);
+            }
         }
 
         private static Transform FindDeep(Transform root, string name)

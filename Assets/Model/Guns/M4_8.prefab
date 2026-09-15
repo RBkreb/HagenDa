@@ -226,6 +226,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5326855215665412016}
   m_LocalEulerAnglesHint: {x: -39.256, y: 0, z: 0}
+--- !u!1 &7615092302997394048
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 7
+  m_Component:
+  - component: {fileID: 7769386102476792488}
+  m_Layer: 0
+  m_HasEditorInfo: 1
+  m_Name: Stock
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7769386102476792488
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7615092302997394048}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.0431, z: 0.382}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5326855215665412016}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7777325668004397319
 GameObject:
   m_ObjectHideFlags: 0
@@ -454,6 +486,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2931154157290491197}
+    - targetCorrespondingSourceObject: {fileID: 400002, guid: c7741850eebe1df4ea75a80275b16311,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7769386102476792488}
     - targetCorrespondingSourceObject: {fileID: 400004, guid: c7741850eebe1df4ea75a80275b16311,
         type: 3}
       insertIndex: -1

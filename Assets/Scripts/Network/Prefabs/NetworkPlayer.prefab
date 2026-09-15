@@ -206,6 +206,8 @@ MonoBehaviour:
   standHeight: 1.8
   crouchHeight: 0.9
   proneHeight: 0.5
+  proneCapsuleLength: 1.85
+  proneCapsuleForward: -0.02
   clearanceRayOffset: 0.02
   standCrouchDelay: 0.1
   standProneDelay: 0.25
@@ -238,6 +240,11 @@ MonoBehaviour:
   slideShakeDuration: 0.5
   diveShakeIntensity: 0.4
   diveShakeDuration: 0.3
+  nearClipNormal: 0.3
+  nearClipAiming: 0.01
+  nearClipBlendSpeed: 8
+  downLookDetachStart: 55
+  downLookDetachMax: 0.5
   combat: {fileID: 3271674328394960880}
   gun: {fileID: 6750311998941298034}
   equipment: {fileID: 5789011040648113979}

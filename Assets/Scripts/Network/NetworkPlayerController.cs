@@ -64,6 +64,14 @@ namespace HagenDa.Networking
         public float crouchHeight = 0.9f;
         [Tooltip("Capsule diameter when lying flat (prone).")]
         public float proneHeight = 0.5f;
+        [Tooltip("趴姿胶囊长度（沿本地 +Z 的轴向长度，米）。\n" +
+                 "趴下时身体是绕**腹部**旋转的刚体，头朝前伸、脚向后拖，整体沿 Z 展开约 1.6m；\n" +
+                 "只用一个以实体原点为中心的 1.8m 胶囊覆盖不到躯干 → 身体中段可穿过障碍物。\n" +
+                 "此处按趴姿实际身体跨度给出长度，配合 proneCapsuleForward 覆盖全身。")]
+        public float proneCapsuleLength = 1.85f;
+        [Tooltip("趴姿胶囊沿本地 +Z 的中心偏移（米）。与 proneCapsuleLength 一起使胶囊\n" +
+                 "精确罩住趴姿身体（实测躯干中心相对实体原点偏 -0.15 附近）。")]
+        public float proneCapsuleForward = -0.02f;
 
         [Tooltip("Offset above the capsule top where the overhead clearance ray starts (avoids grazing the body's own collider).")]
         public float clearanceRayOffset = 0.02f;
@@ -134,6 +142,7 @@ namespace HagenDa.Networking
         public float eyeAnchorSmooth = 14f;
         private float eyeAnchorHeightCur;
         private bool eyeAnchorHeightInit;
+        private float nearClipCur;              // 0=正常近裁剪 1=瞄准极近裁剪（平滑量）
 
         [Header("Camera shake")]
         public float jumpShakeIntensity = 0.2f;
@@ -142,6 +151,24 @@ namespace HagenDa.Networking
         public float slideShakeDuration = 0.5f;
         public float diveShakeIntensity = 0.4f;
         public float diveShakeDuration = 0.3f;
+
+        [Header("Camera near clip (PHASE14 瞄准)")]
+        [Tooltip("正常状态的相机近裁剪面(m)。")]
+        public float nearClipNormal = 0.3f;
+        [Tooltip("瞄准(ADS)时的相机近裁剪面(m) —— 需极小值,否则枪身/瞄具会被裁掉、看见枪内部。")]
+        public float nearClipAiming = 0.01f;
+        [Tooltip("nearClip 随 aimAmount 的过渡速率(每秒)。")]
+        public float nearClipBlendSpeed = 8f;
+
+        [Header("Camera down-look detach (PHASE14 俯视)")]
+        [Tooltip("俯角超过此值(度,取绝对值)后,相机开始脱离 headcollider 表面、向角色正面外推 ——\n" +
+                 "否则俯视时会看到自己身体内部(头/躯干网格)。")]
+        public float downLookDetachStart = 55f;
+        [Tooltip("到最大俯角时向角色正面外推的距离(m),线性插值。\n" +
+                 "必须足够大才能真正越过身体:角色前向跨度约 0.44m(含小臂),而相机在球面上只到\n" +
+                 "约 0.12m —— 外推量需 >0.44−0.12≈0.32 才让相机脱出身体轮廓,故默认 0.50。\n" +
+                 "过小(如 0.35)时相机虽已离球面,仍留在身体包围盒内 → 俯视照样看到身体内部。")]
+        public float downLookDetachMax = 0.50f;
 
         [Header("Combat")]
         public NetworkCombat combat;
@@ -198,6 +225,7 @@ namespace HagenDa.Networking
         private NetworkPlayerHealth health;
         private PhysicMaterial aliveStandMat;   // cached no-friction material (stand)
         private PhysicMaterial aliveCrouchMat;   // cached no-friction material (crouch)
+        private float standColliderHeight0, crouchColliderHeight0;   // 初始长度（趴姿会改，切回还原）
 
         /// <summary>ML 训练观测：当前是否接地（服务端）。</summary>
         public bool Grounded => grounded;
@@ -251,6 +279,8 @@ namespace HagenDa.Networking
                 standCollider = GetComponent<CapsuleCollider>();
             health = GetComponent<NetworkPlayerHealth>();
             soldierAnim = GetComponent<SoldierAnimatorDriver>();
+            if (standCollider != null) standColliderHeight0 = standCollider.height;
+            if (crouchCollider != null) crouchColliderHeight0 = crouchCollider.height;
         }
 
         public override void OnStartServer()
@@ -452,7 +482,19 @@ namespace HagenDa.Networking
             if (GetHeadSphere(out Vector3 center, out float radius))
             {
                 Vector3 normal = view * Vector3.forward;
-                playerCamera.transform.position = center + normal * radius + shakeOffset;
+                Vector3 pos = center + normal * radius;
+                // 俯视脱离:俯角超过阈值后相机沿角色正面(水平朝向)线性外推,直到最大俯角。
+                // 目的:俯视 55°+ 时不再看到自己身体内部的头/躯干网格。
+                // 本项目俯仰约定为**正=低头**(见 Look 段 Tooltip):故 downDeg = +renderPitch。
+                float downDeg = renderPitch;
+                if (downDeg > downLookDetachStart)
+                {
+                    float maxDown = Mathf.Max(downLookDetachStart + 0.01f, PitchMax);
+                    float t = Mathf.Clamp01((downDeg - downLookDetachStart) / (maxDown - downLookDetachStart));
+                    Vector3 front = Quaternion.Euler(0f, localYaw, 0f) * Vector3.forward;
+                    pos += front * (downLookDetachMax * t);
+                }
+                playerCamera.transform.position = pos + shakeOffset;
                 playerCamera.transform.rotation = view;
             }
             else
@@ -495,6 +537,12 @@ namespace HagenDa.Networking
             {
                 playerCamera.fieldOfView = baseFov;
             }
+
+            // PHASE14 瞄准近裁剪面:ADS 时收到极小值,否则枪身/瞄具被近裁剪面切掉 → 看见枪内部。
+            // 用本地瞄准意图(clientAim)平滑过渡 —— 拥有者客户端不经服务端回环,零延迟。
+            float nearTarget = (isLocalPlayer && !dead && clientAim) ? 1f : 0f;
+            nearClipCur = Mathf.MoveTowards(nearClipCur, nearTarget, nearClipBlendSpeed * Time.deltaTime);
+            playerCamera.nearClipPlane = Mathf.Lerp(nearClipNormal, nearClipAiming, nearClipCur);
         }
 
         /// <summary>
@@ -1252,6 +1300,7 @@ namespace HagenDa.Networking
                     standCollider.enabled = true;
                     crouchCollider.enabled = false;
                     standCollider.direction = 1; // Y
+                    standCollider.height = standColliderHeight0 > 0.05f ? standColliderHeight0 : standHeight;
                     standCollider.center = new Vector3(0f, standHeight * 0.5f, 0f);
                     break;
 
@@ -1259,14 +1308,19 @@ namespace HagenDa.Networking
                     standCollider.enabled = false;
                     crouchCollider.enabled = true;
                     crouchCollider.direction = 1; // Y
+                    crouchCollider.height = crouchColliderHeight0 > 0.05f ? crouchColliderHeight0 : crouchHeight;
                     crouchCollider.center = new Vector3(0f, crouchHeight * 0.5f, 0f);
                     break;
 
                 case PlayerPosture.Prone:
+                    // 趴姿：胶囊放倒沿本地 +Z，并沿 Z 平移罩住整个身体（头/躯干/腿）。
+                    // 偏移与长度按趴姿刚体绕腹部旋转后的实际跨度给定（否则躯干探出胶囊 →
+                    // 身体中段可穿过障碍物）。
                     standCollider.enabled = true;
                     crouchCollider.enabled = false;
                     standCollider.direction = 2; // Z (lying forward)
-                    standCollider.center = new Vector3(0f, proneHeight * 0.5f, 0f);
+                    standCollider.height = proneCapsuleLength > 0.05f ? proneCapsuleLength : standHeight;
+                    standCollider.center = new Vector3(0f, proneHeight * 0.5f, proneCapsuleForward);
                     break;
             }
         }
