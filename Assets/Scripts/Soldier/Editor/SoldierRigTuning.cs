@@ -35,6 +35,7 @@ namespace HagenDa.Soldier.EditorTools
         public const bool UseRestFootPlacement = true;
         public const float FootHeightProne = 0.03f;
         public const float SprintLateralOffset = -0.07f;
+        public const float SprintHeightOffset = 0f;
         public const float SprintDropback = 0.06f;
         public const float SprintBlendSpeed = 6f;
         public const float ProneCapsuleLength = 1.85f;
@@ -79,6 +80,7 @@ namespace HagenDa.Soldier.EditorTools
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.useRestFootPlacement), UseRestFootPlacement, force, ref w, ref s, log);
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.footHeightProne), FootHeightProne, force, ref w, ref s, log);
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.sprintLateralOffset), SprintLateralOffset, force, ref w, ref s, log);
+                    Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.sprintHeightOffset), SprintHeightOffset, force, ref w, ref s, log);
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.sprintDropback), SprintDropback, force, ref w, ref s, log);
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.sprintBlendSpeed), SprintBlendSpeed, force, ref w, ref s, log);
                     if (log.Length > 0) sb.Append("Fatui[").Append(log.ToString().TrimEnd()).Append("] ");

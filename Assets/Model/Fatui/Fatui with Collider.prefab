@@ -1726,7 +1726,7 @@ Transform:
   m_GameObject: {fileID: 3337284576555264179}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.731, y: 1.12, z: 0}
+  m_LocalPosition: {x: -0.731, y: 1.311, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3179,12 +3179,13 @@ MonoBehaviour:
   hipHoldOffset: {x: 0.05, y: -0.24, z: 0.2}
   adsEyeRelief: 0.13
   aimBlendSpeed: 6
-  sprintLateralOffset: -0.07
-  sprintDropback: 0.06
+  sprintLateralOffset: 0.08
+  sprintHeightOffset: 0.14
+  sprintDropback: -0.35
   sprintBlendSpeed: 6
-  sprintSwayLateral: 0.06
+  sprintSwayLateral: 0.16
   sprintSwayAmplitude: 5
-  sprintSwayFrequency: 2.2
+  sprintSwayFrequency: 3
   recoilPitchPerUnit: 1.2
   recoilYawPerUnit: 0.9
   recoilKickPerUnit: 0.004

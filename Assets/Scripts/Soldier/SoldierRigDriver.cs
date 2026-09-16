@@ -103,7 +103,8 @@ namespace HagenDa.Soldier
         public float postureRampSpeed = 5f;
 
         [Header("Aim")]
-        [Tooltip("瞄准目标点距离（米）——枪基准 AimConstraint 的源。")]
+        [Tooltip("腰射瞄准目标点距离（米）——枪基准 AimConstraint 的源，即“相机射线多远处的点”。\n" +
+                 "只影响约束解算的数值余量，不影响枪的朝向（朝向由脚本按 Slerp 混合后写入）。")]
         public float aimTargetDistance = 50f;
         [Tooltip("腰射枪位：让**枪托(Stock)**落在右肩 GunCylinder 柱面上 → 枪绕右肩运动。\n" +
                  "旧实现用眼空间固定偏移，下俯时该偏移被相机俯仰带出“向身后”的分量，枪托捅进后背。\n" +
@@ -119,6 +120,11 @@ namespace HagenDa.Soldier
         [Header("Sprint (收枪摆动)")]
         [Tooltip("冲刺枪位相对腰射位的横向偏移（眼空间 x；负 = 向左）。冲刺时枪整体偏右 → 给负值拉回。")]
         public float sprintLateralOffset = -0.07f;
+        [Tooltip("冲刺枪位相对腰射位的**高度**偏移（眼空间 y；正 = 抬高、负 = 压低）。\n" +
+                 "改这个即可调“冲刺时枪的高度”。0 = 与腰射柱面点等高。\n" +
+                 "注意是**眼空间 up**（跟随相机俯仰）——冲刺持枪位随视线一起倾斜，与\n" +
+                 "sprintLateralOffset / sprintDropback 同一坐标系。")]
+        public float sprintHeightOffset = 0f;
         [Tooltip("冲刺时枪相对基准下压的后撤量(m)。")]
         public float sprintDropback = 0.06f;
         [Tooltip("腰射↔冲刺过渡速率（每秒）—— 位置/瞄准权重/摆枪幅度都按此淡入淡出。")]
@@ -126,7 +132,9 @@ namespace HagenDa.Soldier
         [Tooltip("冲刺摆枪的**横向平移**振幅(m)。AimConstraint 瞄准的是源的位置，所以摆动必须\n" +
                  "以平移表示(只转 SprintAim 自身不会改变其位置、不影响约束输出)。")]
         public float sprintSwayLateral = 0.06f;
-        [Tooltip("冲刺摆枪的**朝向**振幅(度/秒相关,叠加在用平移表示的摆动上)。")]
+        [Tooltip("冲刺摆枪的**滚转**振幅(度) —— 绕枪自身枪管轴，枪顶左右倾。\n" +
+                 "约束的 worldUpType=SceneUp 把滚转钉在世界朝上，所以这个量**不能**靠转 SprintAim\n" +
+                 "实现（那是死代码），改为直接写在枪的局部旋转上，与横向平移共用同一相位。")]
         public float sprintSwayAmplitude = 5f;
         [Tooltip("冲刺摆枪频率(Hz)。")]
         public float sprintSwayFrequency = 2.2f;
@@ -653,7 +661,7 @@ namespace HagenDa.Soldier
                 driverAimSource.rotation = s.eyeRot;
             }
             if (driverAimTarget != null)
-                driverAimTarget.position = s.eyePos + s.eyeRot * Vector3.forward * aimTargetDistance;
+                driverAimTarget.position = s.eyePos + s.eyeRot * Vector3.forward * AimTargetDistanceNow();
             // 规范节点：头部骨骼子对象 AimSource 同步眼位（原生约束阶段可实时读到）。
             if (aimSourceHead != null)
             {
@@ -855,17 +863,20 @@ namespace HagenDa.Soldier
             // 腰射↔冲刺过渡量：位置/瞄准权重/摆枪幅度共用同一进度 → 两态之间平滑插值。
             sprintBlend = Mathf.MoveTowards(sprintBlend, (alive && s.sprinting) ? 1f : 0f, sprintBlendSpeed * dt);
 
-            // ---- 冲刺摆枪：SprintAim 节点左右摆 ----
-            // 摆动的**坐标**用位置表示(局部 X 平移) —— AimConstraint 是“瞄准源的位置”,
-            // 只转 SprintAim 自身不会改变其位置、也就不会影响约束输出;平移才会。
-            // 幅度按 sprintBlend 淡入淡出 → 过渡期间摆幅渐增/渐消。
+            // ---- 冲刺摆枪：两路叠加 ----
+            // (a) **平移**：SprintAim 节点沿局部 X 平移。AimConstraint 瞄的是源的**位置**，
+            //     所以只有平移能改变约束输出（武器随之左右摆）。
+            //     幅度按 sprintBlend 淡入淡出 → 过渡期间摆幅渐增/渐消。
+            // (b) **滚转**：绕枪自身枪管轴滚（枪顶左右倾）。约束的 worldUpType=SceneUp 把
+            //     枪的滚转**钉在世界朝上**，故改 SprintAim 的朝向（yaw）对枪零影响 ——
+            //     旧的“转 SprintAim 当摆幅”是死代码（实测 AMPL=20 时枪转动 0.000°）。
+            //     滚转改为直接写在枪的局部旋转上（见下，与后座同一处施加）。
             if (alive && sprintBlend > 0.001f)
             {
                 sprintSwayPhase += dt * sprintSwayFrequency * Mathf.PI * 2f;
                 float sway = Mathf.Sin(sprintSwayPhase) * sprintSwayLateral * sprintBlend;
                 sprintAimSource.localPosition = sprintAimBasePos + Vector3.right * sway;
-                float yaw = Mathf.Sin(sprintSwayPhase) * sprintSwayAmplitude * sprintBlend;
-                sprintAimSource.localRotation = sprintAimBaseRot * Quaternion.AngleAxis(yaw, Vector3.up);
+                sprintAimSource.localRotation = sprintAimBaseRot;   // 朝向不参与（见 (b)）
             }
             else
             {
@@ -873,6 +884,10 @@ namespace HagenDa.Soldier
                 sprintAimSource.localPosition = sprintAimBasePos;
                 sprintAimSource.localRotation = sprintAimBaseRot;
             }
+            // 滚转相位与平移同源（同一 sin），故“左右平移 + 枪顶侧倾”是同一个摆动动作。
+            float swayRoll = (alive && sprintBlend > 0.001f)
+                ? Mathf.Sin(sprintSwayPhase) * sprintSwayAmplitude * sprintBlend
+                : 0f;
 
             // ---- 后座旋转（**先于基准求解**应用）----
             // ADS 基准解算会整体抵消枪的当前局部旋转（含后座增量），因此瞄具连线
@@ -880,21 +895,31 @@ namespace HagenDa.Soldier
             Quaternion recoilRot = s.recoil > 0.0001f
                 ? Quaternion.Euler(-s.recoil * recoilPitchPerUnit, s.recoil * recoilYawPerUnit, 0f)
                 : Quaternion.identity;
+            // 冲刺滚转绕**枪管轴**（枪局部空间的 gunAimLocalAxis）施加 → 枪顶左右倾。
+            Quaternion rollRot = Mathf.Abs(swayRoll) > 0.0001f
+                ? Quaternion.AngleAxis(swayRoll, gunAimLocalAxis)
+                : Quaternion.identity;
             if (boundGun.transform.parent == weaponBasis)
-                boundGun.transform.localRotation = gunAlignRot * recoilRot;
+                boundGun.transform.localRotation = gunAlignRot * recoilRot * rollRot;
 
-            // ---- 瞄准源权重：腰射↔冲刺在**约束内部**混合 ----
-            // 相机射线目标(Director_AimTarget) 与 SprintAim 按 (1−sprintBlend, sprintBlend) 加权。
+            // ---- 约束启停 ----
+            // 腰射↔冲刺的**朝向混合不能交给约束的多源加权**：约束是把各源的 (源−自身)
+            // 向量**加权相加**，而腰射(相机前视)与冲刺(指向 SprintAim)的枪管方向实测相差
+            // **125°** —— 两个大角度向量相加时方向在权重中段急剧扫过，实测一帧转 82°、
+            // 枪位跳 0.5m。任何线性权重都救不了这种大角度反向，必须沿旋转路径走（Slerp）。
+            //
+            // 做法：约束只挂**一个**源(driverAimTarget，权重恒 1)，把混合好的朝向编码成
+            // 该源的位置 → 约束仍然负责“瞄准 + SceneUp 滚转”，但混合路径由脚本控制。
             bool adsEngaged = alive && adsSmooth > 0.001f;
             if (basisAim != null)
             {
                 basisAim.constraintActive = alive && !adsEngaged;
-                if (basisAim.constraintActive) ApplyAimWeights(1f - sprintBlend, sprintBlend);
+                if (basisAim.constraintActive) ApplyAimWeights(1f, 0f);   // 单源:只用 driverAimTarget
             }
             // 枪自身约束不再使用（统一由基准约束承担,避免双解算器互写）。
             if (gunSprintAim != null) gunSprintAim.constraintActive = false;
 
-            // ---- 基准位置（腰射=枪托落在右肩柱面；冲刺=同柱面+左移后撤；ADS=向射线解过渡）----
+            // ---- 基准位置（腰射=枪托落在右肩柱面；冲刺=同柱面+左移/抬高/后撤；ADS=向射线解过渡）----
             if (driverAimSource != null)
             {
                 Transform eye = driverAimSource;
@@ -902,16 +927,17 @@ namespace HagenDa.Soldier
                 if (gunStock != null && gunCylinder != null)
                 {
                     // 枪托目标 = 柱面点(与相机同式:柱心 + 视线方向×半径,俯仰随相机)
-                    //           + 冲刺的横向左移/后撤(按 sprintBlend 淡入)。
-                    // 偏移必须加在**枪托目标**上,不能加在“腰射基准位”上:基准位由误差反馈
-                    // 得出、是相对当前状态的量,拿它再叠加偏移会重复计入当前状态
-                    //（实测冲刺位移 −0.40m,应为 −0.07m）。
+                    //           + 冲刺的眼空间偏移:横向(左移) / 高度(抬高) / 后撤。
+                    //          按 sprintBlend 淡入淡出。
+                    // 偏移必须加在**枪托目标**上,不能加在“腰射基准位”上:基准位是相对
+                    // 当前状态的量,拿它再叠加偏移会重复计入当前状态(实测 −0.40m,应为 −0.07m)。
                     Vector3 aimDir = eye.forward;
                     if (aimDir.sqrMagnitude < 1e-6f) aimDir = Vector3.forward;
                     aimDir.Normalize();
                     float radius = hipOrbitRadius > 0f ? hipOrbitRadius : CylinderWorldRadius(gunCylinder);
                     Vector3 stockTarget = gunCylinder.position + aimDir * radius
                         + eye.right * (sprintLateralOffset * sprintBlend)
+                        + eye.up * (sprintHeightOffset * sprintBlend)
                         - eye.forward * (sprintDropback * sprintBlend);
                     pos = SolveStockOnCylinder(stockTarget);
                 }
@@ -923,31 +949,25 @@ namespace HagenDa.Soldier
                         + eye.forward * hipHoldOffset.z;
                 }
 
-                // 枪管世界方向（供后座沿枪管轴后撤用）。注意 AimConstraint 瞄准的是**源的位置**：
-                // 冲刺态的枪管方向 = 枪位 → SprintAim 节点的方向（不是 SprintAim 的 forward）。
-                Vector3 hipAim = eye.forward;
-                Vector3 sprintAim = hipAim;
-                if (sprintAimSource != null)
-                {
-                    Vector3 d = sprintAimSource.position - pos;
-                    if (d.sqrMagnitude > 1e-6f) sprintAim = d.normalized;
-                }
-                Vector3 barrel = Vector3.Slerp(hipAim.normalized, sprintAim.normalized, sprintBlend).normalized;
-
                 if (adsEngaged && SolveAdsRail(s, out Vector3 railPos, out Quaternion railRot))
                 {
                     // ADS：位置与朝向都脚本直解(向射线解插值，含从腰射/冲刺过渡)。
                     pos = Vector3.Lerp(pos, railPos, adsSmooth);
                     weaponBasis.position = pos;
                     weaponBasis.rotation = railRot;
-                    barrel = (s.eyeRot * Vector3.forward).normalized;
+                    _barrelWorldDir = (s.eyeRot * Vector3.forward).normalized;
                 }
                 else
                 {
-                    // 腰射/冲刺：位置脚本给,**朝向交给启用的 AimConstraint**(双源加权)。
+                    // 腰射/冲刺：位置脚本给，**朝向交给约束**。
                     weaponBasis.position = pos;
+                    // 把本帧混合后的朝向编码进 driverAimTarget 的位置 —— 约束会据此解出
+                    // 与 BlendedAimRotation(pos) 完全一致的朝向（同一 LookRotation 语义）。
+                    Quaternion blended = BlendedAimRotation(pos);
+                    if (driverAimTarget != null && basisAim != null && basisAim.constraintActive)
+                        driverAimTarget.position = pos + (blended * Vector3.forward) * aimTargetDistance;
+                    _barrelWorldDir = (blended * Vector3.forward).normalized;
                 }
-                _barrelWorldDir = barrel;
             }
 
             // ---- 后座位移（枪根沿枪管轴后撤）----
@@ -964,28 +984,34 @@ namespace HagenDa.Soldier
         private Vector3 _barrelWorldDir = Vector3.forward;
 
         /// <summary>
-        /// 设置枪基准 AimConstraint 的两个加权源：相机射线目标(腰射) ↔ SprintAim(冲刺)。
-        /// 权重和恒为 1 → 瞄准方向在约束内部线性混合,朝向连续过渡(无需脚本接管旋转)。
-        /// 复用缓存的 sources 列表,避免每帧分配。
+        /// 本帧腰射瞄准目标该放多远（= aimTargetDistance）。
+        /// 单源瞄准下无需再匹配 SprintAim 的距离（历史上双源加权时因模长悬殊而需要）。
+        /// </summary>
+        private float AimTargetDistanceNow()
+        {
+            return aimTargetDistance;
+        }
+
+        /// <summary>
+        /// 设置枪基准 AimConstraint 的源。**只用单源**(driverAimTarget，权重 1) ——
+        /// 腰射↔冲刺的混合由脚本按 Slerp 做好后编码进该源的位置（见 BlendedAimRotation），
+        /// 不用约束的多源加权(大角度反向时那会瞬间翻转)。
+        /// 保留第二槽位是为了兼容曾烘进预制体的两源配置，这里把 sprint 权重压成 0。
         /// </summary>
         private void ApplyAimWeights(float wHip, float wSprint)
         {
             if (basisAim == null) return;
-            // SprintAim 缺失时退化为纯腰射，避免挂空源（空源会让约束不生效/抖动）。
-            if (sprintAimSource == null) { wHip = 1f; wSprint = 0f; }
-            if (_aimSources.Count < 2)
+            if (_aimSources.Count < 1)
             {
                 _aimSources.Clear();
                 _aimSources.Add(new ConstraintSource { sourceTransform = driverAimTarget });
-                _aimSources.Add(new ConstraintSource { sourceTransform = sprintAimSource });
             }
-            var a = _aimSources[0]; a.sourceTransform = driverAimTarget; a.weight = Mathf.Max(0f, wHip); _aimSources[0] = a;
-            var b = _aimSources[1]; b.sourceTransform = sprintAimSource; b.weight = Mathf.Max(0f, wSprint); _aimSources[1] = b;
+            var a = _aimSources[0]; a.sourceTransform = driverAimTarget; a.weight = 1f; _aimSources[0] = a;
             basisAim.SetSources(_aimSources);
         }
 
         private readonly System.Collections.Generic.List<ConstraintSource> _aimSources =
-            new System.Collections.Generic.List<ConstraintSource>(2);
+            new System.Collections.Generic.List<ConstraintSource>(1);
 
         /// <summary>
         /// 把**枪托(Stock)**送到指定世界目标点（腰射=右肩 GunCylinder 柱面点；冲刺=再加左移/后撤）。
@@ -1018,30 +1044,33 @@ namespace HagenDa.Soldier
         }
 
         /// <summary>
-        /// 复现基准 AimConstraint 的旋转。
+        /// 本帧基准的瞄准旋转 = **沿旋转路径**混合腰射与冲刺朝向。
         ///
-        /// 关键:Unity 的 AimConstraint 对多源是**加权累加“源−自身”的方向向量**,
-        /// 最后只做**一次** LookRotation(aimVector=本地+Z、worldUp=SceneUp):
-        ///     dir = normalize( Σ (sourcePos_i − basisPos) · w_i )
-        ///     rot = LookRotation(dir, Vector3.up)
-        /// 而不是“各源各算旋转再按权重混合”（也不是加权 Slerp）。用四元数累加去近似时,
-        /// 中间权重段与原实现不符 → 腰射↔冲刺过渡起始处枪位跳变(实测单帧 0.47m)。
-        /// 按上式复现后各混合权重都与约束一致。
+        ///     hipRot    = LookRotation(相机前视, SceneUp)          —— 腰射:枪管随视线
+        ///     sprintRot = LookRotation(SprintAim − 基准位, SceneUp) —— 冲刺:枪管指向收枪位
+        ///     return    = Slerp(hipRot, sprintRot, sprintBlend)
+        ///
+        /// **不能**改成“两个源交给约束加权”：约束把 (源−自身) 向量**加权相加**，而两者
+        /// 方向实测相差 125°，相加时方向在权重中段急剧扫过（实测单帧 82°）。Slerp 沿
+        /// 最短旋转路径过渡，与两源夹角无关。
+        /// 约束最终仍负责解算朝向（脚本只是把结果编码成 driverAimTarget 的位置）。
         /// </summary>
         private Quaternion BlendedAimRotation(Vector3 fromPos)
         {
-            float wSprint = Mathf.Clamp01(sprintBlend);
-            float wHip = 1f - wSprint;
-            if (sprintAimSource == null) { wHip = 1f; wSprint = 0f; }
+            Transform eye = driverAimSource;
+            Vector3 hipDir = eye != null ? eye.forward : Vector3.forward;
+            if (hipDir.sqrMagnitude < 1e-6f) hipDir = Vector3.forward;
+            hipDir.Normalize();
+            Quaternion hipRot = Quaternion.LookRotation(hipDir, Vector3.up);
 
-            Vector3 dir = Vector3.zero;
-            if (driverAimTarget != null && wHip > 0.0001f)
-                dir += (driverAimTarget.position - fromPos) * wHip;
-            if (sprintAimSource != null && wSprint > 0.0001f)
-                dir += (sprintAimSource.position - fromPos) * wSprint;
+            float w = Mathf.Clamp01(sprintBlend);
+            if (w <= 0.0001f || sprintAimSource == null) return hipRot;
 
-            if (dir.sqrMagnitude < 1e-8f) return Quaternion.identity;
-            return Quaternion.LookRotation(dir.normalized, Vector3.up);
+            Vector3 sprintDir = sprintAimSource.position - fromPos;
+            if (sprintDir.sqrMagnitude < 1e-6f) return hipRot;
+            Quaternion sprintRot = Quaternion.LookRotation(sprintDir.normalized, Vector3.up);
+
+            return w >= 0.9999f ? sprintRot : Quaternion.Slerp(hipRot, sprintRot, w);
         }
 
         /// <summary>柱面世界半径：优先取 GunCylinder 上的 Collider 尺寸，其次用 lossyScale。</summary>
