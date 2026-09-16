@@ -73,7 +73,29 @@ namespace HagenDa.Soldier
         [Range(0f, 1f)] public float footIKCapIdle = 1f;
         [Tooltip("移动 IK 权重上限（<1 软钉，保留剪辑抬脚自由度）。")]
         [Range(0f, 1f)] public float footIKCapMoving = 0.15f;
+        [Tooltip("蹲姿脚 IK 权重上限。蹲下时模型根整体下沉（crouchOffset≈-0.5m）而剪辑仍是站立\n" +
+                 "高度的走/跑，踝骨被一起带沉到地面以下 —— 若沿用移动上限(0.15)只有 15% 修正量，\n" +
+                 "脚会穿地 0.44m。蹲姿因此给满权重。\n" +
+                 "蹲姿**移动**时该上限会再乘 (1-useCrouchWalkLegs 的程序化权重)，由\n" +
+                 "ApplyCrouchWalkLegs 接管（约束的目标取自自身输出会把脚钉死，见那里说明）。")]
+        [Range(0f, 1f)] public float footIKCapCrouch = 1f;
         public float footWeightSpeed = 8f;
+
+        [Header("Crouch-walk legs (程序化解算)")]
+        [Tooltip("蹲走用程序化两骨 IK 替代约束。原因(实测)：约束的 IK 目标 XZ 取自 tip.position，\n" +
+                 "而 tip 正是**上一帧约束自己的输出** —— 权重=1 时“目标 XZ = 上一帧落点”构成不动点，\n" +
+                 "脚被完全钉住：蹲走步幅 0.767m→0.031m、大腿摆动 54°→6°（实测）。\n" +
+                 "站姿靠 0.15 权重才侥幸保留步幅。\n" +
+                 "改为 LateUpdate 程序化解算：约束权重归零 → 读到的是**干净的剪辑姿态** →\n" +
+                 "目标 XZ 直接取剪辑踝位(XZ) → 步幅/前后摆动完全保留；高度取“地面+踝高+抬脚量”。")]
+        public bool useCrouchWalkLegs = true;
+        [Tooltip("蹲走抬脚量增益：抬脚量 = 剪辑踝高相对本周期最低点的抬升 × 该增益。\n" +
+                 "蹲下时剪辑脚整体在地面之下，靠这个把“剪辑自己的抬脚”抬回地面以上。")]
+        public float crouchLiftGain = 1f;
+        [Tooltip("蹲走抬脚量的上限(米) —— 目标高度 = 地面 + 踝高 + 抬脚量，故这只是**摆动幅度**\n" +
+                 "的上限（不是用来补偿蹲降量的：目标 Y 是绝对值，IK 会自己向下够到地面）。\n" +
+                 "实测剪辑自然抬脚约 0.24m，超过此值即饱和；取 0.35 留余量。0 = 脚完全钉在地面。")]
+        public float crouchLiftMax = 0.35f;
 
         [Header("Differential turn (下半身滞后)")]
         public float turnSmoothTime = 0.18f;
@@ -120,10 +142,9 @@ namespace HagenDa.Soldier
         [Header("Sprint (收枪摆动)")]
         [Tooltip("冲刺枪位相对腰射位的横向偏移（眼空间 x；负 = 向左）。冲刺时枪整体偏右 → 给负值拉回。")]
         public float sprintLateralOffset = -0.07f;
-        [Tooltip("冲刺枪位相对腰射位的**高度**偏移（眼空间 y；正 = 抬高、负 = 压低）。\n" +
-                 "改这个即可调“冲刺时枪的高度”。0 = 与腰射柱面点等高。\n" +
-                 "注意是**眼空间 up**（跟随相机俯仰）——冲刺持枪位随视线一起倾斜，与\n" +
-                 "sprintLateralOffset / sprintDropback 同一坐标系。")]
+        [Tooltip("冲刺枪位相对腰射位的**高度**偏移（米；正 = 抬高、负 = 压低）。\n" +
+                 "冲刺姿态已**去俯仰**（枪不随视线点头），故这里是**世界竖直**方向，\n" +
+                 "与平视时一致、不随相机俯仰倾斜。0 = 与腰射柱面点等高。")]
         public float sprintHeightOffset = 0f;
         [Tooltip("冲刺时枪相对基准下压的后撤量(m)。")]
         public float sprintDropback = 0.06f;
@@ -216,6 +237,8 @@ namespace HagenDa.Soldier
         private float footWeightL = 1f, footWeightR = 1f;
         private float footPlantL, footPlantR;
         private float minAnkleL = float.MaxValue, minAnkleR = float.MaxValue;
+        private float crouchLegProcCur;                                  // 蹲走程序化解算权重 0..1
+        private float minCrouchAnkleL = float.MaxValue, minCrouchAnkleR = float.MaxValue;  // 蹲走剪辑踝高基线
         private float crouchCur, proneCur;      // 姿态 0..1 渐变
         private Vector3 lastBodyOffsetExtra;    // 最近一帧额外根位移（跳跃 dip 等，LateUpdate 复写用）
         private float adsSmooth;                 // aimAmount 平滑
@@ -575,11 +598,16 @@ namespace HagenDa.Soldier
             if (!EnsureCache()) return;
             float dt = Time.deltaTime;
 
-            // ---- 转向（PHASE14 修正：**身体立即跟随瞄准 yaw**，滞后只发生在脚 IK 锚点
-            //      —— 上/下半身同步转向，触地脚经"冻结世界位置+滞后公转"实现钉地与挪步）----
+            // ---- 转向：模型**即时跟随胶囊**，下半身滞后由**脚 IK 基准点滞后**形成（原设计）----
+            // 用户确认的设计：
+            //   角色模型与胶囊是一体 —— 胶囊随相机转向时模型作为子级自然同步旋转，故
+            //   模型根（含上半身）**必须即时**对齐，**不能**给它加滞后（否则上半身一起滞后）。
+            //   "下半身滞后"的观感来自**脚 IK 基准点 footLagYaw 滞后跟随**：躯干已转过去，
+            //   脚仍钉在原世界位置 → 腿被"拧"着（这才是滞后），脚锚随后按 turnStartDelay /
+            //   footLagSmoothTime 逐步追上新朝向（挪步），拧劲随之解开。
             float aimYaw = s.eyeRot.eulerAngles.y;
             bool proneNow = s.dead || s.posture == PlayerPosture.Prone;
-            dampedYaw = aimYaw;                       // 模型根（全身）立即对齐，无差速
+            dampedYaw = aimYaw;                       // 模型根（上/下半身）即时对齐，无差速
 
             if (proneNow || s.airborne)
             {
@@ -607,8 +635,8 @@ namespace HagenDa.Soldier
                 }
                 else
                 {
-                    // 静止转向：上半身/身体已随瞄准转，脚锚**钉住 1s** 后才开始
-                    // 滞后追赶（PHASE14 转身专项：上半身开始转向后 1s，追赶转向）。
+                    // 静止转向：身体已即时转过去，脚锚**钉住 turnStartDelay 秒**后才追赶
+                    // （PHASE14 转身专项：上半身开始转向后 1s 脚才开始挪）。
                     idleTurnTimer += dt;
                     if (idleTurnTimer >= turnStartDelay)
                         footLagYaw = Mathf.SmoothDampAngle(footLagYaw, aimYaw, ref footLagVel,
@@ -684,18 +712,30 @@ namespace HagenDa.Soldier
             if (gripL != null) gripL.weight = handsWCur;
 
             // ---- 脚部贴地 IK ----
-            float cap = s.moving ? footIKCapMoving : footIKCapIdle;
+            bool crouched = s.posture == PlayerPosture.Crouch;
+            // 蹲走交给程序化解算（见 useCrouchWalkLegs）：约束权重按 crouchLegProcCur 让位，
+            // 否则“目标 XZ ← 约束自己的输出”会把脚钉死。
+            bool crouchWalk = useCrouchWalkLegs && crouched && s.moving
+                              && !s.airborne && !s.dead;
+            crouchLegProcCur = Mathf.MoveTowards(crouchLegProcCur, crouchWalk ? 1f : 0f,
+                footWeightSpeed * dt);
+            float cap = (s.moving && !crouched) ? footIKCapMoving
+                      : (crouched ? footIKCapCrouch : footIKCapIdle);
+            cap *= 1f - crouchLegProcCur;   // 让位给程序化解算
             // 滑铲仍要脚贴地（仅 Y 固定）；滞空/死亡完全释放。
             float airGate = (s.airborne || s.dead) ? 0f : 1f;
             bool yOnly = s.sliding;   // 滑铲：仅 Y 固定，脚贴地滑行
             // 强制贴地：蹲/滑铲/静止都用持续 IK（低位与非落地帧下基线门控会漏 → 脚嵌地）。
             bool forcePlant = (!s.moving || s.posture == PlayerPosture.Crouch || s.sliding)
                               && !s.airborne && !s.dead;
-            // 静止且转向已收敛 → 脚位取静态基准（T pose 落点随身体姿态旋转）；
-            // 否则取“当前动画踝下方”（保留走路抬脚自由度与滑铲贴地）。
-            bool restPlace = useRestFootPlacement && forcePlant
-                             && !s.moving && !yOnly
-                             && Mathf.Abs(Mathf.DeltaAngle(footLagYaw, aimYaw)) < 1f;
+            // 静止且未移动 → 脚位取静态基准（T pose 落点），并由 footLagYaw 的滞后量做
+            // **反向公转**（见 StepFoot）→ 这就是"下半身滞后"的来源：躯干已即时转向，
+            // 脚仍留在原世界位置，腿被拧着；脚锚随后追上，拧劲解开（挪步）。
+            //
+            // **不能**在这里再用"滞后已收敛(lag<1°)"当门控：反向公转只在 restPlace=true
+            // 时执行，而转身过程中 lag 必然非零 —— 两者互为条件，等于把整个滞后机制
+            // 短路掉（脚会随身体一起立刻转，看不出任何滞后）。保持"静止即用静态基准"。
+            bool restPlace = useRestFootPlacement && forcePlant && !s.moving && !yOnly;
             footPlantL = StepFoot(footTipL, footTargetL, thighBoneL, footRestOffsetL, cap * airGate,
                                   yOnly, forcePlant, restPlace, dt, ref minAnkleL, ref footWeightL, footIKL);
             footPlantR = StepFoot(footTipR, footTargetR, thighBoneR, footRestOffsetR, cap * airGate,
@@ -722,13 +762,11 @@ namespace HagenDa.Soldier
             float capWeight, bool yOnly, bool forcePlant, bool restPlace, float dt,
             ref float minAnkle, ref float weightCur, TwoBoneIKConstraint ik)
         {
-            if (ik != null)
+            if (tip == null || target == null)
             {
-                float w = Mathf.MoveTowards(weightCur, capWeight, footWeightSpeed * dt);
-                weightCur = w;
-                ik.weight = w;
+                if (ik != null) { weightCur = 0f; ik.weight = 0f; }
+                return 0f;
             }
-            if (tip == null || target == null) return 0f;
 
             // ---- 门控（触地程度）：最低踝高基线，自适应标定 + 极慢回弹适应坡面。
             //      静止/蹲/滑铲强制触地（forcePlant，覆盖基线门控）。----
@@ -737,6 +775,18 @@ namespace HagenDa.Soldier
             else minAnkle = Mathf.MoveTowards(minAnkle, rel, dt * 0.05f);
             float t = (rel - (minAnkle + footPlantBand)) / Mathf.Max(0.01f, footLiftBand - footPlantBand);
             float plant = forcePlant ? 1f : Mathf.Clamp01(1f - t);
+
+            // ---- IK 权重 = 上限 × 触地程度：**脚落地才开 IK、抬脚就关**（PHASE14 约定）。
+            //      门控值此前只被记录、未参与权重 → 移动中 IK 是恒定软钉（"间歇性触地"的观感
+            //      其实来自 0.15 权重本身）。乘上 plant 后：触地相 ≈ cap、摆动相 → 0（纯剪辑）。
+            //      静止/蹲/滑铲 forcePlant=1 → 权重恒 = cap（持续贴地）。
+            if (ik != null)
+            {
+                float want = capWeight * plant;
+                float w = Mathf.MoveTowards(weightCur, want, footWeightSpeed * dt);
+                weightCur = w;
+                ik.weight = w;
+            }
 
             // ---- 目标 XZ 来源 ----
             Vector3 ankle = tip.position;
@@ -833,6 +883,80 @@ namespace HagenDa.Soldier
             // 此处不得再重写模型根 —— 否则会对 rig 作业解算结果二次施加蹲/趴位移
             //（实测"蹲下手到胯部/脚卡地里"的根因）。
             ApplyProceduralRig();
+            ApplyCrouchWalkLegs();
+        }
+
+        // ---------------------------------------------------------------
+        // 蹲走腿部（程序化两骨 IK）
+        // ---------------------------------------------------------------
+
+        /// <summary>
+        /// 蹲走时替代 TwoBoneIKConstraint 解算腿部。
+        ///
+        /// 为什么必须程序化（实测）：约束的 IK 目标 XZ 取自 `tip.position`，而 tip 就是
+        /// 约束**上一帧的输出**。权重=1 时“目标XZ = 上一帧落点”构成不动点 —— 剪辑把脚
+        /// 送到哪都没用，脚被钉住：蹲走步幅 0.767→0.031m、大腿摆动 54°→6°、小腿 75°→5°。
+        /// 站姿只有 0.15 权重才侥幸保留步幅（85% 由剪辑驱动）。
+        ///
+        /// 本函数在 LateUpdate 运行（动画相位之后、约束已按降权后的权重解算完），
+        /// 此时把脚约束权重压到 ~0 → **读到的是干净的剪辑姿态**，于是：
+        ///   - 目标 XZ = 剪辑踝位 XZ            → 步幅与大腿/小腿前后摆动完全保留（不钉腿）
+        ///   - 目标 Y   = 地面 + 踝高 + 抬脚量  → 不穿地；抬脚量取“剪辑踝相对本周期最低点的
+        ///                抬升”，把剪辑自带的抬脚抬回地面以上（蹲下时剪辑脚整体在地面之下）
+        /// 触地/抬脚因此天然分离：触地相抬脚量≈0 → 脚钉在地面；抬脚相抬脚量>0 → 脚离地。
+        /// </summary>
+        private void ApplyCrouchWalkLegs()
+        {
+            float w = crouchLegProcCur;
+            if (w <= 0.001f)
+            {
+                minCrouchAnkleL = minCrouchAnkleR = float.MaxValue;
+                return;
+            }
+            SolveCrouchFoot(footIKL, footTargetL, footTipL, ref minCrouchAnkleL, w);
+            SolveCrouchFoot(footIKR, footTargetR, footTipR, ref minCrouchAnkleR, w);
+        }
+
+        private void SolveCrouchFoot(TwoBoneIKConstraint ik, Transform target, Transform tip,
+            ref float minAnkleRel, float w)
+        {
+            if (ik == null || target == null || tip == null) return;
+            Transform hip = ik.data.root, mid = ik.data.mid;
+            if (hip == null || mid == null) return;
+
+            // 干净剪辑踝位（约束权重已被压到 ~0）。
+            Vector3 ankle = tip.position;
+            float entityY = entityRoot != null ? entityRoot.position.y : transform.position.y;
+
+            // 本周期最低踝高基线（自适应坡面），抬脚量 = 相对该基线的抬升。
+            float rel = ankle.y - entityY;
+            if (rel < minAnkleRel) minAnkleRel = rel;
+            else minAnkleRel = Mathf.MoveTowards(minAnkleRel, rel, Time.deltaTime * 0.05f);
+
+            // 地面：从实体高度上方垂直下探（剪辑踝此时可能在地面以下，不能从踝起射）。
+            Vector3 probe = new Vector3(ankle.x, entityY + 0.6f, ankle.z);
+            if (!ProbeGround(probe, 2f, out var hit) || hit.collider == null) return;
+
+            float lift = Mathf.Clamp((rel - minAnkleRel) * crouchLiftGain, 0f, crouchLiftMax);
+            float baseH = Mathf.Lerp(footHeight, footHeightProne, proneCur);
+            target.position = new Vector3(ankle.x, hit.point.y + baseH + lift, ankle.z);
+
+            // 弯曲平面：用**身体前向的水平分量**当 pole —— 膝必须朝前弯，这是一个固定、
+            // 不随脚位变化的选择，解算出的膝永远落在矢状面前侧同一分支上。
+            // **不要**用剪辑膝或静态 Hint 点：蹲姿下它们可能与“胯->踝”轴近共线，
+            // pole 退化会使膝瞬间翻到另一侧（实测小腿摆幅 234°，物理不可能）。
+            Vector3 poleDir = entityRoot != null ? entityRoot.forward : transform.forward;
+            poleDir.y = 0f;
+            if (poleDir.sqrMagnitude < 1e-6f) poleDir = Vector3.forward;
+            SolveLimb(hip, mid, tip, target, poleDir, w);
+
+            // 脚掌朝向**不动** —— 沿用剪辑姿态。
+            // 烘焙时 FootIK 的 rotationWeight=0（见 SoldierRigBaker），即设计上脚 IK 只管
+            // 位置、朝向交给动画；SolveLimb 结束时也已把 tip.rotation 还原为本帧动画值。
+            // 曾在此**直接写 tip.rotation = LookRotation(fwd, groundNormal)**：那是往真实
+            // 骨骼上写，而 DEF-foot 的局部轴不是"趾尖朝 +Z"（Blender 导出、rest 带 270° 翻转），
+            // 结果脚底被翻转到朝上（用户实测截图）。目标 Transform 的 rotation 在
+            // rotationWeight=0 时是惰性的，所以别处那样写没事，这里写 tip 就有事。
         }
 
         // ---------------------------------------------------------------
@@ -934,11 +1058,27 @@ namespace HagenDa.Soldier
                     Vector3 aimDir = eye.forward;
                     if (aimDir.sqrMagnitude < 1e-6f) aimDir = Vector3.forward;
                     aimDir.Normalize();
+                    // 冲刺**不跟随相机俯仰**(收枪抱在身前,视线上下扫时枪不跟着点头)：
+                    // 绕柱面滑动的方向把俯仰分量按 sprintBlend 淡出 → 冲刺时枪托停在固定高度。
+                    // 腰射(sprintBlend=0)保持全俯仰跟随(此前已确认需求:枪俯仰=相机俯仰)。
+                    Vector3 cylAim = PitchLockedAim(aimDir, sprintBlend);
+                    // 冲刺偏移也必须用**去俯仰**的基（见下）：若用 eye.forward/eye.up，
+                    // 相机俯仰会改变枪托沿枪管轴/竖直方向的位置 → BlendedAimRotation 里
+                    // (SprintAim − 枪位) 的方向随之摆动 → 枪的**水平**朝向被俯仰带偏。
+                    // 实测枪 yaw 相对相机有 ±3.3° 起伏、与相机俯仰同相（"水平跟随不同步"真因）。
+                    // 横向用 eye.right：yaw+pitch 分解下 right 恒在水平面内（pitch 绕 right 转），
+                    // 本就与俯仰无关且不会退化；高度用世界 up；后撤用水平前向。
+                    Vector3 flatFwd = new Vector3(aimDir.x, 0f, aimDir.z);
+                    if (flatFwd.sqrMagnitude < 1e-6f)
+                        flatFwd = entityRoot != null ? entityRoot.forward : Vector3.forward;
+                    flatFwd.y = 0f;
+                    if (flatFwd.sqrMagnitude < 1e-6f) flatFwd = Vector3.forward;
+                    flatFwd.Normalize();
                     float radius = hipOrbitRadius > 0f ? hipOrbitRadius : CylinderWorldRadius(gunCylinder);
-                    Vector3 stockTarget = gunCylinder.position + aimDir * radius
+                    Vector3 stockTarget = gunCylinder.position + cylAim * radius
                         + eye.right * (sprintLateralOffset * sprintBlend)
-                        + eye.up * (sprintHeightOffset * sprintBlend)
-                        - eye.forward * (sprintDropback * sprintBlend);
+                        + Vector3.up * (sprintHeightOffset * sprintBlend)
+                        - flatFwd * (sprintDropback * sprintBlend);
                     pos = SolveStockOnCylinder(stockTarget);
                 }
                 else
@@ -982,6 +1122,21 @@ namespace HagenDa.Soldier
         }
 
         private Vector3 _barrelWorldDir = Vector3.forward;
+
+        /// <summary>调试：枪管世界朝向的水平角（度）。</summary>
+        public float GunBarrelYawDebug => _barrelWorldDir.sqrMagnitude > 1e-6f
+            ? Quaternion.LookRotation(_barrelWorldDir, Vector3.up).eulerAngles.y : 0f;
+
+        /// <summary>调试：枪管世界朝向的俯仰角（度，正=向下）。</summary>
+        public float GunBarrelPitchDebug
+        {
+            get
+            {
+                if (_barrelWorldDir.sqrMagnitude < 1e-6f) return 0f;
+                float p = Quaternion.LookRotation(_barrelWorldDir, Vector3.up).eulerAngles.x;
+                return p > 180f ? p - 360f : p;
+            }
+        }
 
         /// <summary>
         /// 本帧腰射瞄准目标该放多远（= aimTargetDistance）。
@@ -1066,11 +1221,26 @@ namespace HagenDa.Soldier
             float w = Mathf.Clamp01(sprintBlend);
             if (w <= 0.0001f || sprintAimSource == null) return hipRot;
 
+            // 冲刺朝向**俯仰锁定**：只取水平分量 → 枪管保持水平,不随相机俯仰点头。
             Vector3 sprintDir = sprintAimSource.position - fromPos;
-            if (sprintDir.sqrMagnitude < 1e-6f) return hipRot;
-            Quaternion sprintRot = Quaternion.LookRotation(sprintDir.normalized, Vector3.up);
+            Vector3 sprintFlat = new Vector3(sprintDir.x, 0f, sprintDir.z);
+            if (sprintFlat.sqrMagnitude < 1e-6f) return hipRot;
+            Quaternion sprintRot = Quaternion.LookRotation(sprintFlat.normalized, Vector3.up);
 
             return w >= 0.9999f ? sprintRot : Quaternion.Slerp(hipRot, sprintRot, w);
+        }
+
+        /// <summary>按 t 把方向的俯仰分量淡出（t=0 全跟随, t=1 水平）。</summary>
+        private static Vector3 PitchLockedAim(Vector3 dir, float t)
+        {
+            float k = Mathf.Clamp01(t);
+            Vector3 flat = new Vector3(dir.x, 0f, dir.z);
+            // 视线接近正上/正下时水平分量退化：无法定义“水平朝向”，保持原方向。
+            if (flat.sqrMagnitude < 1e-6f) return dir;
+            flat.Normalize();
+            if (k <= 0.0001f) return dir;
+            if (k >= 0.9999f) return flat;
+            return Vector3.Slerp(dir, flat, k).normalized;
         }
 
         /// <summary>柱面世界半径：优先取 GunCylinder 上的 Collider 尺寸，其次用 lossyScale。</summary>

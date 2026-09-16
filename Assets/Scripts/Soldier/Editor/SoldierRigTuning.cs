@@ -34,6 +34,13 @@ namespace HagenDa.Soldier.EditorTools
         public const float BodyPivotHeight = 0f;          // 0 = 运行时自动取腹部/骨盆高度
         public const bool UseRestFootPlacement = true;
         public const float FootHeightProne = 0.03f;
+        // 蹲姿（含蹲行）脚 IK 权重上限：满权重，全程触地。蹲下时模型根下沉
+        // crouchOffset(-0.5m) 而剪辑仍是站立高度 → 沿用移动上限 0.15 会让脚穿地 ~0.44m。
+        public const float FootIKCapCrouch = 1f;
+        // 蹲走程序化腿部解算（约束的 IK 目标取自自身输出会把脚钉死：步幅 0.767→0.031m）
+        public const bool UseCrouchWalkLegs = true;
+        // 蹲走抬脚量上限（摆动幅度上限；目标 Y 是绝对值，不靠它补偿蹲降量）
+        public const float CrouchLiftMax = 0.35f;
         public const float SprintLateralOffset = -0.07f;
         public const float SprintHeightOffset = 0f;
         public const float SprintDropback = 0.06f;
@@ -79,6 +86,9 @@ namespace HagenDa.Soldier.EditorTools
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.proneBellyTarget), BellyTarget, force, ref w, ref s, log);
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.useRestFootPlacement), UseRestFootPlacement, force, ref w, ref s, log);
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.footHeightProne), FootHeightProne, force, ref w, ref s, log);
+                    Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.footIKCapCrouch), FootIKCapCrouch, force, ref w, ref s, log);
+                    Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.useCrouchWalkLegs), UseCrouchWalkLegs, force, ref w, ref s, log);
+                    Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.crouchLiftMax), CrouchLiftMax, force, ref w, ref s, log);
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.sprintLateralOffset), SprintLateralOffset, force, ref w, ref s, log);
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.sprintHeightOffset), SprintHeightOffset, force, ref w, ref s, log);
                     Fill(drv, probeDrv, FatuiPath, nameof(SoldierRigDriver.sprintDropback), SprintDropback, force, ref w, ref s, log);
