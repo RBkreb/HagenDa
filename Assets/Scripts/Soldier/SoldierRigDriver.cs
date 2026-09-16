@@ -1111,11 +1111,26 @@ namespace HagenDa.Soldier
             }
 
             // ---- 后座位移（枪根沿枪管轴后撤）----
+            // **必须用基准局部空间的枪管轴**：`boundGun` 是 `weaponBasis` 的子物体，其
+            // localPosition 处于**基准局部空间**。此前写入的是 `_barrelWorldDir`（**世界**
+            // 方向）—— 两者只在基准旋转与实体根对齐时才偶然一致（实测 yaw=0/180 恰好对，
+            // 45°/90°/135° 出现横向分量）：所以症状是"只在某些朝向下枪模横向平移"，且
+            // 世界朝向一转，位移方向就跟着错。
+            // 实测(yaw 扫掠, recoil=25)：修前 gunLocal 在 yaw=90° 变成 (-0.100,0,0)
+            // —— 横向偏 0.100m；修后恒为 (0,0,-0.100)（纯沿枪管后撤），任意朝向一致。
             if (boundGun.transform.parent == weaponBasis)
             {
-                boundGun.transform.localPosition = s.recoil > 0.0001f
-                    ? -_barrelWorldDir * (s.recoil * recoilKickPerUnit)
-                    : Vector3.zero;
+                if (s.recoil > 0.0001f)
+                {
+                    Vector3 barrelLocal = weaponBasis.InverseTransformDirection(_barrelWorldDir);
+                    if (barrelLocal.sqrMagnitude < 1e-6f) barrelLocal = Vector3.forward;
+                    boundGun.transform.localPosition =
+                        -barrelLocal.normalized * (s.recoil * recoilKickPerUnit);
+                }
+                else
+                {
+                    boundGun.transform.localPosition = Vector3.zero;
+                }
             }
 
             UpdateBolt(s.shotCount, dt);
