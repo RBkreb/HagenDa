@@ -2,7 +2,7 @@
 
 > 对局装配中间层使用文档。三份资产 + 一个菜单,把完整对局(FSM AI、计分据点、部署、真人席位)装配到任意场景,并支持**移动的据点与安全区**。
 >
-> 涉及代码:`Assets/Scripts/Network/Match/`(MatchConfig / MapDefinition / Editor/MatchSceneBuilder)、`Assets/Scripts/Network/MovingZone.cs`、`NetworkMatchManager.cs`。
+> 涉及代码:`Assets/Game/Scripts/Network/Match/`(MatchConfig / MapDefinition / Editor/MatchSceneBuilder)、`Assets/Game/Scripts/Network/MovingZone.cs`、`NetworkMatchManager.cs`。
 
 ---
 
@@ -18,7 +18,7 @@
 
 | 地图类型 | 构建目标 | 前提 |
 |---|---|---|
-| `Procedural`(程序生成) | 新建空场景 `Assets/Scenes/<配置名>.scene`,自动生成地板/围墙/种子掩体 | 无 |
+| `Procedural`(程序生成) | 新建空场景 `Assets/Game/Scenes/<配置名>.scene`,自动生成地板/围墙/种子掩体 | 无 |
 | `SceneReference`(FBX) | 构建进**当前打开的场景**并保存 | 地图根对象已在场景中,场景已保存过 |
 
 > 装配是**幂等**的:可反复重跑。SceneReference 模式会先清理旧对局对象(按组件识别,不会误删地图几何)。
@@ -125,7 +125,7 @@
 12. 生成 FSM AI 两队(锚点 GR 中心周围网格驻扎,出生高度 = GR 地面 + 1.5)。
 13. 保存场景。
 
-## 6. 示例资产(`Assets/Scripts/Network/Match/`)
+## 6. 示例资产(`Assets/Game/Scripts/Network/Match/`)
 
 | 资产 | 说明 |
 |---|---|

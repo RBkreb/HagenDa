@@ -60,94 +60,98 @@
   </PropertyGroup>
   <ItemGroup>
     <Analyzer Include="C:\Users\m1806\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.3.1\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="D:\HagenTa\HagenDa\Assets\ThirdParty\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll" />
+    <Analyzer Include="D:\HagenTa\HagenDa\Assets\ThirdParty\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll" />
+    <Analyzer Include="D:\HagenTa\HagenDa\Assets\ThirdParty\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll" />
+    <Analyzer Include="D:\HagenTa\HagenDa\Assets\ThirdParty\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll" />
     <Analyzer Include="D:\HagenTa\HagenDa\Library\PackageCache\cn.tuanjie.infinity@1.5.0\CodeGen\ECS\Tuanjie.Mosaic.SourceGenerator.dll" />
     <Analyzer Include="E:\Unity3D\2022.3.62t12\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="E:\Unity3D\2022.3.62t12\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Mirror\Core\Tools\CustomStructs\Vector4Byte.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\CustomStructs\Vector3SByte.cs" />
-    <Compile Include="Assets\Mirror\Core\RemoteCalls.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkClient_TimeInterpolation.cs" />
-    <Compile Include="Assets\Mirror\Core\Batching\Unbatcher.cs" />
-    <Compile Include="Assets\Mirror\Core\Threading\ThreadLog.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkManager.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\Extensions.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkBehaviour.cs" />
-    <Compile Include="Assets\Mirror\Core\SnapshotInterpolation\SnapshotInterpolationSettings.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkIdentity.cs" />
-    <Compile Include="Assets\Mirror\Core\Batching\Batcher.cs" />
-    <Compile Include="Assets\Mirror\Core\LagCompensation\HistoryBounds.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\TimeSample.cs" />
-    <Compile Include="Assets\Mirror\Core\SnapshotInterpolation\Snapshot.cs" />
-    <Compile Include="Assets\Mirror\Core\WeaverFuse.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkConnectionToServer.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\CustomStructs\Vector4SByte.cs" />
-    <Compile Include="Assets\Mirror\Core\InterestManagementBase.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkWriterExtensions.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkConnectionToClient.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkWriterPooled.cs" />
-    <Compile Include="Assets\Mirror\Core\ConnectionQuality.cs" />
-    <Compile Include="Assets\Mirror\Core\Threading\ConcurrentNetworkWriterPooled.cs" />
-    <Compile Include="Assets\Mirror\Core\Threading\WorkerThread.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkManagerHUD.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\CustomStructs\Vector2SByte.cs" />
-    <Compile Include="Assets\Mirror\Core\Threading\ConcurrentPool.cs" />
-    <Compile Include="Assets\Mirror\Core\SyncList.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkBehaviourSyncVar.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\CustomStructs\Vector3Long.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\Utils.cs" />
-    <Compile Include="Assets\Mirror\Core\LocalConnectionToServer.cs" />
-    <Compile Include="Assets\Mirror\Core\Transport.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\AccurateInterval.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkServer.cs" />
-    <Compile Include="Assets\Mirror\Core\SyncDictionary.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\CustomStructs\Vector3Byte.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkConnection.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkStartPosition.cs" />
-    <Compile Include="Assets\Mirror\Core\LagCompensation\LagCompensationSettings.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkReaderPool.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\Mathd.cs" />
-    <Compile Include="Assets\Mirror\Core\Attributes.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkTime.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkReaderExtensions.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkClient.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\CustomStructs\Vector2Byte.cs" />
-    <Compile Include="Assets\Mirror\Core\LagCompensation\LagCompensation.cs" />
-    <Compile Include="Assets\Mirror\Core\SyncObject.cs" />
-    <Compile Include="Assets\Mirror\Core\Messages.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkMessage.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\DeltaCompression.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkReader.cs" />
-    <Compile Include="Assets\Mirror\Core\SnapshotInterpolation\TimeSnapshot.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\ExponentialMovingAverage.cs" />
-    <Compile Include="Assets\Mirror\Core\TransportError.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkLoop.cs" />
-    <Compile Include="Assets\Mirror\Core\Prediction\Prediction.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\Pool.cs" />
-    <Compile Include="Assets\Mirror\Core\SnapshotInterpolation\SnapshotInterpolation.cs" />
-    <Compile Include="Assets\Mirror\Core\HostMode.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkMessages.cs" />
-    <Compile Include="Assets\Mirror\Core\Threading\ConcurrentNetworkWriterPool.cs" />
-    <Compile Include="Assets\Mirror\Core\LocalConnectionToClient.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\CustomStructs\Vector4Long.cs" />
-    <Compile Include="Assets\Mirror\Core\LagCompensation\MinMaxBounds.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkDiagnostics.cs" />
-    <Compile Include="Assets\Mirror\Core\InterestManagement.cs" />
-    <Compile Include="Assets\Mirror\Core\PortTransport.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\CustomStructs\Half.cs" />
-    <Compile Include="Assets\Mirror\Core\LagCompensation\Capture.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkWriterPool.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkAuthenticator.cs" />
-    <Compile Include="Assets\Mirror\Core\SyncSet.cs" />
-    <Compile Include="Assets\Mirror\Core\Tools\Compression.cs" />
-    <Compile Include="Assets\Mirror\Core\AssemblyInfo.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkWriter.cs" />
-    <Compile Include="Assets\Mirror\Core\NetworkReaderPooled.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\SnapshotInterpolation\TimeSnapshot.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\CustomStructs\Half.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkReaderExtensions.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\Pool.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\SnapshotInterpolation\SnapshotInterpolationSettings.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkMessages.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\SyncObject.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Prediction\Prediction.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Threading\ConcurrentPool.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\ConnectionQuality.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkManagerHUD.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkBehaviourSyncVar.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkClient_TimeInterpolation.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\CustomStructs\Vector4Long.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\InterestManagement.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkBehaviour.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkStartPosition.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\PortTransport.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\RemoteCalls.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\LagCompensation\MinMaxBounds.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkReaderPool.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkConnection.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkAuthenticator.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkClient.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\InterestManagementBase.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkReaderPooled.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\Utils.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\CustomStructs\Vector3Byte.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\CustomStructs\Vector2Byte.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\TimeSample.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkWriterPool.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkTime.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Attributes.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\LocalConnectionToClient.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkConnectionToClient.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\DeltaCompression.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\LagCompensation\Capture.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\ExponentialMovingAverage.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\SyncSet.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Batching\Batcher.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Threading\ConcurrentNetworkWriterPool.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkWriter.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkServer.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\LagCompensation\LagCompensation.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\LagCompensation\LagCompensationSettings.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Transport.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\SnapshotInterpolation\Snapshot.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkIdentity.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\AccurateInterval.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\Compression.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\SyncDictionary.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\Extensions.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkConnectionToServer.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkWriterExtensions.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkDiagnostics.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\LagCompensation\HistoryBounds.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\AssemblyInfo.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\CustomStructs\Vector3SByte.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Batching\Unbatcher.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\SnapshotInterpolation\SnapshotInterpolation.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Messages.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\LocalConnectionToServer.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\HostMode.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkReader.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Threading\ThreadLog.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkLoop.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\CustomStructs\Vector2SByte.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\TransportError.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Threading\WorkerThread.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\CustomStructs\Vector3Long.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\WeaverFuse.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\Mathd.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkWriterPooled.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkManager.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\CustomStructs\Vector4SByte.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\SyncList.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\NetworkMessage.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Tools\CustomStructs\Vector4Byte.cs" />
+    <Compile Include="Assets\ThirdParty\Mirror\Core\Threading\ConcurrentNetworkWriterPooled.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Mirror\Core\Mirror.asmdef" />
-    <None Include="Assets\Mirror\Core\Tools\Readme.txt" />
+    <None Include="Assets\ThirdParty\Mirror\Core\Mirror.asmdef" />
+    <None Include="Assets\ThirdParty\Mirror\Core\Tools\Readme.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -519,7 +523,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.CecilX">
-      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll</HintPath>
+      <HintPath>Assets\ThirdParty\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis">
@@ -527,7 +531,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.CecilX.Mdb">
-      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
+      <HintPath>Assets\ThirdParty\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.IO.Abstractions">
@@ -555,11 +559,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Mirror.BouncyCastle.Cryptography">
-      <HintPath>Assets\Mirror\Transports\Encryption\Plugins\BouncyCastle\Mirror.BouncyCastle.Cryptography.dll</HintPath>
+      <HintPath>Assets\ThirdParty\Mirror\Transports\Encryption\Plugins\BouncyCastle\Mirror.BouncyCastle.Cryptography.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.CecilX.Pdb">
-      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll</HintPath>
+      <HintPath>Assets\ThirdParty\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Reflection.Metadata">
@@ -571,7 +575,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.CecilX.Rocks">
-      <HintPath>Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
+      <HintPath>Assets\ThirdParty\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Interactive.Async">

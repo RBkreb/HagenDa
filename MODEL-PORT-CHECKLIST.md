@@ -3,8 +3,8 @@
 把 Soldier 基础动画系统移植到一个新角色模型（本清单以 **Natlan Soldier** 为目标）需要创建/修改的对象。
 所有名字都是**代码里的硬编码字面量**（不是约定俗成的叫法），必须逐字一致。
 
-参考基准：`Assets/Model/Fatui/Fatui with Collider.prefab`（已完成）+ `Assets/Scripts/Network/Prefabs/NetworkPlayer.prefab`
-目标：`Assets/Model/natlan/Natlan Soldier FBX with collider.prefab`
+参考基准：`Assets/Game/Characters/Fatui/Fatui with Collider.prefab`（已完成）+ `Assets/Game/Prefabs/NetworkPlayer.prefab`
+目标：`Assets/Game/Characters/natlan/Natlan Soldier FBX with collider.prefab`
 
 图例：**必须** = 缺了功能坏掉/报错；**推荐** = 缺了会退化到不明显但更差的回退路径；*(自动)* = 运行时/烘焙脚本会自己建，不用手放。
 
@@ -254,9 +254,9 @@ Natlan 按自己头围调到世界半径 ≈ 0.10–0.12 即可。
 
 | 资产 | 路径与设置 |
 |---|---|
-| Controller | `Assets/Scripts/Soldier/SoldierLoco.controller`（用 `HagenDa/SoldierAnim/Bake Soldier Controller` 生成） |
-| 下半身遮罩 | `Assets/Scripts/Network/Animation/LowerBody.mask` |
-| 上半身遮罩 | `Assets/Scripts/Network/Animation/UpperBody.mask` |
+| Controller | `Assets/Game/Scripts/Soldier/SoldierLoco.controller`（用 `HagenDa/SoldierAnim/Bake Soldier Controller` 生成） |
+| 下半身遮罩 | `Assets/Game/Animation/LowerBody.mask` |
+| 上半身遮罩 | `Assets/Game/Animation/UpperBody.mask` |
 | Animator | `applyRootMotion = false`（Humanoid 剪辑即使关根运动也会重写模型根 localPosition） |
 
 Natlan 当前用的是旧的 `NetworkSoldierLayers` —— **要换成 `SoldierLoco`**。

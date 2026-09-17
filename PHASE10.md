@@ -1,5 +1,5 @@
 # 主目标：多模态LLM指挥官系统
-> **状态：已完成（2026-08-27）**。实现位于 `Assets/Scripts/Network/Commander/`，装配菜单 `HagenDa/Setup Commander System`（注入 FSMBattle 场景），冒烟测试 `HagenDa/Commander/Test LLM Endpoint`。运行日志：`Logs/Commander/*.jsonl` + `snapshots/`。
+> **状态：已完成（2026-08-27）**。实现位于 `Assets/Game/Scripts/Network/Commander/`，装配菜单 `HagenDa/Setup Commander System`（注入 FSMBattle 场景），冒烟测试 `HagenDa/Commander/Test LLM Endpoint`。运行日志：`Logs/Commander/*.jsonl` + `snapshots/`。
 >
 > 实现决策（三轮访谈定案）：后端仅 LM Studio localhost:1234 / minicpm-v-4_6（自写 OpenAI 兼容 REST 客户端；LLM for Unity 保留安装但不使用）；红蓝双方各一个独立指挥官；单飞轮次+5s最小间隔+20轮滚动记忆（丢弃轮仍入JSONL）；输出=analysis+原生tool_calls（≤8次迭代）；wait工具5–120s替换30s空闲节奏；开局门控全员冻结、双方部署完成或300s超时退化后才开战（一次催促）；炮击零友伤且击杀己方+1分；网格坐标系原点=西北角(0,0)与快照标尺一致。
 
