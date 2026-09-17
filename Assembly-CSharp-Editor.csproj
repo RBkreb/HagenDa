@@ -83,21 +83,30 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Game\Scripts\Network\Editor\BuildScript.cs" />
-    <Compile Include="Assets\Game\Scripts\Soldier\Editor\SoldierRigTuning.cs" />
-    <Compile Include="Assets\Game\Scripts\Soldier\Editor\SoldierRigBaker.cs" />
+    <Compile Include="Assets\Game\Scripts\Animation\RigDriver\Editor\SoldierRigBaker.cs" />
+    <Compile Include="Assets\Game\Scripts\Network\Editor\Builders\PhaseSceneBuilder.cs" />
+    <Compile Include="Assets\Game\Scripts\Network\Editor\EditorScenePrimitives.cs" />
+    <Compile Include="Assets\Game\Scripts\Network\Editor\EditorPrefabFactory.cs" />
+    <Compile Include="Assets\Game\Scripts\Network\Editor\Builders\TrainingSceneBuilder.cs" />
+    <Compile Include="Assets\Game\Scripts\Animation\Showcase\Editor\NailongClipGen.cs" />
+    <Compile Include="Assets\Game\Scripts\Animation\Showcase\Editor\NailongRigSetup.cs" />
+    <Compile Include="Assets\Game\Scripts\Network\Editor\Builders\BattleSceneBuilder.cs" />
+    <Compile Include="Assets\Game\Scripts\Animation\RigGraph\Editor\SoldierLocomotionTuner.cs" />
+    <Compile Include="Assets\Game\Scripts\Animation\Showcase\Editor\HandGripRigBuilder.cs" />
     <Compile Include="Assets\Game\Scripts\Network\Match\Editor\MatchSceneBuilder.cs" />
-    <Compile Include="Assets\Game\Scripts\Animation\Rigging\Editor\SoldierLocomotionTuner.cs" />
-    <Compile Include="Assets\Game\Scripts\Animation\Rigging\Editor\FatuiRigBuilder.cs" />
+    <Compile Include="Assets\Game\Scripts\Network\Editor\Builders\MultiplayerSceneBuilder.cs" />
+    <Compile Include="Assets\Game\Scripts\Animation\RigDriver\Editor\SoldierAssembly.cs" />
+    <Compile Include="Assets\Game\Scripts\Network\Editor\NetworkSetupPaths.cs" />
     <Compile Include="Assets\Game\Scripts\Network\Commander\Editor\CommanderSetup.cs" />
+    <Compile Include="Assets\Game\Scripts\Animation\RigGraph\Editor\FatuiRigBuilder.cs" />
     <Compile Include="Assets\ScriptTemplates\Editor\MoveToAssetsFolder.cs" />
     <Compile Include="Assets\Game\Scripts\Network\Commander\Editor\CommanderSmokeTest.cs" />
-    <Compile Include="Assets\Game\Scripts\Animation\Rigging\Editor\HandGripRigBuilder.cs" />
-    <Compile Include="Assets\Game\Scripts\Soldier\Editor\SoldierControllerBaker.cs" />
-    <Compile Include="Assets\Game\Scripts\Soldier\Editor\SoldierAssembly.cs" />
-    <Compile Include="Assets\Game\Scripts\Network\Editor\NailongRigSetup.cs" />
+    <Compile Include="Assets\Game\Scripts\Animation\RigDriver\Editor\SoldierControllerBaker.cs" />
+    <Compile Include="Assets\Game\Scripts\Network\Editor\EditorSoldierModelFactory.cs" />
+    <Compile Include="Assets\Game\Scripts\Vfx\Editor\InfinityVfxFactory.cs" />
+    <Compile Include="Assets\Game\Scripts\Network\Editor\EditorEquipmentFactory.cs" />
     <Compile Include="Assets\ThirdParty\ParticlePack\UnionAssetes\Particle\ParticleScaler\Editor\ParticleScaleEditor.cs" />
-    <Compile Include="Assets\Game\Scripts\Network\Editor\NailongClipGen.cs" />
-    <Compile Include="Assets\Game\Scripts\Effects\Editor\InfinityVfxFactory.cs" />
+    <Compile Include="Assets\Game\Scripts\Animation\RigDriver\Editor\SoldierRigTuning.cs" />
     <Compile Include="Assets\Game\Scripts\Network\Editor\NetworkSetup.cs" />
   </ItemGroup>
   <ItemGroup>

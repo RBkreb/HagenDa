@@ -26,14 +26,71 @@ Repo root holds code-integration and tooling dirs (`ProjectSettings/`, `Packages
 
 Prefabs/materials/data used to sit *inside* `Assets/Scripts/`; they now live in the typed `Assets/Game/` folders. Moving any asset is safe **only** via `AssetDatabase.MoveAsset` (or the Unity editor) because references are GUID-based — moving `.meta` files by hand or via git can still work, but a bare file copy that drops the `.meta` breaks every reference.
 
+## Script layout (`Assets/Game/Scripts/`)
+
+There are **no assembly definitions** — every first-party script compiles into
+`Assembly-CSharp`, so folder placement is purely organisational and a `.cs` can be
+moved freely as long as its `.cs.meta` moves with it. Folders carry the
+responsibility grouping; namespaces are aligned to them:
+
+```
+Network/
+  Core/        NetworkInputState, IDamageable                     (shared contracts)
+  Player/      NetworkPlayerController, NetworkPlayerHealth, NetworkCombatant, NetworkCombat
+  Combat/      NetworkGun, NetworkBullet, NetworkEquipment, *Definition, Loadout*, hitboxes
+  Throwables/  NetworkThrowable + its 6 subclasses
+  Effects/     NetworkExplosion, NetworkEmpField, NetworkSmoke(+Volume), SpecialCover
+  Deployment/  Deployable*, DeployBeacon, LargeSupplyCrate, NetworkInterceptor, SensorProbe
+  Match/       NetworkMatchManager, CapturePoint, GarrisonZone, StrategicZone, MovingZone,
+               MatchConfig, MapDefinition, Editor/MatchSceneBuilder
+  AI/          Brains/ (3 interchangeable brains)  Perception/  Tactics/  Training/ (ML)
+  Hud/         GameHud, PlayerHud, DebugHud, FSMStatsHud, HudMath, map/head markers
+  Dev/         FreeCamera, MirrorView, AnimationTestAutoDeploy, NetworkShootableTarget
+  Commander/   LLM commander system. See `PHASE10.md` for the design.
+  Editor/      NetworkSetup partials + Builders/ (see below), BuildScript
+Animation/
+  Rigging/     reusable Animation-Rigging constraint jobs — SHARED by both anim impls
+  RigGraph/    animation implementation A (PHASE13): SoldierRigSetup + NetworkSoldierAnimator
+  RigDriver/   animation implementation B (PHASE14, current/live): SoldierRigDriver + SoldierAnimatorDriver
+  Cameras/     AimController, HeadCamFollow, ThirdPersonCam
+  Showcase/    ShowcaseLoopState + Nailong/HandGrip demo builders
+Vfx/           InfinityVfxFactory (battle VFX prefab factory)
+Environment/   TreePhysicsProxy
+```
+
+**Do not "deduplicate" the animation folders.** `RigGraph` and `RigDriver` are two
+deliberate, parallel implementations of the same feature (PHASE13 vs PHASE14), not
+duplicated responsibility. `RigDriver` is the live one (attached to the player/AI
+prefabs and every battle scene); `RigGraph` is retained on purpose. The same applies
+to the three AI brains in `Network/AI/Brains/` — `NetworkAIController` (intent host),
+`FSMAIController` (FSM), `ScriptedAIController` (sparring) are alternative
+implementations selected per scene.
+
+### `Network/Editor/` — the editor toolkit
+
+`NetworkSetup` is a single `static partial` class spread by concern so no file holds
+the whole toolkit. Callers (`MatchSceneBuilder`, etc.) still write
+`NetworkSetup.SomeMember(...)`; only the files changed, not the API.
+
+| File | Contents |
+| --- | --- |
+| `NetworkSetup.cs` | index/shell only — the class overview |
+| `NetworkSetupPaths.cs` | asset path constants; `EnsureFolder`, `EnsureMapLayers`, `EnsureLayerNamed`, scene save/dirty |
+| `EditorScenePrimitives.cs` | spawns, walls, lighting, zones, garrisons, capture points, map geometry, NavMesh |
+| `EditorPrefabFactory.cs` | player, AI-entity, bullet, throwable and deployable prefabs |
+| `EditorEquipmentFactory.cs` | equipment / weapon / loadout assets, persistent materials |
+| `EditorSoldierModelFactory.cs` | soldier model attach, Fatui rig + hitbox bake |
+| `Builders/MultiplayerSceneBuilder.cs` | `HagenDa/Setup Multiplayer Scene`, physics, animation-test, solo FPS, rebuild player |
+| `Builders/TrainingSceneBuilder.cs` | `HagenDa/Create ML Training Scene`, S1 training |
+| `Builders/BattleSceneBuilder.cs` | FSM battle scenes (59 AI, all-support, HGTR, Map_v1) |
+| `Builders/PhaseSceneBuilder.cs` | Phase3/5/6/7/8 and match scenes |
+
 ## Key locations
 
-- `Assets/Game/Scripts/Network/` — all custom runtime scripts (combat, AI, HUD, equipment).
-- `Assets/Game/Scripts/Network/Commander/` — LLM commander system (tool-calling agent, snapshot camera, weapon tasks). See `PHASE10.md` for the design.
-- `Assets/Game/Scripts/Network/Editor/` — editor menu generators (`NetworkSetup.cs`, `BuildScript.cs`).
 - `Assets/Game/Settings/` — scriptable-object configs (e.g. `CommanderConfig.asset`).
 - `Training/config/` — ML-Agents YAML trainer configs.
 - `ML-TRAINING.md`, `ML-STATUS-REPORT.md`, `PHASE*.md` — milestone/phase docs. Read the relevant one before touching ML or commander code.
+- `MODEL-PORT-CHECKLIST.md` — model porting state; `PHASE14.md` — the live animation design.
 
 ## Build & run
 
