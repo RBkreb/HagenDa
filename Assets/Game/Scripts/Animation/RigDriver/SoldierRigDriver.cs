@@ -226,7 +226,8 @@ namespace HagenDa.Animation.RigDriver
         [SerializeField] private Transform footTargetL, footTargetR;
         [SerializeField] private Transform footHintL, footHintR;
         [SerializeField] private Transform driverAimSource;   // 眼位（骨架外，rig 作业可实时读）
-        [SerializeField] private Transform driverAimTarget;   // 相机射线 50m 目标点
+        [SerializeField] private Transform driverAimTarget;   // 相机射线 50m 目标点（**恒=相机指向**）
+        [SerializeField] private Transform gunAimTarget;      // 枪械瞄准目标（腰射=相机 / 冲刺=SprintAim 混合）
         [SerializeField] private Transform headBone;          // DEF-spine.005
         [SerializeField] private Transform headPitchBone;     // DEF-spine.006（俯仰跟随的被约束骨骼）
         [SerializeField] private Transform aimSourceHead;     // 头部骨骼子对象 AimSource（PHASE14 规范节点）
@@ -368,6 +369,24 @@ namespace HagenDa.Animation.RigDriver
             footTargetR = Require(drivers, "Driver_FootTarget_R");
             footHintL = Require(drivers, "Driver_FootHint_L");
             footHintR = Require(drivers, "Driver_FootHint_R");
+
+            // 枪械瞄准目标（与 Driver_AimTarget **分开**）：
+            // 结构约定（用户设计）——
+            //   Driver_AimTarget  **恒等于相机指向**（每帧由眼位+视线方向写入，任何状态下都不被改写）
+            //   Driver_GunAimTarget 枪械瞄准目标：腰射=相机指向；冲刺=SprintAim 方向（脚本 Slerp 混合）
+            // 腰射时枪械由 Driver_AimTarget 约束、冲刺时由 SprintAim 约束；头部俯仰跟随读
+            // Driver_AimTarget（恒=相机），故冲刺收枪不会再带动头部。
+            // 旧实现在冲刺时把 Driver_AimTarget 本身改写成侧向点（实测偏离相机 94°）→ 头部跟着甩。
+            if (gunAimTarget == null)
+            {
+                gunAimTarget = drivers.Find("Driver_GunAimTarget");
+                if (gunAimTarget == null)
+                {
+                    var go = new GameObject("Driver_GunAimTarget");
+                    go.transform.SetParent(drivers, false);
+                    gunAimTarget = go.transform;
+                }
+            }
 
             headBone = FindDeep(modelRoot, "DEF-spine.005");
             if (headBone == null && animator.isHuman)
@@ -561,8 +580,9 @@ namespace HagenDa.Animation.RigDriver
         /// 胶囊实体根 -> [角色模型 + 枪械基准(同级)] -> 枪模。本方法：
         ///  1. 双手 TwoBoneIK 目标 = RearGrip(右)/BarrelGrip(左)，HandGrip 握把胶囊换绑；
         ///  2. 枪相对基准的对齐旋转（基准本地 +Z = 枪管轴），使基准 AimConstraint 生效；
-        ///  3. 确保枪基准 AimConstraint（源=Driver_AimTarget）与枪自身 SprintAim
-        ///     AimConstraint（源=人物子对象 SprintAim）存在（默认停用，按三态切换）。
+        ///  3. 确保枪基准 AimConstraint（源=Driver_GunAimTarget：腰射=相机点/冲刺=SprintAim 方向）
+        ///     与枪自身 SprintAim AimConstraint（源=人物子对象 SprintAim）存在
+        ///     （默认停用，按三态切换）。
         /// </summary>
         public bool BindWeapon(GameObject gun)
         {
@@ -655,14 +675,16 @@ namespace HagenDa.Animation.RigDriver
             gunAlignRot = Quaternion.Inverse(Quaternion.LookRotation(gunAimLocalAxis, gunAimLocalUp));
             gun.transform.localRotation = gunAlignRot;
 
-            // 枪基准 AimConstraint：源=Driver_AimTarget（相机射线 50m 目标点）。
-            // 默认 aimVector=本地 +Z、worldUpType=Vector/(0,1,0)，配合枪对齐旋转即所需。
+            // 枪基准 AimConstraint：源 = **Driver_GunAimTarget**（枪械瞄准目标，与相机目标分离）。
+            // 腰射时该点=相机射线 50m 点（脚本按相机写入）→ 等效“枪由 Driver_AimTarget 约束”；
+            // 冲刺时该点=沿 SprintAim 方向（脚本 Slerp 混合）→ 等效“枪由 SprintAim 约束”。
+            // 这样 Driver_AimTarget 保持纯相机语义（头部俯仰跟随它），不再被冲刺改写。
             if (basisAim == null) basisAim = weaponBasis.GetComponent<AimConstraint>();
             if (basisAim == null) basisAim = weaponBasis.gameObject.AddComponent<AimConstraint>();
             basisAim.constraintActive = false;
             basisAim.SetSources(new System.Collections.Generic.List<ConstraintSource>
             {
-                new ConstraintSource { sourceTransform = driverAimTarget, weight = 1f }
+                new ConstraintSource { sourceTransform = gunAimTarget, weight = 1f }
             });
 
             // 枪自身 AimConstraint：源=人物子对象 SprintAim（冲刺三态）。
@@ -788,6 +810,9 @@ namespace HagenDa.Animation.RigDriver
 
             // ---- 瞄准源/目标点（模型根写定之后再写世界位姿：枪基准 AimConstraint
             //      与 UpperAim 都读它们；本帧内根变换不再变动，位姿精确）----
+            // **Driver_AimTarget 恒=相机指向**：每帧无条件写成“眼位 + 视线×距离”，
+            // 任何状态（腰射/冲刺/ADS）都不再改写它 —— 头部俯仰跟随（MultiAim→该点）
+            // 因此永远只反映相机。枪械的冲刺朝向改由 Driver_GunAimTarget 承担（见下）。
             if (driverAimSource != null)
             {
                 driverAimSource.position = s.eyePos;
@@ -1136,18 +1161,24 @@ namespace HagenDa.Animation.RigDriver
         // ---------------------------------------------------------------
 
         /// <summary>
-        /// 三态切换（约束启停 + 基准位姿）：
-        ///  - 腰射：枪基准 AimConstraint 启用（源=相机射线 50m 点），基准位置=
-        ///    AimSource∘持枪偏移（右前胸）；枪自身 SprintAim 约束停用。
-        ///  - 瞄准：两约束全停；直解基准位姿使 RearAim 与 SightAim 同时落在相机
-        ///    射线上（瞳距沿枪管轴后移 adsEyeRelief，可调）；按 aimAmount 从腰射过渡。
-        ///  - 冲刺：枪基准停用；枪自身 AimConstraint（源=SprintAim）启用；
-        ///    摆枪（局部 X）由 SprintAim 节点自身振荡实现（约束跟随，无写冲突）。
+        /// 三态切换（约束源 + 基准位姿）。
+        ///
+        /// **结构约定（用户设计）**：
+        ///   Driver_AimTarget   恒跟随**相机指向**（每帧无条件写入，任何状态都不改写）
+        ///   Driver_GunAimTarget 枪械瞄准目标：腰射=相机指向；冲刺=SprintAim 方向
+        /// 于是等价于“腰射：枪由 Driver_AimTarget 约束；冲刺：枪由 SprintAim 约束”，
+        /// 而 Driver_AimTarget 始终是纯相机语义 → 头部俯仰跟随不会因收枪而跑偏。
+        ///
+        ///  - 腰射：枪基准 AimConstraint 启用（源=gunAimTarget≈相机点）；SprintAim 约束停用。
+        ///  - 瞄准：基准停用；直解基准位姿使 RearAim 与 SightAim 同时落在相机射线上
+        ///    （瞳距沿枪管轴后移 adsEyeRelief，可调）；按 aimAmount 从腰射过渡。
+        ///  - 冲刺：基准仍启用，但源点沿 SprintAim 方向（见 BlendedAimRotation 的 Slerp）。
         /// 后座作用在枪根（不动基准 → 不影响手臂 IK 目标以外的任何动作）。
         ///
-        /// 注意:**朝向仍由枪基准的 AimConstraint 承担**(未停用)。腰射↔冲刺的过渡通过
-        /// 给该约束挂**两个加权源**(相机射线目标 ↔ SprintAim,权重 = 1−sprintBlend : sprintBlend)
-        /// 实现:约束内部的瞄准方向按权重混合 → 朝向连续过渡,无需脚本接管旋转。
+        /// **腰射↔冲刺的朝向混合不能交给约束的多源加权**：约束是把各源的 (源−自身)
+        /// 向量**加权相加**，而腰射(相机前视)与冲刺(指向 SprintAim)的枪管方向实测相差
+        /// 125° —— 两个大角度向量相加时方向在权重中段急剧扫过，实测一帧转 82°、枪位跳 0.5m。
+        /// 故约束只挂**单源**(gunAimTarget)，混合好的朝向由脚本按 Slerp 编码进该源的位置。
         /// 脚本只负责**位置**(腰射绕肩柱面 / 冲刺左移后撤)与 ADS 直解。
         /// </summary>
         private void UpdateWeaponPose(in SoldierFrameState s, float dt)
@@ -1204,13 +1235,13 @@ namespace HagenDa.Animation.RigDriver
             // **125°** —— 两个大角度向量相加时方向在权重中段急剧扫过，实测一帧转 82°、
             // 枪位跳 0.5m。任何线性权重都救不了这种大角度反向，必须沿旋转路径走（Slerp）。
             //
-            // 做法：约束只挂**一个**源(driverAimTarget，权重恒 1)，把混合好的朝向编码成
+            // 做法：约束只挂**一个**源(gunAimTarget，权重恒 1)，把混合好的朝向编码成
             // 该源的位置 → 约束仍然负责“瞄准 + SceneUp 滚转”，但混合路径由脚本控制。
             bool adsEngaged = alive && adsSmooth > 0.001f;
             if (basisAim != null)
             {
                 basisAim.constraintActive = alive && !adsEngaged;
-                if (basisAim.constraintActive) ApplyAimWeights(1f, 0f);   // 单源:只用 driverAimTarget
+                if (basisAim.constraintActive) ApplyAimWeights(1f, 0f);   // 单源:只用 gunAimTarget
             }
             // 枪自身约束不再使用（统一由基准约束承担,避免双解算器互写）。
             if (gunSprintAim != null) gunSprintAim.constraintActive = false;
@@ -1271,13 +1302,15 @@ namespace HagenDa.Animation.RigDriver
                 }
                 else
                 {
-                    // 腰射/冲刺：位置脚本给，**朝向交给约束**。
+                    // 腰射/冲刺：位置脚本给，**朝向交给约束**（源=gunAimTarget）。
                     weaponBasis.position = pos;
-                    // 把本帧混合后的朝向编码进 driverAimTarget 的位置 —— 约束会据此解出
-                    // 与 BlendedAimRotation(pos) 完全一致的朝向（同一 LookRotation 语义）。
+                    // 把本帧混合后的朝向编码进 **Driver_GunAimTarget** 的位置 ——
+                    // 约束据此解出与 BlendedAimRotation(pos) 一致的朝向。
+                    // 注意写的是 gunAimTarget（枪专用），**不是** driverAimTarget：
+                    // 后者必须保持纯相机语义，否则冲刺收枪会把头部一起带偏（实测偏 94°）。
                     Quaternion blended = BlendedAimRotation(pos);
-                    if (driverAimTarget != null && basisAim != null && basisAim.constraintActive)
-                        driverAimTarget.position = pos + (blended * Vector3.forward) * aimTargetDistance;
+                    if (gunAimTarget != null && basisAim != null && basisAim.constraintActive)
+                        gunAimTarget.position = pos + (blended * Vector3.forward) * aimTargetDistance;
                     _barrelWorldDir = (blended * Vector3.forward).normalized;
                 }
             }
@@ -1335,7 +1368,7 @@ namespace HagenDa.Animation.RigDriver
         }
 
         /// <summary>
-        /// 设置枪基准 AimConstraint 的源。**只用单源**(driverAimTarget，权重 1) ——
+        /// 设置枪基准 AimConstraint 的源。**只用单源**(gunAimTarget，权重 1) ——
         /// 腰射↔冲刺的混合由脚本按 Slerp 做好后编码进该源的位置（见 BlendedAimRotation），
         /// 不用约束的多源加权(大角度反向时那会瞬间翻转)。
         /// 保留第二槽位是为了兼容曾烘进预制体的两源配置，这里把 sprint 权重压成 0。
@@ -1346,9 +1379,9 @@ namespace HagenDa.Animation.RigDriver
             if (_aimSources.Count < 1)
             {
                 _aimSources.Clear();
-                _aimSources.Add(new ConstraintSource { sourceTransform = driverAimTarget });
+                _aimSources.Add(new ConstraintSource { sourceTransform = gunAimTarget });
             }
-            var a = _aimSources[0]; a.sourceTransform = driverAimTarget; a.weight = 1f; _aimSources[0] = a;
+            var a = _aimSources[0]; a.sourceTransform = gunAimTarget; a.weight = 1f; _aimSources[0] = a;
             basisAim.SetSources(_aimSources);
         }
 
@@ -1395,7 +1428,7 @@ namespace HagenDa.Animation.RigDriver
         /// **不能**改成“两个源交给约束加权”：约束把 (源−自身) 向量**加权相加**，而两者
         /// 方向实测相差 125°，相加时方向在权重中段急剧扫过（实测单帧 82°）。Slerp 沿
         /// 最短旋转路径过渡，与两源夹角无关。
-        /// 约束最终仍负责解算朝向（脚本只是把结果编码成 driverAimTarget 的位置）。
+        /// 约束最终仍负责解算朝向（脚本只是把结果编码成 gunAimTarget 的位置）。
         /// </summary>
         private Quaternion BlendedAimRotation(Vector3 fromPos)
         {
