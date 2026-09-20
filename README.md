@@ -15,8 +15,10 @@ receive no new commits.
 
 ## Working with this repository
 
-- **Git LFS is required.** Large binary assets are stored via Git LFS — run
-  `git lfs install` before cloning, or the asset files will not resolve.
+- **Git LFS is configured.** `.gitattributes` routes large binary assets (textures,
+  meshes, audio, video, archives) through Git LFS, so run `git lfs install` before
+  working with the repo. Note that assets committed before the rules existed are still
+  plain Git objects; the rules apply to newly added or changed large files.
 - **Generated content is not tracked.** `Library/`, `*.csproj`, `*.sln`, build output,
   caches, ML training artifacts (`results/`) and agent/editor tooling are ignored via
   `.gitignore`.
