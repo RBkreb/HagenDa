@@ -388,7 +388,7 @@ namespace HagenDa.Animation.RigDriver
                 }
             }
 
-            headBone = FindDeep(modelRoot, "DEF-spine.005");
+            //headBone = FindDeep(modelRoot, "DEF-spine.005");
             if (headBone == null && animator.isHuman)
                 headBone = animator.GetBoneTransform(HumanBodyBones.Head);
             if (headBone == null) Debug.LogWarning($"[SoldierRigDriver] {name}: head bone DEF-spine.005 not found", this);
