@@ -1,4 +1,20 @@
-# Unity/Tuanjie
+# =============================================================================
+# HagenDa — git ignore policy
+#
+# Kept under version control on purpose (do NOT ignore these):
+#   Packages/manifest.json        - UPM / scoped-registry / git-url declarations
+#   Packages/packages-lock.json   - resolved dependency graph
+#   ProjectSettings/**            - project settings
+#   Assets/**                     - first-party + imported asset source
+#
+# Excluded on purpose:
+#   Library/                      - Unity import cache (incl. PackageCache)
+#   build outputs, caches, logs, ML training artifacts, agent/harness tooling
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Unity / Tuanjie — generated, build outputs, caches
+# -----------------------------------------------------------------------------
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -7,42 +23,110 @@
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
 [Mm]em-[Ll]og/
-MiniCPM-V-4_6/
-Assets/NatureManufacture Assets/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+[Ee]xportedObj/
+Assets/AssetStoreTools*
+Assets/StreamingAssets/aa/
+Assets/StreamingAssets/aa.meta
+Assets/Temp/
+crashlytics-build.properties
+sysinfo.txt
+*.unitypackage
+*.apk
+*.aab
+*.app
+*.ipa
 
-# IDE
-.idea/
-.vs/
-*.user
-*.suo
-*.cache
-*.DotSettings.user
-.codely-cli/
-.codely/
-.vscode/
-.agent/
-.dsh/
-.omp/
-.zcode/
-MapSource/
-
-# Unity-generated solution/project files (recreated by the editor on open;
-# assembly layout is defined by the .asmdef files, not by these)
+# Unity-generated solution/project files (the editor recreates these on open;
+# assembly layout is defined by the .asmdef files, not by these).
 *.csproj
 *.unityproj
 *.sln
+*.suo
+*.user
+*.userprefs
+*.booproj
+*.pidb
+*.DotSettings.user
+
+# -----------------------------------------------------------------------------
+# Third-party packages: declared only, never vendored here.
+#   UPM / scoped registry / git-url deps are resolved into Library/PackageCache.
+#   The Codely bridge (cn.tuanjie.codely.bridge) is tooling and is not tracked.
+# -----------------------------------------------------------------------------
+Library/PackageCache/
+Assets/PackageCache/
+Assets/Unity.VisualScripting.Generated/
+
+# Codely bridge — runtime state, IDE tooling and bridge config
+.codely/
+.codely-cli/
+.codely.packages/
+.codelyignore
+.com-unity-codely.json
+
+# -----------------------------------------------------------------------------
+# Agent / editor harness tooling (not project source)
+# -----------------------------------------------------------------------------
+.claude/
+.codegraph/
+.gitnexus/
+.gitnexusignore
+.gitnexusrc
+.zcode/
+.zcodeignore
+.agent/
+.dsh/
+.omp/
+.scratch/
+.idea/
+.vs/
+.vscode/
+.consulo/
+.zed/
+
+# -----------------------------------------------------------------------------
+# ML-Agents training artifacts (never LFS-tracked either).
+# Anchor to the training-output roots — the deployed model under
+# Assets/Game/MLModels/ is first-party asset source and stays tracked.
+# -----------------------------------------------------------------------------
+/results/
+/TrainLog/
+/MiniCPM-V-4_6/
+/Assets/ML-Agents/Timers/
+events.out.tfevents.*
+Training/**/*.log
+
+# -----------------------------------------------------------------------------
+# Python / tooling caches
+# -----------------------------------------------------------------------------
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# -----------------------------------------------------------------------------
+# Misc
+# -----------------------------------------------------------------------------
+MapSource/
+docs/
+screenshots/
+mem-log/
+Assets/NatureManufacture Assets/
+chat-export-*.md
+*.log
+*.tmp
+*.bak
 
 # OS
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# Screenshots (codely debug)
-screenshots/
-
-# PHASE10 commander runtime logs & snapshots
-Logs/Commander/
-
-#python env
-venv/
-docs/
