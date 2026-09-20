@@ -385,6 +385,13 @@ namespace HagenDa.Networking
                 return;
             }
 
+            // PHASE15: 房间非对局相位 / 未正式部署 —— 冻结输入采样（只留看向）。
+            if (health != null && health.holdInPlace)
+            {
+                UpdateLocalLook();
+                return;
+            }
+
             SampleInput();
             UpdateLocalLook();
         }
@@ -739,7 +746,8 @@ namespace HagenDa.Networking
             }
 
             // PHASE8: 首次部署前（观战/大厅）冻结 3C 与战斗，仅让身体落地。
-            if (health != null && health.awaitingInitialDeploy)
+            // PHASE15: 房间非对局相位同样冻结（模型不进入地图）。
+            if (health != null && (health.awaitingInitialDeploy || health.holdInPlace))
             {
                 if (!grounded)
                     rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration);

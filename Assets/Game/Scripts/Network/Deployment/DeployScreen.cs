@@ -86,7 +86,8 @@ namespace HagenDa.Networking
             }
 
             bool deploying = health != null &&
-                (health.awaitingInitialDeploy || health.awaitingRedeploy);
+                (health.awaitingInitialDeploy || health.awaitingRedeploy) &&
+                !health.holdInPlace;   // PHASE15: 非对局相位不显示部署界面
 
             SetVisible(deploying);
 

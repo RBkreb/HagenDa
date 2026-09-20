@@ -177,6 +177,7 @@ namespace HagenDa.Tests.PlayMode.Harness
 
             // 静态单例也要还原，避免跨测试串味。
             NullOutSingleton("HagenDa.Networking.NetworkMatchManager", "Instance");
+            NullOutSingleton("HagenDa.Networking.NetworkRoomController", "Instance");
         }
 
         private static void NullOutSingleton(string typeName, string propertyName)

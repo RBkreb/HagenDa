@@ -37,8 +37,16 @@ namespace HagenDa.Networking
             if (controller == null)
                 controller = GetComponent<NetworkPlayerController>();
 
+            // PHASE15: 登记为可被真人挤占的 AI 席位（房间控制器不存在时 no-op）。
+            NetworkRoomController.NotifyAiSpawned(this);
+
             // PHASE7: 阵营分配后染色（延迟一帧等 NetworkMatchManager 分配 teamId）。
             Invoke(nameof(ApplyTeamColor), 0.2f);
+        }
+
+        private void OnDestroy()
+        {
+            NetworkRoomController.NotifyAiDespawned(this);
         }
 
         private void FixedUpdate()

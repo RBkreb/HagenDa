@@ -60,6 +60,9 @@ namespace HagenDa.Networking
         [Tooltip("首次部署：玩家连接后处于观战/大厅状态，选定部署点+配装前不进入世界。")]
         [SyncVar] public bool awaitingInitialDeploy;
 
+        [Tooltip("PHASE15: 房间相位非对局/尚未正式部署 —— 冻结 3C 且模型不进入地图。")]
+        [SyncVar] public bool holdInPlace;
+
         // PHASE9: DeathSOS 定向重复（每 1s × 9 次，定向 40m 内最近支援兵）
         private float sosRepeatTimer;
         private int sosRepeatCount;
@@ -86,6 +89,12 @@ namespace HagenDa.Networking
             awaitingRedeploy = false;
             awaitingInitialDeploy = connectionToClient != null;   // 真人首次进入部署
             lastAttacker = null;
+
+            // PHASE15: 房间非对局相位(空闲/准备)加入的实体立即冻结 ——
+            // 规格要求开局前模型不进入地图。房间控制器不存在(旧战斗场景)时不介入。
+            var room = NetworkRoomController.Instance;
+            if (room != null && room.phase != RoomPhase.Match)
+                SetPhaseHold(true);
         }
 
         // ---------------------------------------------------------------
@@ -416,6 +425,44 @@ namespace HagenDa.Networking
                 transform.position, self.squadId, GetInstanceID(), targetId);
         }
 
+        /// <summary>
+        /// PHASE15: 房间相位门控。非对局相位(空闲/准备)时冻结实体并禁止部署 ——
+        /// 规格要求"进入游戏时不加载任何地图/模型"。正式开局(对局相位)后解除,
+        /// 此时 awaitInitialDeploy 仍为 true,等玩家选点。
+        /// </summary>
+        [Server]
+        public void SetPhaseHold(bool value)
+        {
+            holdInPlace = value;
+            if (value)
+            {
+                awaitingRedeploy = false;
+                awaitingInitialDeploy = true;   // 相位解除后仍需选点
+            }
+        }
+
+        /// <summary>PHASE15: 正式开局解除相位冻结(保留首次部署等待)。</summary>
+        [Server]
+        public void ReleasePhaseHold()
+        {
+            holdInPlace = false;
+            awaitingInitialDeploy = true;
+        }
+
+        /// <summary>
+        /// PHASE15: 由房间控制器在"正式开局"时统一落地一个实体(真人或 AI)。
+        /// 绕过 awaitingInitialDeploy / redeployDeadline 门控 —— 那些门控是给
+        /// 玩家交互用的,这里是服务器按已记录的部署点批量执行。
+        /// </summary>
+        [Server]
+        public bool ServerPlaceAtDeployPoint(int choice)
+        {
+            Vector3? pos = ResolveDeployPoint(choice);
+            if (!pos.HasValue) return false;
+            DoDeploy(pos.Value);
+            return true;
+        }
+
         /// <summary>统一部署点解析（1=GR / 2=HQ / 3=squad / 4=beacon，fallback GR）。</summary>
         [Server]
         private Vector3? ResolveDeployPoint(int choice)
@@ -501,6 +548,7 @@ namespace HagenDa.Networking
             unrevivable = false;
             awaitingRedeploy = false;
             awaitingInitialDeploy = false;
+            holdInPlace = false;
             sosRepeatCount = SosRepeatMax;   // 停止 SOS 重复
             lastAttacker = null;
             health = maxHealth;
@@ -615,6 +663,7 @@ namespace HagenDa.Networking
             unrevivable = false;
             awaitingRedeploy = false;
             awaitingInitialDeploy = false;
+            holdInPlace = false;
             lastAttacker = null;
             health = maxHealth;
             armor = 0f;
