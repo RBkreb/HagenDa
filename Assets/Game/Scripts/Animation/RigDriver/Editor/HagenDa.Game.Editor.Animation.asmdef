@@ -1,0 +1,20 @@
+{
+    "name": "HagenDa.Game.Editor.Animation",
+    "rootNamespace": "",
+    "references": [
+        "HagenDa.Game",
+        "Mirror",
+        "Unity.Animation.Rigging"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

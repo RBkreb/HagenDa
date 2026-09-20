@@ -1,0 +1,434 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99e17b8882705564f98340ae03b81329, type: 3}
+  m_Name: MapGenConfig
+  m_EditorClassIdentifier: 
+  sizeX: 500
+  sizeZ: 500
+  resolution: 1025
+  heightMax: 120
+  seed: 42
+  terrainMaterial: {fileID: 0}
+  symmetry: 1
+  ringWidth: 50
+  ringHeight: 0.85
+  ringTransition: 25
+  baseHeight: 0.09
+  hillAmplitude: 0.25
+  hillScale: 120
+  hillDetail: 0.45
+  hillSharpness: 1.15
+  lanes:
+  - name: Mid
+    from: {x: -175, y: -175}
+    to: {x: 175, y: 175}
+    width: 45
+    transition: 30
+    flatten: 0.5
+    levelNormalized: 0.11
+    heightBias: 0
+  - name: FlankWest
+    from: {x: -175, y: 175}
+    to: {x: 175, y: -175}
+    width: 35
+    transition: 28
+    flatten: 0.42
+    levelNormalized: 0.1
+    heightBias: 0.04
+  - name: FlankEast
+    from: {x: 190, y: 190}
+    to: {x: -190, y: -190}
+    width: 35
+    transition: 28
+    flatten: 0.42
+    levelNormalized: 0.1
+    heightBias: 0.04
+  - name: LinkAB
+    from: {x: 0, y: 110}
+    to: {x: -95, y: -60}
+    width: 26
+    transition: 22
+    flatten: 0.45
+    levelNormalized: 0.13
+    heightBias: 0
+  - name: LinkAC
+    from: {x: 0, y: 110}
+    to: {x: 95, y: -60}
+    width: 26
+    transition: 22
+    flatten: 0.45
+    levelNormalized: 0.13
+    heightBias: 0
+  centerFeature: 1
+  centerRadius: 45
+  centerTransition: 40
+  centerHeight: 0.22
+  flattenZonePads: 1
+  padTransition: 30
+  capturePadHeight: 0.14
+  garrisonPadHeight: 0.1
+  padShape: 0
+  padExtent: {x: 60, y: 60}
+  anchors:
+  - role: 0
+    letter: A
+    markerName: 
+    position: {x: -125, y: 0, z: -125}
+    radius: 70
+    extent: {x: 0, y: 0}
+    deployPointCount: 8
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 1
+    letter: A
+    markerName: 
+    position: {x: 125, y: 0, z: 125}
+    radius: 70
+    extent: {x: 0, y: 0}
+    deployPointCount: 8
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 2
+    letter: A
+    markerName: 
+    position: {x: 0, y: 0, z: 110}
+    radius: 30
+    extent: {x: 0, y: 0}
+    deployPointCount: 6
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 2
+    letter: B
+    markerName: 
+    position: {x: -97.75, y: 0, z: -63.25}
+    radius: 30
+    extent: {x: 0, y: 0}
+    deployPointCount: 6
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 2
+    letter: C
+    markerName: 
+    position: {x: 97.75, y: 0, z: -63.25}
+    radius: 30
+    extent: {x: 0, y: 0}
+    deployPointCount: 6
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 3
+    letter: A
+    markerName: SpawnRed
+    position: {x: -125, y: 0, z: -125}
+    radius: 56
+    extent: {x: 0, y: 0}
+    deployPointCount: 30
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 3
+    letter: A
+    markerName: SpawnBlue
+    position: {x: 125, y: 0, z: 125}
+    radius: 56
+    extent: {x: 0, y: 0}
+    deployPointCount: 30
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  spawnInset: 5
+  captureAOffset: 110
+  captureBCOffset: 115
+  captureRadius: 30
+  garrisonRadius: 70
+  mapDecor:
+  - name: Trees
+    prefabs:
+    - {fileID: 2222111361404534124, guid: 88f2fd29f58b9734683512546acec310, type: 3}
+    - {fileID: 4661435515762455780, guid: e289bf5debb17f6459818c207d781953, type: 3}
+    - {fileID: 6941765000743290380, guid: c60edd51c065ceb46b345849a03bc106, type: 3}
+    - {fileID: 2807449429036958551, guid: f0c16f0ea935ea64297ca1d4d55d9746, type: 3}
+    - {fileID: 9069115365609291303, guid: 60f79905accf3b24fa0114b941f1aac0, type: 3}
+    densityPer1000m2: 1.2
+    count: 0
+    minSpacing: 14
+    slopeMaxDeg: 20
+    heightBand: {x: 0.12, y: 1}
+    scaleRange: {x: 0.85, y: 1.3}
+    randomYaw: 1
+    alignToSlope: 0
+    clusterScale: 90
+    clusterThreshold: 0.45
+    clearanceRadius: 0
+    avoidZones: 1
+    stripColliders: 0
+  - name: Bushes
+    prefabs:
+    - {fileID: 4263922822445002727, guid: 3cdafb3c2f54d434894928d72d282874, type: 3}
+    - {fileID: 6239969156481229051, guid: b71b0f8d2f881c743a85228f3030d1cb, type: 3}
+    - {fileID: 38335279662140195, guid: 34d3f526198dae440bb2ce6005d86055, type: 3}
+    densityPer1000m2: 2.5
+    count: 0
+    minSpacing: 6
+    slopeMaxDeg: 28
+    heightBand: {x: 0, y: 1}
+    scaleRange: {x: 0.9, y: 1.5}
+    randomYaw: 1
+    alignToSlope: 0
+    clusterScale: 45
+    clusterThreshold: 0.4
+    clearanceRadius: 0
+    avoidZones: 1
+    stripColliders: 0
+  - name: Rocks
+    prefabs:
+    - {fileID: 1576488453971893466, guid: a778b631c6253a04899cb31bad047c81, type: 3}
+    - {fileID: 8783306491908617939, guid: f02116c209ecd9e488fc4d2cd8996133, type: 3}
+    densityPer1000m2: 0.8
+    count: 0
+    minSpacing: 16
+    slopeMaxDeg: 42
+    heightBand: {x: 0.15, y: 1}
+    scaleRange: {x: 0.8, y: 1.6}
+    randomYaw: 1
+    alignToSlope: 1
+    clusterScale: 0
+    clusterThreshold: 0.5
+    clearanceRadius: 0
+    avoidZones: 1
+    stripColliders: 0
+  - name: GroundCover
+    prefabs:
+    - {fileID: 8903058273634794869, guid: f1fc5bb90ac285e4486771552d63bcb8, type: 3}
+    - {fileID: 3356751432538110193, guid: ffbddc4ef9676cc419e81e06aaa836d8, type: 3}
+    - {fileID: 5186735023776687486, guid: ac8efb728f1fb9b4092c4df591c827ca, type: 3}
+    - {fileID: 3899520030806763256, guid: 299e7a1cb6456cf4fa6079cf5978df9b, type: 3}
+    - {fileID: 4385080170328260021, guid: ff62b58c5a9ea164fa8ddf8038e10cd1, type: 3}
+    - {fileID: 5440707293445505367, guid: 494f6d43e170e9145bc7865d243ee00b, type: 3}
+    densityPer1000m2: 14
+    count: 0
+    minSpacing: 2.5
+    slopeMaxDeg: 32
+    heightBand: {x: 0, y: 1}
+    scaleRange: {x: 0.8, y: 1.4}
+    randomYaw: 1
+    alignToSlope: 0
+    clusterScale: 30
+    clusterThreshold: 0.35
+    clearanceRadius: 0
+    avoidZones: 1
+    stripColliders: 1
+  - name: IndustrialClutter
+    prefabs:
+    - {fileID: 1000012087368230, guid: a22c0c7e17126fa4f89534dc98bcac8f, type: 3}
+    - {fileID: 1000012364095318, guid: a62abbb708e3f49489bde29e5cfc3ebd, type: 3}
+    - {fileID: 1000010467075504, guid: 4944c29dadd7e02468c053eafe48e485, type: 3}
+    - {fileID: 1000010811274378, guid: 6857ff1d3761e21479727f3b27cc8f68, type: 3}
+    - {fileID: 1000010325068422, guid: 4aacf79f5a0dae44687cf65a42a1b825, type: 3}
+    densityPer1000m2: 1.6
+    count: 0
+    minSpacing: 10
+    slopeMaxDeg: 14
+    heightBand: {x: 0, y: 0.6}
+    scaleRange: {x: 1, y: 1}
+    randomYaw: 1
+    alignToSlope: 0
+    clusterScale: 60
+    clusterThreshold: 0.55
+    clearanceRadius: 0
+    avoidZones: 1
+    stripColliders: 0
+  - name: Deadwood
+    prefabs:
+    - {fileID: 108507113624723981, guid: eebb56c82efbd8d4bb0eb6bd925a0e9d, type: 3}
+    - {fileID: 1493958779012120596, guid: b9de24523a11d714db3851b5f0f9d527, type: 3}
+    densityPer1000m2: 1
+    count: 0
+    minSpacing: 12
+    slopeMaxDeg: 25
+    heightBand: {x: 0.12, y: 1}
+    scaleRange: {x: 0.9, y: 1.4}
+    randomYaw: 1
+    alignToSlope: 0
+    clusterScale: 0
+    clusterThreshold: 0.5
+    clearanceRadius: 0
+    avoidZones: 1
+    stripColliders: 0
+  zoneDecor:
+  - name: Containers
+    prefabs:
+    - {fileID: 1000011523426384, guid: 84147b87204d0a0478bae9558d656ea2, type: 3}
+    - {fileID: 1000010817437606, guid: 58d97d456aead63499ac7d5316541f78, type: 3}
+    - {fileID: 1000013479777962, guid: 9615d776614809e4890301d5377aeb9f, type: 3}
+    densityPer1000m2: 0
+    count: 14
+    minSpacing: 11
+    slopeMaxDeg: 6
+    heightBand: {x: 0, y: 1}
+    scaleRange: {x: 1, y: 1}
+    randomYaw: 0
+    alignToSlope: 0
+    clusterScale: 0
+    clusterThreshold: 0.5
+    clearanceRadius: 0
+    avoidZones: 1
+    stripColliders: 0
+  - name: FenceWalls
+    prefabs:
+    - {fileID: 1000010959013678, guid: f5c94d7d7f024eb43b7dd5258c0608d0, type: 3}
+    - {fileID: 1000013039883512, guid: fee6e1da33beae9409089ab8a832464f, type: 3}
+    densityPer1000m2: 0
+    count: 12
+    minSpacing: 10
+    slopeMaxDeg: 6
+    heightBand: {x: 0, y: 1}
+    scaleRange: {x: 1, y: 1}
+    randomYaw: 0
+    alignToSlope: 0
+    clusterScale: 0
+    clusterThreshold: 0.5
+    clearanceRadius: 0
+    avoidZones: 1
+    stripColliders: 0
+  - name: Crates
+    prefabs:
+    - {fileID: 1000010811274378, guid: 6857ff1d3761e21479727f3b27cc8f68, type: 3}
+    - {fileID: 1000013510172720, guid: ddf0187b9b9cef54bab5c9c49969758a, type: 3}
+    - {fileID: 1000012001423700, guid: efaf0e3818a9ab240983b51198f0a77a, type: 3}
+    - {fileID: 1000012006241372, guid: 6d21e769def7d504ea22abcb06173633, type: 3}
+    densityPer1000m2: 0
+    count: 18
+    minSpacing: 6
+    slopeMaxDeg: 6
+    heightBand: {x: 0, y: 1}
+    scaleRange: {x: 1, y: 1}
+    randomYaw: 1
+    alignToSlope: 0
+    clusterScale: 0
+    clusterThreshold: 0.5
+    clearanceRadius: 0
+    avoidZones: 1
+    stripColliders: 0
+  - name: Utility
+    prefabs:
+    - {fileID: 1000011804541950, guid: f6bcabe29ce92584f8125c196a931d73, type: 3}
+    - {fileID: 1000010628347772, guid: 46132fa6877a42947bf1f7f15c09f435, type: 3}
+    - {fileID: 1000010325068422, guid: 4aacf79f5a0dae44687cf65a42a1b825, type: 3}
+    densityPer1000m2: 0
+    count: 6
+    minSpacing: 12
+    slopeMaxDeg: 6
+    heightBand: {x: 0, y: 1}
+    scaleRange: {x: 1, y: 1}
+    randomYaw: 0
+    alignToSlope: 0
+    clusterScale: 0
+    clusterThreshold: 0.5
+    clearanceRadius: 0
+    avoidZones: 1
+    stripColliders: 0
+  zoneDecorRing: {x: 0.45, y: 0.85}
+  zoneDecorInnerClearance: 0.35
+  coverCount: 900
+  coverSeed: 20260917
+  coverMinGap: 8
+  coverLowPrefabs:
+  - {fileID: 1000013510172720, guid: ddf0187b9b9cef54bab5c9c49969758a, type: 3}
+  - {fileID: 1000012087368230, guid: a22c0c7e17126fa4f89534dc98bcac8f, type: 3}
+  - {fileID: 1000012364095318, guid: a62abbb708e3f49489bde29e5cfc3ebd, type: 3}
+  - {fileID: 1000010811274378, guid: 6857ff1d3761e21479727f3b27cc8f68, type: 3}
+  - {fileID: 1000011585897626, guid: 9d1bb44d500a3ad489d3cb3a6900199f, type: 3}
+  - {fileID: 1000012744991898, guid: 36667f34d4b750c4695e409fb89b51f8, type: 3}
+  coverTallPrefabs:
+  - {fileID: 1000013039883512, guid: fee6e1da33beae9409089ab8a832464f, type: 3}
+  - {fileID: 1000012516067446, guid: 32c4edf4f02ad254092a6e1ba94f5b4e, type: 3}
+  - {fileID: 1000013040479746, guid: 46472ef0a5e771447837601c9fb0d67e, type: 3}
+  - {fileID: 1000010037619014, guid: 721671003a026be4fb47107988831b38, type: 3}
+  - {fileID: 1000012006241372, guid: 6d21e769def7d504ea22abcb06173633, type: 3}
+  - {fileID: 1000011824939378, guid: f0edaebc598e4d34b80cc4fcf3f6550b, type: 3}
+  coverBlockPrefabs:
+  - {fileID: 1000011523426384, guid: 84147b87204d0a0478bae9558d656ea2, type: 3}
+  - {fileID: 1000013479777962, guid: 9615d776614809e4890301d5377aeb9f, type: 3}
+  - {fileID: 1000010192389154, guid: 39485138b2c1f4d41bdd3846e259ffea, type: 3}
+  - {fileID: 1000010959013678, guid: f5c94d7d7f024eb43b7dd5258c0608d0, type: 3}
+  - {fileID: 1000010628347772, guid: 46132fa6877a42947bf1f7f15c09f435, type: 3}
+  - {fileID: 1000013628716364, guid: ee5ce8c8eaa133d43a291b519c442236, type: 3}
+  coverSlopeMaxDeg: 25
+  coverZoneClearance: 1.05
+  terrainLayers:
+  - name: Ground
+    diffuse: {fileID: 2800000, guid: 05d1653bd2f76724f8f17b8d500c8787, type: 3}
+    tileSize: {x: 16, y: 16}
+    slopeRange: {x: 0, y: 24}
+    slopeSmooth: 8
+    heightRange: {x: 0, y: 0.22}
+    heightSmooth: 0.05
+  - name: Meadow
+    diffuse: {fileID: 2800000, guid: e63c7e66aca47a244b9e4a24948d0a2a, type: 3}
+    tileSize: {x: 16, y: 16}
+    slopeRange: {x: 0, y: 22}
+    slopeSmooth: 8
+    heightRange: {x: 0.22, y: 0.55}
+    heightSmooth: 0.05
+  - name: Rock
+    diffuse: {fileID: 2800000, guid: 9575eeb174958fa46bcf52b136e0e2ea, type: 3}
+    tileSize: {x: 20, y: 20}
+    slopeRange: {x: 18, y: 90}
+    slopeSmooth: 8
+    heightRange: {x: 0, y: 1}
+    heightSmooth: 0.05
+  - name: Cliff
+    diffuse: {fileID: 2800000, guid: f0eabb916c8c83c48be3498e5b1bc768, type: 3}
+    tileSize: {x: 24, y: 24}
+    slopeRange: {x: 40, y: 90}
+    slopeSmooth: 8
+    heightRange: {x: 0.35, y: 1}
+    heightSmooth: 0.05
+  - name: Dirt
+    diffuse: {fileID: 2800000, guid: eb7d0d76bff04bf498953bd946515768, type: 3}
+    tileSize: {x: 18, y: 18}
+    slopeRange: {x: 0, y: 40}
+    slopeSmooth: 8
+    heightRange: {x: 0.55, y: 1}
+    heightSmooth: 0.05
+  detailAmplitude: 0.045
+  detailScale: 45
+  erosionIterations: 0
+  blurIterations: 1
+  graphPath: Assets/Game/Match/Graphs/HagenDaMacro.asset
+  maskPath: Assets/Game/Match/Graphs/HagenDaMask.asset

@@ -1,0 +1,1087 @@
+
+
+===== PAGE 1 =====
+ 
+Installation
+ 
+If you have MapMagic 1 asset installed it's recommended to remove it before installing MapMagic 
+2.
+MapMagic 2 requires .NET 4.x API Compatibility Level enabled in Editor. The 
+compatibility level could be switched in  Edit -> Project Settings -> Player -> API 
+Compatibility Level -> .NET 4.x
+MapMagic is installed the way any other Unity asset does.
+If MapMagic is your ﬁrst asset and you are not familiar with the installation procedure you can 
+refer Unity manual (Asset Store and Asset Packages) to ﬁnd out how it's done, or follow these 
+steps:
+Open MapMagic page at the Unity Asset Store site.
+Click Add To My Assets button.
+Run Unity Editor, make sure you are using .NET 4 compatibility level.
+Open the Asset Store window (Windows - Asset Store), log into your account, and open up 
+your assets list by clicking My Assets button at the top of the window. 
+Find MapMagic 2 in the list, and click Download.
+Once the asset is dowloaded, the Download button will be replaced with the Import one.
+Clicking Import button will open up an import window after a while. Make sure that all of the 
+checkbox are enabled if you want to install the full version. You can unckeck some folders if 
+you'd like to:
+Demo: the demo graphs, scenes, textures, meshes that take up most of the space of 
+MM asset. MapMagic will work ﬁne without these assets.
+Compatibility: compatibility packs for MicroSplat, MegaSplat, Vegetation Studio Pro and 
+CTS. 
+These folders could be imported anytime later from the AssetStore window.
+Click Import button and wait for the asset to be imported. After this, Assets/MapMagic 
+folder will be created in your project. You can then rename the folder or move it inside the 
+other, it does not aﬀect the asset operation.
+  
+Quick Start
+ 
+Three quick steps on how to hit the ground running with MapMagic:
+1. Create the new MapMagic Graph asset by clicking Create in a Project View, and select 
+MapMagic -> Template Graph (or MapMagic -> Empty Graph if you want to start from 
+
+
+===== PAGE 2 =====
+scratch).
+  
+2. Drag and drop the created Graph to scene to create the MapMagic object.
+Alternatively: click GameObject menu -> 3D Object -> MapMagic, select the created object 
+and assign graph in inspector.
+3. Double-click on the Graph asset in the project view to open up the editor window.
+Alternatively: select the Graph asset in the project view, click Open Editor in the inspector.
+
+
+===== PAGE 3 =====
+Alternatively: select the MapMagic object, click Open next to the Graph slot.
+Graph Window
+ 
+The Graph Window is the main tool for working with MapMagic, so it is recommended to dock it 
+somewhere if you are going to work closely with MM. Try not to make it overlap the Scene View to 
+let you see the generation results. 
+This window could be opened  
+by double-clicking the graph asset,  
+or by selecting the graph asset in inspector and clicking Open button,  
+or by selecting MapMagic object and clicking open folder icon 
+FolderOpen.
+The graph window consists of a Toolbar (at the top) and the nodes window (all other window 
+space). The nodes window is ﬁlled with a grid to help navigating while scrolling or zooming. If you 
+opened a template, a demo, or any other non-empty graph you will see the nodes inside of the 
+nodes window. 
+Toolbar
+ 
+
+
+===== PAGE 4 =====
+Toolbar controls, from left to right:
+Graph Asset Name - the name of the graph currently edited. If current graph is a sub-
+biome there will be two names displayer - one of the root biome, and one of the current 
+one. See Biomes module for details.
+Single click on the Graph Asset Name will highlight the asset ﬁle in the Project window.
+Biomes Tree button - pressing it will display this graph sub-biomes tree for quick navigation.
+Graph Seed - the seed of the current graph, used to generate all pseudo-randoms values. 
+Changing this value will generate diﬀerent terrain crated by the same principles determined 
+by graph.
+Progress Gauge - displays the summary generate progress of all MapMagic object tiles. If all 
+tiles are generated - the label "Ready" is displayed instead of gauge. Gauge is not available if 
+graph is not assigned to MapMagic object.
+Force Re-Generate button - clears all the generated results and generates all the tiles from 
+scratch.
+Generate Changed Only - will generate nodes that are not generated when Instant 
+Generate is turned oﬀ. If Instant Generate enabled the graph will be already generating if it 
+has any node changed.
+Scroll to Center - places the graph view so that it is centered at all the nodes rectangle 
+center. Useful when the graph was not made at the origin, or you have scrolled too far and 
+lost somewhere in the wilderness.
+Zoom far/close - quickly switches between the minimal (furtherest) and maximum (closest) 
+zoom.
+Nodes Window
+ 
+Each node consists of a Header with the node name, icon, Inlet (or Inlets) on the left, and Outlet 
+(or Outlets) at the header right. Note that some nodes - called the Initial nodes - do not require 
+any input data, and thus have no Inlets. The central part of the node contains the node 
+parameter values - it is called the Field. Under the node ﬁeld, at the bottom of the node, you can 
+ﬁnd an expandable Preview ﬁeld.
+In the top right corner of the Nodes Window there an Add drag-button, that gives a quick and 
+easy way to create new nodes. Add drag-button turns itself into a "Remove" trash bin if node is 
+currently dragged with a mouse.
+
+
+===== PAGE 5 =====
+Nodes Window Actions
+ 
+The Editor window can be scrolled using the middle mouse button:
+If you are using a laptop with touch pad, you can scroll with the left mouse button with Alt 
+pressed. Pressing the 
+Focus button on the toolbar will scroll  to the center of all the graph 
+nodes.
+To zoom in or out, use mouse scroll wheel:
+You can press zoom in 
+ZoomSmallPlus or zoom out 
+ZoomSmallMinusbuttons on the 
+toolbar to zoom in/out quickly.
+
+
+===== PAGE 6 =====
+To move a generator, drag it with the left mouse. To start the dragging you perform the 
+initial click on the node header or any other node space that is free from any control:
+To change the value click on it's name and drag to left or right with the left mouse button:
+If you want to enter the precise value click on the ﬁled and type the new value from 
+keyboard.
+If current graph is assigned to active MapMagic object in scene, then changing any value will 
+make the terrain to re-generate.
+To link the nodes drag node Input to the other node Output with left mouse button. 
+Dragging vice-versa - the Output of one node to the Input of the other will work too.
+
+
+===== PAGE 7 =====
+To unlink nodes drag linked Input to any free space of the graph.
+Note that nodes output connectors can have any number of nodes linked, while each inlet 
+can have only one link. So, to re-link node to the other one, simply drag it's Inlet to the other 
+node Outlet.
+To add a new node either right-click on the empty node window space, or use the Add drag-
+button. Dragging Add to an empty space of the node window (or right-clicking on the empty 
+space, and selecting Create) will simply create a new node:
+Dragging Add to the nodes link (or right-clicking and selecting Insert) will create a new 
+modiﬁer node of the link type, and link it with the link's Outlet and Inlet.
+
+
+===== PAGE 8 =====
+Note there's no Type or Initial/Modiﬁer menu since they are unnecessary - you can insert 
+only the modiﬁer node of the link type. For instance, there could be no Object node insert in 
+a Map link.
+Dragging Add to the other node (or right-clicking on node and selecting Append) will create 
+the new node of the same type, and link it to the original node.
+To remove the node either drag it to the Remove area (it will be automatically enabled on 
+the place of the Add when node is dragged), or right-click on the node and select Generator -
+> Remove.
+You can select multiple nodes by pressing the Shift button and drawing the selection frame. 
+Multiple nodes are dragged or removed as if they were one node. Click and drag with the left 
+mouse on any of the nodes to perform a drag. Clicking anywhere on the graph except the 
+selected nodes will cancel the selection. 
+
+
+===== PAGE 9 =====
+You can convert selection to a Group by right-clicking on any of the selected nodes, and 
+selecting Group -> Group Selected.
+Right Click Menu
+ 
+Right click menu shows up when on right mouse click anywhere in the node window. Depending 
+on the object clicked there will be some menu options available, while others disabled.
+This menu is used to perform all of the advanced node/group/graph operations, in addition to 
+the basic actions accessable with the node interface itself or the Add/Remove button.
+All of the sub-menu items are opened automatically, after mouse pointer is hovering for 0.3 
+seconds on the parent menu. Clicking on the parent menu will open the sub-menu immediately.
+Create Menu
+Alternative way to create a node - in some cases (for example, the laptop with no mouse) it's 
+more handy to right-click and select this menu rather than drag the Add button.
+Depending on the object clicked Create menu will have a diﬀerent name and will perform a 
+corresponding action:
+If clicked on an empty graph space - it will be an Add menu, and will simply add the new 
+node to graph.
+If clicked on the link line - it will be an Insert meny, and will connect the newly created node 
+with the link input and output.
+If clicked on node or outlet - it will be an Append menu that will link the created node to the 
+clicked one.
+
+
+===== PAGE 10 =====
+These actions are similar to the actions performed by dragging Add button on empty space / 
+link / node.
+The create menu contains the categories of the nodes to be created. Each category 
+corresponds to the object the node takes as input, output, or internally works with. For 
+example, Map nodes process the Map object (called Matrix in code), while Spline object work 
+with Spline System (SplineSys). Each new MapMagic module brings the new object type, and 
+thus new category. For the MapMagic core version only the Map category is available.
+Create menu items
+Appears on opening a Create Menu. 
+All of the nodes are grouped by their behaviour type:
+Initial nodes:
+Modiﬁers:
+Generator menu
+Available if right-clicked anywhere on the node. Contains the list of actions that could be 
+performed with the node (Generator).
+Disable/Enable: disabled generator won't generate any product, but will just read the input 
+and assign it to the output.
+Duplicate: will create the node of the same with the same parameters below the clicked one.
+Update: will convert the outdated legacy generator to the new one if available.
+Unlink: removes all of the node links. If several nodes are selected, removes only their 
+external connections, preserving the links between selected nodes.
+Remove: deletes selected node. Similarly to dragging the node to the Remove area.
+Reset: return all of the generator values to the default ones (the same values that were set 
+on node creation).
+Group menu
+All the actions related with the groups
+Create: will add a new empty group to the graph. 
+Group Selected: will create a new group of the selection size, thus including the selected 
+nodes to to the group.
+Ungroup: deletes the group, but leaves the nodes.
+
+
+===== PAGE 11 =====
+Remove: deletes the group with the nodes.
+Graph menu
+Graph import/export
+Export: saves the selected nodes in a separate graph. Not avaialable if no nodes are 
+selected.
+Import: add the other graph nodes to the current one.
+Update All: converts all of the legacy nodes to the new ones.
+Value menu
+Exposes or removes the value ﬁelds for the Functions.
+Expose: makes currently clicked value exposed (available for change from the parent biome)
+UnExposes: removes this value ﬁeld from exposed.
+Layers
+ 
+Some generators like Textures Output, Blend, Split, Combine, Rarefy and others have layers 
+interface. Usually layers store similar parameters.
+Add:
+ 
+To create a new layer press the Add button with plus sign:
+Note that some generators like Textures Output or Rarefy don't have any layers added by default. 
+So keep in mind that if you see the Add button with the plus sign then you can add layers with 
+additional properties here:
+
+
+===== PAGE 12 =====
+Switch:
+ 
+To change the layer order click and drag on it's name or any other non-active area:
+Non-active area is any place within the layer except 
+Remove:
+ 
+To remove the layer drag it to the Remove ﬁeld. When the layer is about to be removed the 
+Remove ﬁeld will be highlighted red: 
+Note that the Remove ﬁeld is drawn over the layer itself. It was made intentionally - otherwise 
+Remove won't be visible when dragging the layer atop of it.
+Expand:
+ 
+Most of the layers have the additional parameters that could be rolled out by pressing the 
+triangle chevron:
+
+
+===== PAGE 13 =====
+Note that for most of the generators only one layer could be rolled out. It was made to prevent 
+excessive expanding node interface and cluttering of the graph.
+Rename:
+ 
+Clicking on a pencil mark will allow to edit the layer name.
+I'd like recommend to give reasonable names you your layers since it will help a lot to organize 
+your graph. Since only one layer could be expanded it could be very hard to say what's this layer 
+is about if it is just named "Layer 5".
+Settings
+ 
+Properties of the MapMagic object in scene. Set in Inspector window.
+
+
+===== PAGE 14 =====
+Tiles
+ 
+Here you can manage the terrains that are generated in editor (i.e. Pinned Tiles). To pin or 
+remove tiles press the checkbutton, and then select the tile in scene. You can use the frame 
+selection to pin/unpin multiple tiles at once.
+Tiles, as well as all other Unity gizmos, are not displayed and could not be modiﬁed 
+when Gizmos are disabled in the scene view. 
+Pin New Tile: will create a new terrain tile at the selected position.
+Pin As Draft: will create a tile with low-resolution (Draft) detail level only. This is useful to 
+when forming the initial terrain shape, since draft are generated way faster and require less 
+memory. When working with large terrains it would be handy to pin the large grid of Draft 
+tiles or observing the whole terrain, and one or two full resolution tiles to work in detail.
+Pin Existing Terrain: will convert already existing terrain to MapMagic tile. This will remove 
+all the terrain information on it.
+Select Preview: select the pinned tile that will be used to display the nodes preview in 
+graph, in preview window, and to assign a special preview shader to terrain. When preview is 
+not selected, the closest to the camera tile is used. You can select only one preview tile.
+Unpin: unpins the tile and removes it's terrain.
+Locks
+ 
+Creates an area that is excluded from procedural generate. Could be useful for creating custom 
+locations on pinned tiles. See Locks section for details.
+
+
+===== PAGE 15 =====
+Inﬁnite Terrain
+ 
+One of the main MapMagic features: when enabled, generates the new terrain tiles when the 
+camera comes closer to them, and removes the tiles that are out of range. Every tile is unique, 
+but based on the same creation principles. This way MapMagic creates an illusion that the terrain 
+is inﬁnite and doesn't repeat itself.  
+Inﬁnite Terrain will generate low-resolution tiles (Drafts) ﬁrst. Then it will create the main tiles 
+only in a close range, leaving drafts in a background. This will help to save the memory and the 
+compute time. 
+As long as the graph (and it's seed value) haven't changed will generate exactly the same tile 
+every time player comes to it. 
+This feature works in playmode only, only the pinned tiles are available in editor.
+Generate Inﬁnite Terrain: enables/disables Inﬁnite terrain feature.
+Main Range: the distance of creating the Main (hi=res) chunks (in terrain tiles). Thus, if tile 
+size is 1000 and Main Range is 2, it will create main tiles in 2000 units.
+Drafts Range: the distance of creating Draft (low-res) chunks (in terrain tiles).
+Hide Out of Range Chunks: when enabled, will hide pinned chunks when they are out of 
+generate range. When disabled, pinned chunks will be always visible.
+Generate Terrain Markers:
+By the default the main camera is used as a trigger object to generate new chunks. All the 
+generate, remove and enable ranges are counted from the main camera, it is the main 
+generate marker. You can add the other markers enabling Around objects tagged and 
+selecting a proper tag from the ﬁeld. This could be useful if you have several characters that 
+could have a vast distance between them.
+Moreover, you can turn oﬀ using camera as a generate marker by disabling Around Main 
+Camera - for example, if you camera moves between those characters quickly and you don't 
+want to generate terrain while in motion.
+
+
+===== PAGE 16 =====
+Tile Settings
+ 
+Settings shared between all the tiles of this MapMagic object.
+Size: length (X axis) and width (Z axis) of a tile, in world units.
+Main Resolution: the size of the output terrain heightmap, in pixels. For terrain layers the 
+size is the same (minus one pixel).
+Main Margins: 
+Many MapMagic nodes, such as Blur, Erosion, Cavity and others require additional pixel 
+information to work with. This way they generate incorrect results on the tile edges. To avoid 
+this, MapMagic generates a map that slightly bigger then the tile itself, and cuts out edges.
+Main Margins value determines the number of additional pixels on each of the map size. 
+Fore example, for an output resolution 513 and margins of 16 the ﬁnal map size will be 513 
++ 16*2 = 545 (squared).
+You can try decreasing this value to speed up the generate process, but check the tile edges 
+for artifacts.
+Draft Resolution: the size of the draft heightmap, in pixels.
+Draft Margins: extra pixels on the edges for draft tiles (see Main Margins for detail).
+Use Draft Terrains in: enables/disables draft terrains for editor or playmode:
+Editor: will disable generating draft tiles while generating main ones. Disable this if you 
+don't like switching to drafts, or work with low resolutions / fast graphs that are applied 
+nearly as fast as drafts.
+Playmode: will disable creating draft terrains ﬁrst for inﬁnite terrains. All of the tiles will 
+appear in full detail.
+Outputs Settings
+ 
+The data that is used by the graph outputs. Usually all of these values could be changed in graph 
+in a corresponding output with the link icon (
+Linked). However, they could not be the part of 
+the graph: The graph stores the information of how the tile is generated, while this data 
+determines how the generated result is applied.
+
+
+===== PAGE 17 =====
+Height Output: see Height Output for details.
+Apply Type: determines the way the generated height map is applied to the terrain:
+Set Heights: the simplest way, via SetHeights. Fast on low resolutions due to reduced 
+overhead, but using it on big heightmaps can create a noticeable lag.
+Set Heights Delay LOD: set heights in several frames via SetHeightsDelayLOD, and 
+then applies LOD modiﬁcation. Takes a bit more time than Set Heights, but since it's 
+split in several frames the lag is not so noticable.
+Texture To Heightmap: creates the raw texture data in a separate thread, creates a 
+render texture in coroutine and uses SyncTexture to apply it. Asynchronous and fast, 
+but does not work in Unity 2018.
+Split Frame: number of pixels in stripe that are processed per frame in Set Heights Delay 
+LOD (or send to texture in Texture To Heightmap). If resolution is 513, Split Frame of 129 
+means that terrain will be applied in 4 frames (four 129*513 stripes). Decreasing this value 
+will make terrain apply smoother, but will increase the total apply time.
+Terrain properties
+ 
+Are equivalent to the settings used for each terrain in the standard terrain's Settings tab. The only 
+diﬀerence is that they are applied to all of the MapMagic terrains.
+Auto Connect: Connects Terrain LOD Levels so that the tiles are welded seamlesly on detail 
+level switching. The number is the terrains Grouping ID.
+Base Map Distance: The maximum distance at which terrain textures will be displayed at 
+full resolution. Beyond this distance, a lower resolution composite image will be used for 
+eﬃciency. Checkbox enables/disables the base map feature.
+Draw Instanced: enables/disables instanced rendering.
+Pixel Error: The accuracy of the mapping between the terrain maps (heightmap, textures, 
+etc) and the generated terrain; higher values indicate lower accuracy but lower rendering 
+
+
+===== PAGE 18 =====
+overhead. Unlike the standard terrain setting you can set the value to 0 to force the terrain 
+render full-resolution mesh.
+Reﬂection Probes: Use this to set how Unity uses Reﬂection Probes on Terrain. 
+Material Template: Material to use for rendering Terrain. 
+Trees, Details and Grass Properties
+ 
+Are equivalent to the settings used for each terrain in the standard terrain's Settings tab. The only 
+diﬀerence is that they are applied to all of the MapMagic terrains.
+Tree Distance: The distance (from camera) beyond which trees will be culled.
+Billboard Start: The distance (from camera) at which 3D tree objects will be replaced by 
+billboard images.
+Fade length Distance over which trees will transition between 3D objects and billboards.
+Max Full LOD Trees: The maximum number of visible trees that will be represented as solid 
+3D meshes. Beyond this limit, trees will be replaced with billboards.
+Bake Light Probes For Trees: If this option is enabled, Unity will create internal Light Probes 
+at the position of each tree and apply them to tree renderers for lighting. Otherwise trees 
+are still aﬀected by light probe groups.
+Remove Light Probe Ringing: If you check this box, Unity removes visible overshooting, 
+which often appears as ringing on GameObjects that are aﬀected by intense lighting. This 
+setting reduces contrast, and is dependent on Bake Light Probes for Trees.
+Draw Detail: Check this box to draw grass and details.
+Detail Distance: The distance (from camera) beyond which details will be culled.
+Detail Density: The number of detail/grass objects in a given unit of area. The value can be 
+set lower to reduce rendering overhead.
+Wind Speed: The speed of the wind as it blows grass.
+Wind Size: The size of the 'ripples' on grassy areas as the wind blows over them.
+Wind Bending: The degree to which grass objects are bent over by the wind.
+Grass Tint Overall color tint applied to grass objects.
+Multithreading
+ 
+Multithreaded: when enabled, Map Magic generate works in a several separate threads.  Turning 
+this parameter oﬀ forces Map Magic to work in the main thread only using co-routines only (this 
+could be useful for debugging of custom generators or for compatibility reasons).
+
+
+===== PAGE 19 =====
+Max Threads: the number of threads MapMagic uses to generate maps. The recommended 
+value is number of current processor threads -1.
+Auto Max Threads: sets the number of threads to processor thread count - 1. This way, on 
+the diﬀerent hardware the number of threads will be diﬀerent. Auto mode works both in 
+editor and in build.
+Apply Time per Frame: Although generate happens in other threads, applying generated 
+results to the terrain, the ﬁnal stage, is done using co-routines. This value sets the maximum 
+time spent per frame by co-routine in milliseconds. Increasing this value will shorten the 
+overall apply time, but can create a noticeable lag. Note that in some cases co-routine could 
+not be split in smaller parts, so setting this value to 1 will not help to avoid some proﬁler 
+spikes.
+Instant Generate: when this parameter is enabled there is no need to press the 'Generate' 
+button after changing any of the generator parameters: Map Magic triggers the change and 
+forces generation automatically as you make changes to each node in the graph.
+Initial Generators
+ 
+Constant
+ 
+Creates a map ﬁlled with a given value. This is the most simple generator, used to create 
+transparent masks or ﬂat heightmaps.
+Output
+ 
+The planar map at a certain level.
+Properties:
+ 
+Level: the map will be ﬁlled with this value on generate. Value ranges between 0 (no ﬁll, 
+transparent ﬁll or zero ground level depending on the output where it will be used) and 1 
+(fully opaque ﬁll or maximum terrain height).
+Level: 0, 0.5, 1
+
+
+===== PAGE 20 =====
+Import
+ 
+Allows to import custom heightmaps from textures or RAW ﬁles. 
+Custom heightmaps could be used to create a base terrain, which then could be detailed with 
+noise, erosion and other nodes:
+Or it could be used to create custom stamps with the Stamp node.
+Imported Map asset
+ 
+Import node does not load RAW ﬁle or texture directly - it's a costly operation that greatly 
+increases the graph size. Instead a special asset is used to load and keep (serialize) RAW or 
+texture data. This asset is called Imported Map. The graph itself (import node) only keeps the 
+reference to this asset.
+You can experience some lag when large Imported Map is selected in inspector. This lag is 
+caused by Unity trying to serialize the imported map each frame, and will go out on de-
+selecting Imported Map.
+To create Imported Map use the standard way assets are created: Assets (or right-click in project 
+view) -> Create -> MapMagic -> Imported Map.
+
+
+===== PAGE 21 =====
+ 
+ 
+Map Source: determines whether the imported map is loaded from RAW ﬁle or texture.
+Load Raw (for raw mode): opens the dialog to load the .raw ﬁle.
+In order to use it the .raw ﬁle should be properly prepared. It should be:  
+square (width should be equal to length)  
+grayscale  
+16 bits per channel  
+and it should be saved as .raw ﬁle with PC byte order 
+Placing RAW ﬁle in the assets folder is not required, it could be loaded from any location.
+Texture slot (for texture mode): ﬁeld for the texture asset that is used as the map source. The 
+source texture should be placed inside the Assets folder and should have Read/Write attribute 
+enabled in texture settings.
+Channel (for texture mode): Selects the channel to be used as map source:  
+Average: the average of 3 channels (red, green and blue)  
+Grayscale: the map value is calculated using formula: 0.21*R + 0.72*G + 0.07f*B   
+Red/Green/Blue: uses only one color channel  
+Alpha: using texture alpha
+Reload button: reloads map from previously assigned texture or RAW ﬁle.
+Generator Properties:
+ 
+
+
+===== PAGE 22 =====
+Map: imported map asset slot
+Wrap Mode: determines how the heightmap should be repeated so that every terrain point 
+will not miss a map:  
+Once: repeat map only once  
+Tile: repeat map endlessly the way the standard texture could be tiled  
+PingPong: will mirror every 2nd map and repeat map endlessly. Use this if you want to 
+ﬁll your land with a ﬁgure that is not tilable
+Wrap (4 terrain grid): Once, Tile, PingPong
+Scale: sets the size of heightmap. By default size is equal to one chunk (terrain).
+Scale (4 terrain grid): 0.5, 1,  2
+Oﬀset: moves ﬁgure along X or Z-axis (in world units). 
+Oﬀset (4 terrain grid): 0, 500, 1000
+Noise
+ 
+
+
+===== PAGE 23 =====
+The Noise Generator is one of the most basic generators in MapMagic. It generates a fractal noise 
+map that is widely used as a base for various map creation algorithms.
+Use Cases:
+ 
+Might be used to create the initial terrain height:
+Or to add some detail on low-resolution heightmap that comes from Import or Simple Form 
+generators:
+
+
+===== PAGE 24 =====
+As well as be used as a mask to deﬁne various areas, including biomes. In this case Noise node 
+usually goes with Contrast and Blend nodes:
+Or to mask objects, trees, biomes:
+Inputs:
+ 
+Initial generator (has no inputs).
+Output:
+ 
+Single output - a noise map, ranged from 0 to 1.
+Properties:
+ 
+Type: 
+Unity: the noise created with the standard Unity Mathf.PerlinNoise function. Mostly for 
+the debug purpose.
+Linear: for the fractals larger 1 linearly interpolates values between random values. If 
+you turn oﬀ detail fractals you can notice the "ﬂat" look, seems that this noise is made 
+of planes. The fastest algorithm and is recommended to use in various masks.
+Perlin, or bilinear: more advanced large fractal interpolation, that takes into account 
+further random values. 
+Simplex: perlin ﬁltration, but uses triangular (hexagon) noise points grid instead of the 
+square ones. Since triangular grid is more dense than the square one, visual pattern of 
+this noise type is a bit smaller and requires "Size" parameter adjustment. The slowest 
+noise type, but suits best for the heightmap creation.
+
+
+===== PAGE 25 =====
+Type:  Unity, Linear, Perlin, Simplex
+Type with no detail (detail=0): Unity, Linear, Perlin, Simplex
+Seed: a number used to initialize pseudo-random noise generator. If two generators use 
+equal seed numbers the resulting pattern will be the same.
+Intensity: sets the highest noise value.
+Intensity:  0.3,  0.6,  1,  1.5,  2
+Size: this parameter determines the size of the biggest fractal. Noise above this value ceases 
+to be fractal being a standard perlin noise. Lower size values result in a very homogeneous 
+and predictable noise, while high values can create diverse noise and scenic heightmaps.
+Size:  50,  100,  200,  300,  400
+Here the same noise sizes generated with no detail to make the pattern visible
+Detail: this parameter determines the big and small fractals' bias. When the parameter is 
+higher than 0.5 then small fractals have greater impact, which results in a more 'noisy' map. 
+When parameter is below 0.5 small fractals are less signiﬁcant than the big ones, which 
+results in a smoother noise.
+Detail: 0,  0.25,  0.5,  0.75
+
+
+===== PAGE 26 =====
+Turbulence: creates "bubbles" (positive) or "ridges" (negative).
+Turbulence: 0,  0.25,  0.5,  0.75,  1
+Oﬀset: this parameter deﬁnes the noise pattern position, shifting it along the x and z axes. 
+These values can be positive or negative. Oﬀset applies to all of the terrains and sums with 
+the terrain position, so the noise maps continue seamlessly on all the terrains.
+Oﬀset Z:  0,  100,  200,  300,  400  
+Simple Form
+ 
+Creates simple mathematical pattern: gradient, pyramid or cone.
+Use cases:
+ 
+Used mainly to create gradients, for example, to blend biomes from North to South:
+
+
+===== PAGE 27 =====
+However, cone and pyramid modes could be handy too. The way to create a crater from Simple 
+Form:
+A Simple Form is used as a basic terrain for the island:
+Cone could be transformed into a blob with a curve:
+Properties:
+ 
+Type:
+Gradient X: ﬁlls a map with an x-axis aligned gradient.
+Gradient Z: ﬁlls a map with an z-axis aligned gradient.
+Pyramid: creates a pyramidal form.
+Cone: creates a cone.
+ 
+Type: Cone, Pyramid, Gradient X, Gradient Z
+Intensity: the height of the simple form ﬁgure.
+Intensity: 0, 0.5, 1, 2
+Scale: sets the size of heightmap. By default size is equal to one chunk (terrain).
+Scale: 0.1, 0.5, 1, 2
+Oﬀset: moves ﬁgure along X or Z-axis (in world units).
+Wrap Mode: determines how the heightmap should be repeated so that every terrain point 
+will not miss a map:
+Once: repeat map only once  
+Tile: repeat map endlessly the way the standard texture could be tiled  
+PingPong: will mirror every 2nd map and repeat map endlessly. Use this if you want to 
+ﬁll your land with a ﬁgure that is not tilable.
+Wrap Mode: Once, Tile, PingPong
+ 
+
+
+===== PAGE 28 =====
+Modiﬁers
+ 
+Blend
+ 
+Blends two or more maps together using the speciﬁed blend algorithm. This generator acts quite 
+similar to the layer blending mode in Photoshop or other graphics editor. Think of the most 
+bottom 'Base' map input as a background layer, and the layers above are the blending layers.
+Use cases:
+ 
+Green grass mask texture multiplied with the random noise mask
+Properties:
+ 
+Each layer (except the Base one) has the algorithm and opacity properties. 
+Algorithm - determines how exactly the layers are blended
+Opacity - the blending layer opaqueness factor. If the value is 0 the blending result is not 
+visible.
+Here are the algorithms the blend generator oﬀers:
+Mix: simply blends two maps using the opacity value Algorithm's formula is { return b };
+Add: adds the Blend layer to the Base layer, i.e. the sum of the layers { a+b; }
+Subtract: subtracts the Blend layer from Base layer { a-b; }
+Multiply: multiplies the two layers. Note that since input values in most cases are less than 1, 
+the multiplied value would be lesser than any of the input ones. { a*b; }
+Divide: the opposite of Multiply. The result can often exceed 1, so use it with care. { a/b; }
+Diﬀerence: the delta value between two layers { Mathf.Abs(a-b); }
+Min: the minimum value between both layers.  { Mathf.Min(a,b); }
+Max: the maximum value between both layers. Try experimenting with Min and Max blend 
+algorithms as they can bring clean and useful results { Mathf.Max(a,b); }
+Overlay: this eﬀect is often used to process images but the feasibility of using it for blending 
+height or splat maps is questionable.
+if (a > 0.5f) return 1 - 2(1-a)(1-b);
+else return 2ab;  
+
+
+===== PAGE 29 =====
+Algorithm examples for the graph scheme:
+  
+  
+Algorithm: Mix, Add, Subtract, Multiply, Diﬀerence, Min, Max
+In current case base layer (voronoi) opacity is always 1, and the algorithm is always additive. Blend 
+mode is changed for Noise only. In Mix mode opacity is set to 0.5 
+Most common blend algorithms for masks are Add and Multiply. 
+Add will blend two masks in "OR" mode, combining their allowed zones
+While applying map with Multiply will blend it in "AND" mode, combining their restricted zones
+Blur
+ 
+ 
+Smooths the input map.
+Inputs:
+ 
+ Input - the default map to be processed by the generator.
+ Mask - multiplies the generator intensity by the mask map's value. For the mask pixels that 
+have a value of 0 the generator eﬀect is invisible, for the pixels that have a value of 1 the 
+intensity is unchanged.
+| Source heightmap | Mask map | Masking result |
+Outputs:
+ 
+ Output - stores the generator's processing result.
+Properties:
+ 
+Intensity: amount of blur applied per iteration.
+Iterations: number of blur iterations applied. Note that increasing the iterations count will 
+reduce blur performance. The maximum reasonable amount of iterations is about 10, if you 
+want more map smoothness use the Loss parameter.
+
+
+===== PAGE 30 =====
+Iterations: 0, 1, 10
+Loss: forces the generator to skip some of the input pixels. This will result in a bit more 
+'pixelated' look, but will give the map extra smoothness. A value of 1 means that no pixels 
+will be skipped. The Loss parameter has virtually no eﬀect on performance so it could be 
+used to create extremely smooth maps. Use it together with high Intensity and Iterations 
+counts to avoid noticeable pixelization.
+Loss (with Iterations = 10): 1, 20, 60
+Do not try to make your map extra-blurry by increasing Iterations value only. This will result 
+in poor Blur performance. Use Loss value instead.
+Safe Borders: masks terrain borders so that the generator eﬀect on the borders is zero, and 
+increases with distance from the border. This parameter sets the amount (in pixels) until the 
+eﬀect's full strength. When set to 0 border masking is oﬀ. This parameter is essential for 
+better terrain welding, so always enable it if this generator outputs to height.
+Safe Borders: 0 (oﬀ), 20, 100
+Note that turning Safe Borders oﬀ (setting it to 0) will result in seams between chunks.
+Cavity
+ 
+Generates the maps of concavity and convexity. All of the bulges and cambers are regarded as 
+convex and the hollows are regarded as concave. Note that output maps do not intersect: one 
+pixel can not be convex and concave at the same time.
+Properties:
+ 
+Type: 
+Convex highlights the bulgy areas
+Concave highlights hollows
+Both generates the mid-value (gray) map, darkens concave areas and brightens convex 
+ones
+Type: Convex, Concave, Both
+
+
+===== PAGE 31 =====
+Type, shown on the map: Convex, Concave, Both
+Intensity - the amount of inﬂuence of the generator on the input map. When the value is set 
+to 0 the generator eﬀect is not visible. In other words, it is the generator's eﬀective opacity.
+Intensity: 1, 5, 10, 20
+Spread - since really curving terrain areas are rather rare, the Cavity Generator can expand 
+resulting information on more level areas. 
+Contrast
+ 
+Changes the intensity (brightness) and the contrast of the input map. Could be useful for the 
+simple modiﬁcations of various masks.
+Increasing contrast to large values (100-1000) will return single-bit masks, with only 0 or 1 values 
+and no gradients (or almost no gradients).
+Increasing contrast of the Noise and grass texture masks
+Properties:
+ 
+
+
+===== PAGE 32 =====
+Intensity: changes the height (or brightness, if considering map is an image) of the map. 
+Ranges from -1 (any input map would be black) to 1 (any map would be white).
+Intensity: -0.5, -0.25, 0, 0.25, 0.5
+Contrast: changes the map contrast. Ranges from 0 (planar map at Intensity level) up to 
+inﬁnity.
+Contrast: 0.25, 0.5, 1, 2, 10, 1000
+Contrast on map: 0.25, 0.5, 1, 2, 10, 1000
+Curve
+ 
+Adjusts map values using a user-deﬁned curve. It works similar to the curves adjustment in 
+graphics editors like Photoshop. The horizontal axis of the curve chart is the input value, vertical 
+axis is the output value.
+This generator provides plenty of opportunities for map editing: it can be used to invert maps, 
+adjust minimum or maximum values, clamp map values or even make ladder slopes (although a 
+terrace generator could be more handy for this).
+For example, to give the map more contrast just move left and right keys horizontally closer to 
+the central line. To invert the map move the left key to the top and the right key to the bottom so 
+that the diagonal line is inverted (note that key tangents should be set to auto to achieve a 
+straight line).
+
+
+===== PAGE 33 =====
+Understanding curve:
+ 
+Imagine you have a mountain with more or less straight slope going from the zero level up to it's 
+top at the level one - this slope will be the default linear curve. When we add a point and drag it 
+down we change the shape of this imaginary slope, and all of the other slopes as well.
+Properties:
+ 
+Curve ﬁeld: displays a curve preview. To create a point click anywhere at the curve. To move 
+the point - drag it with the mouse. You can create a point and start dragging, just keep the 
+mouse button pressed. To delete the point drag away anywhere from the curve ﬁeld. The 
+ﬁrst and the last points are draggable too.
+If any of the terrain tiles assigned as preview - the curve ﬁeld background shows preview tile 
+histogram. Note that the histogram does not represent a terrain tile relief, slice or part of it, 
+it's completely diﬀerent thing.
+Erosion
+ 
+Reproduces water's ﬂowing action on the terrain's surface. Flows erode cliﬀ formation, transport 
+eroded stratum to another location and settle it as a sediment. Note that all of the ﬂows, erosion 
+and sediment calculations are iterative and very resource intensive, this makes the Erosion 
+Generator the slowest generator of  all the MapMagic generators. It usually takes a second to 
+generate erosion with the default parameters on a modern computer - compared to any other 
+generator which are nearly realtime. But the result is usually worth it.
+
+
+===== PAGE 34 =====
+Properties:
+ 
+Iterations: number of passes the generator should perform. This parameter determines the 
+performance directly. In most cases there is no need to set it more than 5-7 as further 
+erosion becomes less noticeable.
+Iterations: 1, 3, 5, 10
+Durability factor: determines how durable the input terrain is - i.e. how much it is aﬀected 
+by the ﬂow erosion. Lower values will erode the land more with each iteration but the overall 
+result will be less accurate and predictable, so it is recommended to set this value to 0.8 or 
+higher. If value is set to 1 then the land will not be eroded at all. 
+Durability: 0, 0.5, 0.9, 0.99
+Sediment factor: this factor multiplies the amount of stratum that will be settled out of the 
+ﬂow. A value 0 means that all of the eroded land will be disintegrated or carried away 
+somewhere so that no sediment will be left at all, just eroded land will remain. A value 2 
+means that the stratum amount will be magically doubled before it settles. A realistic value 
+should be slightly below 1, but ﬁne results can be achieved within all of the 0-2 value range.
+Sediment: 0, 0.5, 0.75, 1, 2
+
+
+===== PAGE 35 =====
+Fluidity iterations: the amount of passes used to calculate ﬂow runs. A higher value means 
+the farther sediment will travel from  where the stratum was originally eroded. Together 
+with the Iterations parameter it aﬀects performance greatly.
+Fluidity: 1, 3, 10, 30
+Levels
+ 
+This tool is used to make a map higher or lower, to change contrast or to correct map gamma.
+All of the levels sliders are draggable. Output high and low levels sliders are dragged vertically, 
+while Input low and high and Gamma are dragged horizontally. To reset the slider to it's original 
+position drag out of the node and release it. Reseting Gamma this way will always place it 
+between Input low and high (value 0.5).
+In most cases Levels generator can replace the Curve node. While curves are more ﬂexible and 
+give more control, levels node is a bit faster, and has more compact interface. But the main 
+advantage of Levels node over curves is that it's properties could be exposed for function. Curve 
+node key values could not be exposed, so could not be adjusted from the parent graph.
+To expose the slider properties, or to enter their values manually unroll the Parameters rollout. 
+Here the values could be edited the way it's done in other generators.
+Use Cases:
+ 
+Original non-modiﬁed terrain
+
+
+===== PAGE 36 =====
+Increasing contrast by lowering Input levels range
+Decreasing contrast by lowering Output levels range
+Oﬀset height by adjusting Input and Output levels
+Changing gamma
+Normalize
+ 
+This generator is used to combine several maps so that their sum is always 1. 
+
+
+===== PAGE 37 =====
+Normalize Generator ﬁnal result depends on the layer order. Layers are blended together 
+similarly to the layer system in Photoshop and other graphics editors:  Each of the upper layers 
+overlaps the lower ones. A mathematical algorithm for each layer generator multiplies all 
+underlying layer values with the inverse value (1-value) of the current layer. The sum of the 
+output maps values is always equal to 1.
+ 
+Some generators like Biomes Set or Textures Output have a normilizer built-in, but in some cases 
+it would be handy to pre-normalize them manually. In other cases it would be necessary to 
+normalize masks for Mask node, Grass Output or other nodes.
+
+
+===== PAGE 38 =====
+Normalizing grass masks
+Inputs:
+ 
+Input in all of the layers - source non-normalized maps.
+The Background layer does not require an input since it is regarded as completely ﬁlled (a 
+constant of 1). This layer could not be removed or sent up or down.
+Outputs:
+ 
+Map outputs in all if the layers - input maps processed so that any pixel sum of the map values is 
+equal to 1.
+Properties:
+ 
+Each layer has an Opacity value that multiplies layer's map before applying it.
+Slope
+ 
+Generates the height diﬀerence map. For each map pixel it calculates the average height delta to 
+four nearby pixels. Could be useful for separating horizontal and vertical surfaces (to ﬁll them 
+with grass and cliﬀ respectively).
+Masking only inclined areas with Slope
+Properties:
+ 
+
+
+===== PAGE 39 =====
+From: the starting angle (in degrees) of the masking eﬀect.
+From: 10, 20, 30, 50
+To: the ending angle (in degrees) of the masking eﬀect. Usually it's 90 (vertical), but if you 
+want to create an inversed eﬀect (from 0 to X) or mask only the slope of some particular 
+degrees (from X to Y) it might be needed to set this value.
+To (while From is 20): 20, 30, 40, 90
+Smooth Range: the range (in degrees) of the transition between masked and unmasked 
+eﬀect.
+Smooth Range: 0, 10, 20, 50
+Selector
+ 
+ 
+Selects (masks) the values interval at a speciﬁed level. In simple terms if the value is within From-
+To range it becomes 1, otherwise it becomes 0 (if not taking transition into account). 
+
+
+===== PAGE 40 =====
+Transition eﬀect allows gradual masking - it creates smooth gradients both at From and To ends.
+Properties:
+ 
+Set Range: switches the node interface between transition and min/max values. It's the 
+matter of personal preference which UI type to choose (however in Min/Max you can set 
+diﬀerent transitions for from or to ends).
+In Min/Max mode from and to minimal value is converted using X-Transition/2, and 
+maximal: Y+Transition/2
+Units: determines whether the the map units (ranging from 0 to 1) or world units (ranging 
+from 0 to 250 or whatever set in output/MM object settings. See Height Output for details).
+From: determines the lower selection range. All values higher this value (or min-max range) 
+will be selected, up to To value.
+From (while To 0.66):  0,  0.5,  0.55,  0.6
+
+
+===== PAGE 41 =====
+To: determines the upper selection range. All values below this value starting with From will 
+be selected.
+To (while From 0.5):  0.5,  0.6,  0.7,  0.8,  0.9
+Transition: sets the gradient on Front and To ends for smooth masking:
+Transition:  0,  0.05,  0.1,  0.2,  1
+Terrace
+ 
+Produces step-like land forms on the slopes of hills. Used together with a Noise (as terrace's 
+input) and Erosion (originates from terrace's output) Generator, it can produce ﬁne landscapes. 
+Don't underestimate the Terrace Generator - even if it seems that pure terrace output is not good 
+enough looking, together with erosion it can make a terrain much more realistic and diverse.
+Initial terrain | Terrace generator | Terrace+Erosion
+Properties:
+ 
+Num: sets the number of treads - from 2 (at the top and bottom of terrain) to any 
+reasonable number (note that making a terrace height lesser than a unit often does not 
+make sense). This parameter aﬀects the generator performance but since Terrace Generator 
+is relatively fast every value below 100 will not have an appreciable inﬂuence on total the 
+
+
+===== PAGE 42 =====
+generation time.
+Num: 10, 20, 30
+Uniformity: the terrace's step's height diﬀerence. When set to 1 all of the steps have the 
+same height and when set to 0 the height may vary from zero to twice the uniform height.
+Uniformity: 0, 0.5, 1
+Steepness: determines how inclined the step's vertical plane(riser) is and how acute the 
+bend between the tread and riser would be. A value of 1 will generate absolutely vertical 
+risers with maximum tread length, while a value of 0 will set the tread's length to zero (but 
+that does not mean that terracing would be turned oﬀ - to make the terrace eﬀect even less 
+noticeable use the Intensity parameter).
+Steepness: 0, 0.5, 1
+Unity Curve
+ 
+
+
+===== PAGE 43 =====
+Similar to the Curve node, but uses Unity animation curve interface instead. This gives more 
+ﬂexibility and control at the price of increased generate time.
+Inputs:
+ 
+Inlet (mandatory) - a source map.
+Mask - the node eﬀect opacity mask. The higher the value of the mask - the more visible curve 
+eﬀect is.
+Properties:
+ 
+Curve ﬁeld: displays a curve preview. Clicking on it will open up a Curve Editor window - the 
+standard Unity curve editing tool (see Unity manual: https://docs.unity3d.com/Manual/EditingCur
+ves.html for more information).
+Outputs
+ 
+Height
+ 
+Applies the Input map as a terrain height.
+Output Generator
+ 
+Output Generators bring all the map and object inputs to life: convert maps to terrain heightmap, 
+splatmap or detailmap and place real objects on terrain. All of the generator chains should end 
+up in one (or more) Output Generators - otherwise they will not be generated at all.
+Inputs:
+ 
+Input: a map that will be applied to terrain.
+Properties:
+ 
+Note that all of the properties marked with the link icon ( ) are stored not in the graph, but 
+in MapMagic object (Outputs Settings). Assigning this graph on a diﬀerent MM object will 
+virtually set this values to the MM object ones. Changing these values will change the MM 
+object's values, as well as all the biomes and sub-graphs.
+Height: the maximum terrain height. Changing this value will set the terrain's Terrain Height 
+parameter for each of the tiles.  Does not aﬀect the graph maps (it will just stretch the 
+terrain upwards). To raise the maximum terrain height lower the intensity of all the 
+generators.
+
+
+===== PAGE 44 =====
+Height: 100, 200, 300, 400
+Interpolation: smoothen the terrain on height apply:
+None: applies the heightmap as is (generated map pixel -> to terrain heightmap pixel). 
+The fastest apply speed.
+Smooth: interpolates between two pixels, smoothing applied heightmap a bit. Still fast 
+apply speed, but some small detail may be lost.
+Scale 2X: upscales the applied heightmap twice each dimension, making terrain more 
+detailed. This way terrain polygon density is four times bigger than other other maps 
+(like splatmap). For instance, when using resolution of 513 in MapMagic, the terrain tile 
+heightmap size will be 1025.
+Scale 4X: further terrain density upscale. Mainly used to create smooth terrains with 
+low MapMagic resolution. Slowest apply time.
+Note that the maximum terrain resolution Unity supports is 2049. This way the 
+maximum MapMagic resolution for Scale 2X would be 1025, and for Scale 4X - 
+513.
+Out level: selects whether this output should be applied to main or draft detail level.
+Draft: applied only for draft (preview) terrains. Useful if you have the other output with 
+more complex graph thread that is applied to main terrain level.
+Main: applied for main high-resolution chunks only. Some outputs like Grass do not 
+need their eﬀect to be applied for draft tiles, so it's recommended to use them in Main 
+output level.
+Both: the output is applied both for draft and main tiles.
+Textures
+ 
+
+
+===== PAGE 45 =====
+Applies the terrain texturing information, i.e. colors the terrain with textures.
+Note that Textures Output has a normalizer built-in. It blends layers and normalizes them so that 
+their sum is always 1. This way the layers order matters - each upper layer will overlap the 
+bottom ones. Consider layer masks as Photoshop layers masks.
+The Background layer does not require an input since it is regarded as completely ﬁlled (a 
+constant of 1). 
+To use the Textures Output you've got to create the Terrain Layer asset ﬁles: Assets -> Create -> 
+Terrain Layer. Then these assets should be assigned in Textures Output in Layer slot.
+Main Properties:
+ 
+Opacity: the visibility factor of this layer
+Layer: Terrain Layer asset
+Properties:
+ 
+Clicking on the properties tab will open up the layer settings so that layer parameters could be 
+modiﬁed without opening up the layers asset. 
+Note that changing these values will change terrain layer asset
+Diﬀuse: base color Texture of the Terrain Layer
+Normal: normal information for your Terrain Layer
+Mask: The TerrainLit Shader, which is part of the High Deﬁnition Render Pipeline (HDRP) and 
+Universal Render Pipeline (URP), uses this Mask Map Texture data. Custom Terrain shaders 
+might also use this Texture for user-deﬁned purposes, such as ambient occlusion or height-
+based blending.
+Specular: The specular highlight color of the Terrain Layer.
+Metallic: The overall metallic value of the Terrain Layer.
+
+
+===== PAGE 46 =====
+N. Scale: Normal Scale of the Terrain Layer. This value acts as a scaling factor for the normal 
+values present in the Normal Map.
+See  Terrain Layer documentation for more detail.
+Tile Settings:
+ 
+Size: the size of the texture tile, in world units. The bigger the value - the bigger the pixels of 
+the terrain tile are.
+Note that due to better terrain welding splat prototypes the size parameter should be a 
+multiple of the size of the terrain: if the terrain size is 1000 the proper terrain sizes are 10, 
+20, or 100. But with the tile size of 15 you'll get texture seams between tiles.
+Oﬀset: the oﬀset of the terrain tile, in world units.
+Grass
+ 
+Output generator, paints grass on terrain using layer's maps as a mask. This generator can place 
+detail meshes as well.
+Properties:
+ 
+
+
+===== PAGE 47 =====
+The grass layer parameters are similar to the standard terrain grass and detail properties
+Mode: determines whether it will be a standard grass, a billboard grass or a detail mesh
+Grass is the default method to display grass using the static planes.
+Billboard grass images will rotate so that they always face the camera.
+Mesh Vertex Lit mode is used to place a detail meshes (does not support opacity).
+Mesh Unlit mode is used to place custom unlit grass bushes with opacity.
+Mode: Grass, Billboard, Mesh Vertex Lit, Mesh Unlit
+Texture ﬁeld (for the grass modes): a grass albedo (diﬀuse) texture
+Object ﬁeld (for the mesh unlit/vertex lit mode): a detail mesh prefab
+Density: number of objects for current grass type
+Density: 0.1, 0.3, 1, 2
+Dry/Healthy colors: The alternating patches of grass are considered more 'healthy' at the 
+centers than at the edges and the Healthy/Dry Color settings show the health of grass 
+clumps by their color. (Tech note: the noise is actually generated using Perlin noise; the 
+noise spread refers to the scaling applied between the x, y position on the terrain and the 
+noise image.)
+White dry yellow healthy,  red dry yellow healthy,  red dry green healthy
+Width and Height values specify the upper and lower limits of the size of the clumps of 
+grass that are generated.
+
+
+===== PAGE 48 =====
+Height: 1-1,  Width: 1-1,  2-2,  3-3,  1-3
+The Noise spread value controls the approximate size of the alternating patches, with 
+higher values indicating more variation within a given area. (Tech note: the noise is actually 
+generated using Perlin noise; the noise spread refers to the scaling applied between the x,y 
+position on the terrain and the noise image.)
+Dry/Health colors spread with diﬀerent noise values: 0.02, 0.1, 0.2, 1
+Out level: selects whether this output should be applied to main or draft detail level.
+Draft: applied only for draft (preview) terrains. Useful if you have the other output with more 
+complex graph thread that is applied to main terrain level.
+Main: applied for main high-resolution chunks only. Some outputs like Grass do not need 
+their eﬀect to be applied for draft tiles, so it's recommended to use them in Main output 
+level.
+Both: the output is applied both for draft and main tiles.

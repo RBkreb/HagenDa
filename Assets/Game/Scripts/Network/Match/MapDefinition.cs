@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace HagenDa.Networking
 {
-    public enum MapKind { Procedural = 0, SceneReference = 1 }
+    public enum MapKind { Procedural = 0, SceneReference = 1, MapMagic = 2 }
 
     /// <summary>地图锚点角色:GR ×2 / 据点 ×N / 真人出生点。</summary>
     public enum AnchorRole { GarrisonRed = 0, GarrisonBlue = 1, CapturePoint = 2, PlayerSpawn = 3 }
@@ -63,11 +63,19 @@ namespace HagenDa.Networking
     ///  - <see cref="MapKind.SceneReference"/>:引用 FBX 导入的地图根
     ///    (如 HGTR_map / Map_v1),按 ceilingKeyword 归层,锚点按
     ///    标记物名或坐标解析。
+    ///
+    ///  - <see cref="MapKind.MapMagic"/>:地形由 <see cref="MapGenConfig"/> +
+    ///    MapMagic 流水线预先烘焙到本场景(菜单 HagenDa/MapMagic),本资产只负责
+    ///    锚点与对局规则;锚点以 <see cref="mapGen"/> 内的锚点为准。
     /// </summary>
     [CreateAssetMenu(menuName = "HagenDa/Map Definition", fileName = "MapDefinition")]
     public class MapDefinition : ScriptableObject
     {
         public MapKind kind = MapKind.Procedural;
+
+        [Header("MapMagic")]
+        [Tooltip("MapKind.MapMagic 时的生成参数;锚点也从这里读(保证与地形平台一致)。")]
+        public MapGenConfig mapGen;
 
         [Header("Procedural")]
         [Tooltip("X 方向宽度 (m)。")]

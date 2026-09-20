@@ -46,6 +46,7 @@ namespace HagenDa.Networking.EditorTools
             }
 
             bool procedural = map.kind == MapKind.Procedural;
+            bool mapMagic = map.kind == MapKind.MapMagic;
             var active = SceneManager.GetActiveScene();
             if (active.isDirty)
             {
@@ -81,6 +82,8 @@ namespace HagenDa.Networking.EditorTools
             float sizeX = map.sizeX, sizeZ = map.sizeZ, wallHeight = map.wallHeight;
             int coverCount = map.coverCount, coverSeed = map.coverSeed;
             float coverMinGap = map.coverMinGap;
+            // MapMagic 地图的锚点是权威来源:地形平台就是按它们压平的,
+            // 若改用 MapDefinition.anchors 会与地形对不上。
             var resolved = ResolveAnchors(map);   // 纯托管 MapAnchor 克隆
 
             string scenePath;
@@ -99,15 +102,37 @@ namespace HagenDa.Networking.EditorTools
                     Debug.LogError("[MatchBuilder] 当前场景未保存,无法作为 SceneReference 构建目标。");
                     return;
                 }
-                foreach (var root in map.mapRootNames)
+
+                if (mapMagic)
                 {
-                    if (string.IsNullOrEmpty(root)) continue;
-                    if (GameObject.Find(root) == null)
+                    // MapMagic 地图:地形已由 HagenDa/MapMagic 流水线烘焙进本场景,
+                    // 这里只补对局实体,所以必须先在正确的场景里。
+                    if (map.mapGen == null)
                     {
-                        Debug.LogError($"[MatchBuilder] 当前场景找不到地图根 '{root}',请先导入地图。");
+                        Debug.LogError($"[MatchBuilder] MapDefinition '{map.name}' 是 MapMagic 类型" +
+                                       "但没有引用 MapGenConfig。");
+                        return;
+                    }
+                    if (GameObject.Find(MapMagicGraphBuilder.MapMagicObjectName) == null)
+                    {
+                        Debug.LogError("[MatchBuilder] 当前场景找不到 MapMagic 地形。" +
+                                       "请先在该场景执行 HagenDa/MapMagic/Build。");
                         return;
                     }
                 }
+                else
+                {
+                    foreach (var root in map.mapRootNames)
+                    {
+                        if (string.IsNullOrEmpty(root)) continue;
+                        if (GameObject.Find(root) == null)
+                        {
+                            Debug.LogError($"[MatchBuilder] 当前场景找不到地图根 '{root}',请先导入地图。");
+                            return;
+                        }
+                    }
+                }
+
                 scene = active;
                 scenePath = active.path;
             }
@@ -129,9 +154,11 @@ namespace HagenDa.Networking.EditorTools
             GameObject fsmPrefab = NetworkSetup.BuildFSMAIPrefab(aiPrefab);
 
             // 幂等清理(Procedural 每次全新场景,无需清理)。
+            // MapMagic 场景要保住流水线生成的掩体场与装饰,只清对局实体。
             if (!procedural)
             {
-                ClearMatchObjects();
+                if (mapMagic) NetworkSetup.ClearOld("FreeCamera", "BattleCamera", "PlayerStart");
+                else ClearMatchObjects();
                 NetworkSetup.ClearAllFSMEntities();
             }
 
@@ -146,12 +173,16 @@ namespace HagenDa.Networking.EditorTools
             // 应用地图几何 / 归层。
             if (procedural)
                 BuildProceduralGeometry(sizeX, sizeZ, wallHeight, coverCount, coverSeed, coverMinGap, resolved);
-            else ApplySceneReferenceLayers(map);
+            else if (!mapMagic)
+                ApplySceneReferenceLayers(map);
 
             // 地图 AABB(相机 / LLM 指挥官 overlay 用)。
             Bounds mapBounds;
             if (procedural)
                 mapBounds = new Bounds(Vector3.zero, new Vector3(sizeX, 0f, sizeZ));
+            else if (mapMagic)
+                mapBounds = new Bounds(Vector3.zero,
+                    new Vector3(map.mapGen.sizeX, map.mapGen.heightMax, map.mapGen.sizeZ));
             else if (!MapLayers.TryGetMapBounds(out mapBounds))
                 mapBounds = new Bounds(Vector3.zero, new Vector3(sizeX, 0f, sizeZ));
 
@@ -232,6 +263,7 @@ namespace HagenDa.Networking.EditorTools
 
             // ---- NavMesh(必须先于 AI 生成) ----
             if (procedural) NetworkSetup.BuildNavMeshForFloor();
+            else if (mapMagic) { /* NavMesh 已由 HagenDa/MapMagic 流水线烘好 */ }
             else if (map.mapRootNames.Length > 0)
                 NetworkSetup.BuildNavMeshForMapRoot(map.mapRootNames[0]);
 
@@ -255,8 +287,13 @@ namespace HagenDa.Networking.EditorTools
         /// <summary>按 AnchorResolve 模式解析全部锚点为世界坐标副本。</summary>
         private static List<MapAnchor> ResolveAnchors(MapDefinition map)
         {
+            // MapMagic 地图:锚点存在 MapGenConfig 里(地形平台按它们压平)。
+            IList<MapAnchor> source = map.kind == MapKind.MapMagic && map.mapGen != null
+                ? (IList<MapAnchor>)map.mapGen.anchors
+                : map.anchors;
+
             var list = new List<MapAnchor>();
-            foreach (var a in map.anchors)
+            foreach (var a in source)
             {
                 var copy = new MapAnchor
                 {

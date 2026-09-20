@@ -1,0 +1,29 @@
+{
+    "name": "HagenDa.Game.Editor.Network",
+    "rootNamespace": "",
+    "references": [
+        "HagenDa.Game",
+        "Mirror",
+        "Mirror.Components",
+        "Mirror.Transports",
+        "kcp2k",
+        "Unity.ML-Agents",
+        "Unity.Animation.Rigging",
+        "Unity.AI.Navigation",
+        "Unity.InputSystem",
+        "UnityEngine.UI",
+        "MapMagic",
+        "Den.Tools"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 44922613609374066}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.2, y: 0, z: 0.6}
+  m_LocalPosition: {x: -0.4, y: 0, z: 0.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2012,7 +2012,7 @@ Transform:
   m_GameObject: {fileID: 3978784386096491390}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2, y: 0, z: 0.6}
+  m_LocalPosition: {x: 0.4, y: 0, z: 0.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3079,9 +3079,9 @@ MonoBehaviour:
   headPitchEnabled: 1
   headPitchWeight: 1
   headPitchLimits: {x: -80, y: 80}
-  kneeOutwardCorrect: 1
-  kneeOutwardDeg: 2
-  kneeOutwardSmooth: 8
+  kneeOutwardCorrect: 0
+  kneeOutwardDeg: 0
+  kneeOutwardSmooth: 4
   animator: {fileID: 0}
   rigBuilder: {fileID: 0}
   upperAim: {fileID: 0}
@@ -3100,6 +3100,7 @@ MonoBehaviour:
   footHintR: {fileID: 0}
   driverAimSource: {fileID: 0}
   driverAimTarget: {fileID: 0}
+  gunAimTarget: {fileID: 0}
   headBone: {fileID: 0}
   headPitchBone: {fileID: 0}
   aimSourceHead: {fileID: 0}

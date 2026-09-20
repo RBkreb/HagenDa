@@ -26,6 +26,12 @@ Assets/NatureManufacture Assets/
 .zcode/
 MapSource/
 
+# Unity-generated solution/project files (recreated by the editor on open;
+# assembly layout is defined by the .asmdef files, not by these)
+*.csproj
+*.unityproj
+*.sln
+
 # OS
 .DS_Store
 Thumbs.db

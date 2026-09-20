@@ -1,0 +1,21 @@
+{
+    "name": "HagenDa.Game",
+    "rootNamespace": "",
+    "references": [
+        "Mirror",
+        "Unity.Animation.Rigging",
+        "Unity.Collections",
+        "Unity.InputSystem",
+        "UnityEngine.UI",
+        "Unity.ML-Agents"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,118 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5389c69776d69ce4480dc0a1d3ad438e, type: 3}
+  m_Name: MapGenConfig_Map
+  m_EditorClassIdentifier: 
+  kind: 2
+  mapGen: {fileID: 11400000, guid: f684f47ed09de034f905314c70266a9c, type: 2}
+  sizeX: 500
+  sizeZ: 500
+  wallHeight: 6
+  coverCount: 64
+  coverSeed: 20260825
+  coverMinGap: 5
+  mapRootNames: []
+  ceilingKeyword: ceiling
+  doubleSidedMaterials: 1
+  anchorResolve: 1
+  anchors:
+  - role: 0
+    letter: A
+    markerName: 
+    position: {x: -125, y: 0, z: -125}
+    radius: 70
+    extent: {x: 0, y: 0}
+    deployPointCount: 8
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 1
+    letter: A
+    markerName: 
+    position: {x: 125, y: 0, z: 125}
+    radius: 70
+    extent: {x: 0, y: 0}
+    deployPointCount: 8
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 2
+    letter: A
+    markerName: 
+    position: {x: 0, y: 0, z: 110}
+    radius: 30
+    extent: {x: 0, y: 0}
+    deployPointCount: 6
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 2
+    letter: B
+    markerName: 
+    position: {x: -97.75, y: 0, z: -63.25}
+    radius: 30
+    extent: {x: 0, y: 0}
+    deployPointCount: 6
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 2
+    letter: C
+    markerName: 
+    position: {x: 97.75, y: 0, z: -63.25}
+    radius: 30
+    extent: {x: 0, y: 0}
+    deployPointCount: 6
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 3
+    letter: A
+    markerName: SpawnRed
+    position: {x: -125, y: 0, z: -125}
+    radius: 56
+    extent: {x: 0, y: 0}
+    deployPointCount: 30
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
+  - role: 3
+    letter: A
+    markerName: SpawnBlue
+    position: {x: 125, y: 0, z: 125}
+    radius: 56
+    extent: {x: 0, y: 0}
+    deployPointCount: 30
+    moving: 0
+    waypoints: []
+    moveSpeed: 3
+    dwellSeconds: 0
+    pingPong: 1
+    startDelay: 5
